@@ -33,6 +33,10 @@ export default function ControllerTextField<T extends FieldValues>({
           slotProps={{
             input: {
               size: 'medium',
+              sx: {
+                bgcolor: '#fff',
+                borderRadius: 8
+              },
               startAdornment: PrefixIcon ? <PrefixIcon color='action' sx={{ mr: 1 }} /> : null,
               ...textFieldProps?.slotProps?.input,
             },
