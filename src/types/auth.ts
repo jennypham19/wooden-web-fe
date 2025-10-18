@@ -1,4 +1,5 @@
 import { HttpResponse } from './common';
+import { IUser } from './user';
 
 export type LoginRequest = {
   email: string;
@@ -8,6 +9,7 @@ export type LoginRequest = {
 export type LoginResponse = {
   accessToken: string;
   refreshToken: string;
+  user: IUser
 };
 
 export type ResetPasswordRequest = {

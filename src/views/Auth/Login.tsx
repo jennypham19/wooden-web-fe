@@ -28,7 +28,7 @@ import { getCurrentUser } from '@/services/user-service';
 import { setIsAuth } from '@/slices/auth';
 import { setProfile } from '@/slices/user';
 import { useAppDispatch } from '@/store';
-import { setStorageToken } from '@/utils/AuthHelper';
+import { setAccessToken } from '@/utils/AuthHelper';
 import Logger from '@/utils/Logger';
 import Grid from "@mui/material/Grid2";
 import logo_auth from "@/assets/images/users/logo-auth.png"
@@ -69,31 +69,34 @@ export default function Login() {
         email: values.email,
         password: values.password,
       });
+      const accessToken = respAuth.data?.accessToken;
+      const userProfile = respAuth.data?.user;
+      if (accessToken && userProfile) {
+        setAccessToken(accessToken);
 
-      if (respAuth.data?.accessToken) {
-        setStorageToken(remember)
-          .accessToken(respAuth.data.accessToken)
-          .refreshToken(respAuth.data.refreshToken);
-        const respUser = await getCurrentUser();
-        dispatch(setProfile(respUser.data));
-        dispatch(setIsAuth(true));
-        setError('');
+        // Xét trường is_change_type
+        if(userProfile.isReset){
+          // localStorage.setItem(ID_USER, String(userProfile.id));
+          navigate(`/${ROUTE_PATH.AUTH}/${ROUTE_PATH.CHANGE_PASSWORD}`)
+        }else{
+          // 3. Cập nhật state của Redux/Context
+          // Thông tin user đã có sẵn từ response login, không cần gọi /me nữa
+          dispatch(setProfile(userProfile));
+          dispatch(setIsAuth(true));
+        }
+
+        // 4. Thông báo và chuyển hướng
         notify({
           message: t('login_success'),
           severity: 'success',
         });
-        let route = ROUTE_PATH.HOME;
-        if (!_.isNull(location.state) && location.state !== ROUTE_PATH.LOGIN) {
-          route = location.state;
-        }
-        navigate(route);
+
+        navigate(ROUTE_PATH.MANAGE, { replace: true });     
       } else {
-        setFocus('email');
-        setError(respAuth.message);
-        throw new Error(respAuth.message);
+        setError(respAuth.message || 'Login failed, no access token returned.');
       }
     } catch (error: any) {
-      Logger.log(error);
+      setError(error.message)
     } finally {
       setLoading.off();
     }
@@ -103,7 +106,7 @@ export default function Login() {
     <Page title='Wooden website'>
       <Grid container sx={{ height: '100vh', bgcolor: '#FFFAE4' }}>
         <Grid size={{ xs: 12, md: 6 }} sx={{ height: '100%', display: 'flex',alignItems: 'center', justifyContent: 'center',}}>
-          <Box sx={{ flexDirection: 'column', margin: 'auto 0', width: '50%'}}>
+          <Box sx={{ flexDirection: 'column', margin: 'auto 0', width: '50%m run '}}>
             <Box>
               <Typography
                 component='h1'

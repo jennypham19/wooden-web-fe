@@ -12,3 +12,12 @@ export const prepareRealPath = (
 
   return path;
 };
+
+//Get url image
+const apiBaseUrl = import.meta.env.MODE === 'development' ? import.meta.env.VITE_API_BASE_URL : '';
+export function getPathImage(path: string) : string {
+  if(!path){
+    return ""
+  }
+  return `${apiBaseUrl.replace(/\/$/, '')}${path}`
+}

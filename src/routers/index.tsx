@@ -14,6 +14,8 @@ import ChangePassword from '@/views/Auth/ChangePassword';
 import ForgotPassword from '@/views/Auth/ForgotPassword';
 import Login from '@/views/Auth/Login';
 import Registration from '@/views/Auth/Registration';
+import AuthGuard from '@/components/AuthGuard';
+import manageRoutes from './Manage';
 
 // Home
 const Home = Loadable(lazy(() => import('@/views/Home')));
@@ -25,28 +27,33 @@ const PermissionDenied = Loadable(lazy(() => import('@/views/Errors/PermissionDe
 // Auth
 
 const routes: RouteObject[] = [
+   // --- NHÁNH 1: CÁC TRANG ĐƯỢC BẢO VỆ (PRIVATE) ---
   {
-    path: '/',
-    element: (
-      <ProtectedRoute>
-        <DashboardLayout />
-      </ProtectedRoute>
-    ),
-    children: [{ index: true, element: <Home /> }, Customers],
+    path: '/manage',
+    element: <AuthGuard/>,
+    children: [
+      {
+        element: <DashboardLayout/>,
+        children: manageRoutes
+      }
+    ]
   },
+
+  // --- NHÁNH 2: CÁC TRANG XÁC THỰC (CHỈ DÀNH CHO NGƯỜI CHƯA ĐĂNG NHẬP) ---
   {
     path: 'auth',
-    element: (
-      <PublicRoute>
-        <AuthLayout />
-      </PublicRoute>
-    ),
+    element: <PublicRoute/>,
     children: [
-      { index: true, element: <Navigate to={'login'} replace /> },
-      { path: 'login', element: <Login /> },
-      { path: 'registration', element: <Registration /> },
-      { path: 'forgot-password', element: <ForgotPassword /> },
-      { path: 'change-password', element: <ChangePassword /> },
+      {
+        element: <AuthLayout/>,
+        children: [
+          { index: true, element: <Navigate to={'login'} replace /> },
+          { path: 'login', element: <Login /> },
+          { path: 'registration', element: <Registration /> },
+          { path: 'forgot-password', element: <ForgotPassword /> },
+          { path: 'change-password', element: <ChangePassword /> },
+        ]
+      },
     ],
   },
   {

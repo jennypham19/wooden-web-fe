@@ -26,6 +26,7 @@ dist-ssr
 *.sw?
 
 # Env
+.env
 .env.development
 .env.production
 .env.staging

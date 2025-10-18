@@ -2,115 +2,116 @@ import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } fro
 import axios from 'axios';
 import qs from 'qs';
 
-import { getStorageToken, parsedToken, setStorageToken } from './AuthHelper';
 import DateTime from './DateTime';
 
 import { __BASEURL__ } from '@/config';
-import { ACCESS_TOKEN } from '@/constants/auth';
+import { getAccessToken, removeAccessToken, setAccessToken } from './AuthHelper';
 
-const accessToken = parsedToken(ACCESS_TOKEN);
-
+const accessToken = getAccessToken();
 const config: AxiosRequestConfig = {
   baseURL: __BASEURL__,
   headers: {
-    'Content-Type': 'application/json',
+    // 'Content-Type': 'application/json',
     TimeZone: DateTime.TimeZone(),
     ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
   },
+  withCredentials: true,
   timeout: 10 * 60 * 1000,
   paramsSerializer: (params) => qs.stringify(params, { skipNulls: true }),
 };
 
 class Axios {
-  private isRefreshing = false;
   private instance: AxiosInstance;
-  private failedQueue: Array<{ resolve: Function; reject: Function }> = [];
-  private setLogout: (() => void) | null = null;
+  private isRefreshing = false;
+  private failedQueue: Array<{ resolve: (token: string) => void; reject: (error: AxiosError) => void }> = [];
 
   constructor() {
     const instance = axios.create(config);
+    this.setupInterceptors(instance);
+    this.instance = instance;
+  }
 
-    // Request interceptor
+  private setupInterceptors(instance: AxiosInstance) {
+    // Request Interceptor: Tự động gắn access token vào mỗi request
     instance.interceptors.request.use(
       (config) => {
-        const accessToken = parsedToken(ACCESS_TOKEN);
-        if (accessToken) {
-          config.headers.Authorization = `Bearer ${accessToken}`;
+        const token = getAccessToken();
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
       },
       (error) => Promise.reject(error),
     );
 
-    // Response interceptor
+    // Response Interceptor: Xử lý khi token hết hạn
     instance.interceptors.response.use(
-      (response: AxiosResponse) => response,
-      (error: AxiosError) => {
-        const { response } = error;
+      (response) => response,
+      async (error: AxiosError) => {
+        const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
 
-        if (response?.status === 401 && !this.isRefreshing) {
-          return this.handleTokenRefresh(error);
+        // Chỉ xử lý lỗi 401 Unauthorized và đảm bảo không bị lặp vô hạn
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          if (this.isRefreshing) {
+            // Nếu đang có một tiến trình refresh token khác chạy, đẩy request này vào hàng đợi
+            return new Promise((resolve, reject) => {
+              this.failedQueue.push({ resolve, reject });
+            }).then(token => {
+              originalRequest.headers!.Authorization = `Bearer ${token}`;
+              return instance(originalRequest);
+            });
+          }
+
+          originalRequest._retry = true;
+          this.isRefreshing = true;
+
+          try {
+            // Gọi API refresh token
+            const { data } = await axios.post(import.meta.env.VITE_API_BASE_URL +'/api/auth/refresh-token');
+            
+            const newAccessToken = data.data.accessToken;
+
+            // Cập nhật token mới vào storage
+            setAccessToken(newAccessToken);
+            
+            // Xử lý các request trong hàng đợi với token mới
+            this.processQueue(null, newAccessToken);
+            
+            // Thực hiện lại request gốc đã thất bại
+            originalRequest.headers!.Authorization = `Bearer ${newAccessToken}`;
+            return instance(originalRequest);
+
+          } catch (refreshError) {
+            this.processQueue(refreshError as AxiosError, null);
+            
+            // Nếu refresh token thất bại, xóa token cũ và logout
+            console.error('Session expired, logging out.', refreshError);
+            removeAccessToken();
+            // Chuyển hướng về trang đăng nhập
+            // Cách tốt nhất là dispatch một action logout ở đây
+            window.location.href = '/auth/login'; 
+            
+            return Promise.reject(refreshError);
+          } finally {
+            this.isRefreshing = false;
+          }
         }
-        throw error;
-      },
-    );
-
-    this.instance = instance;
-  }
-
-  async handleTokenRefresh(error: AxiosError) {
-    const originalRequest = error.config;
-
-    if (!originalRequest) {
-      return Promise.reject(error);
-    }
-
-    if (!this.isRefreshing) {
-      this.isRefreshing = true;
-
-      try {
-        const refreshToken = getStorageToken.refreshToken;
-        const result = await axios.post(import.meta.env.VITE_BASE_URL, {
-          headers: {
-            Authorization: `Bearer ` + refreshToken,
-          },
-        });
-        const { data } = result.data;
-        setStorageToken().accessToken(data.accessToken);
-        const newToken = data.accessToken;
-
-        if (newToken) {
-          originalRequest.headers.Authorization = `Bearer ${newToken}`;
-
-          // Retry the failed requests
-          this.failedQueue.forEach((req) => req.resolve(newToken));
-          this.failedQueue = [];
-
-          return this.instance(originalRequest);
-        }
-      } catch (refreshError) {
-        this.failedQueue.forEach((req) => req.reject(refreshError));
-        this.failedQueue = [];
-
-        //call logout
-        if (this.setLogout) {
-          this.setLogout();
-        }
-
-        throw refreshError;
-      } finally {
-        this.isRefreshing = false;
+        
+        // Trả về lỗi cho các trường hợp khác (ví dụ: 403, 404, 500)
+        return Promise.reject(error.response?.data);
       }
-    } else {
-      return new Promise((resolve, reject) => {
-        this.failedQueue.push({ resolve, reject });
-      }).then((token: any) => {
-        if (originalRequest) {
-          originalRequest.headers.Authorization = `Bearer ${token.access_token}`;
-          return this.instance(originalRequest);
-        }
-      });
-    }
+    );
+  }
+  
+  private processQueue(error: AxiosError | null, token: string | null = null) {
+    this.failedQueue.forEach(prom => {
+      if (error) {
+        prom.reject(error);
+      } else {
+        prom.resolve(token!);
+      }
+    });
+    this.failedQueue = [];
   }
 
   public get Instance(): AxiosInstance {
@@ -130,7 +131,9 @@ class Axios {
     return new Promise((resolve, reject) => {
       this.Instance.post<D, AxiosResponse<R>>(url, data, rest)
         .then((response) => resolve(integrity ? response : response.data))
-        .catch((error: AxiosError) => reject(error.response?.data));
+        .catch((error: AxiosError) => {
+          reject(error.response?.data || error)
+        });
     });
   }
 
@@ -140,7 +143,7 @@ class Axios {
       this.Instance.get<T, AxiosResponse<R>, D>(url, config)
         .then((response) => resolve(response.data))
         .catch((error: AxiosError) => {
-          reject(error.response?.data);
+          reject(error.response?.data || error);
         });
     });
   }
@@ -150,7 +153,7 @@ class Axios {
     return new Promise((resolve, reject) => {
       this.Instance.put<D, AxiosResponse<R>>(url, data, config)
         .then((response) => resolve(response.data))
-        .catch((error: AxiosError) => reject(error.response?.data));
+        .catch((error: AxiosError) => reject(error.response?.data || error));
     });
   }
 
@@ -162,7 +165,7 @@ class Axios {
     return new Promise((resolve, reject) => {
       this.Instance.patch<D, AxiosResponse<R>>(url, data, config)
         .then((response) => resolve(response.data))
-        .catch((error: AxiosError) => reject(error.response?.data));
+        .catch((error: AxiosError) => reject(error.response?.data || error));
     });
   }
 
@@ -171,7 +174,7 @@ class Axios {
     return new Promise((resolve, reject) => {
       this.Instance.delete<D, AxiosResponse<R>>(url, config)
         .then((response) => resolve(response.data))
-        .catch((error: AxiosError) => reject(error.response?.data));
+        .catch((error: AxiosError) => reject(error.response?.data || error));
     });
   }
 }

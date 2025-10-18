@@ -34,6 +34,7 @@ import useDerivedState from '@/hooks/useDerivedState';
 import usePrevious from '@/hooks/usePrevious';
 import { useAppSelector } from '@/store';
 import type { MouseEvent } from '@/types/react';
+import ProfileSection from './ProfileSection';
 
 export const CollapseContext = createContext<boolean | null>(null);
 export const SidebarContext = createContext<boolean | null>(null);
@@ -47,8 +48,7 @@ interface Props {
 const Sidebar = (props: Props) => {
   const { openSidebar, collapsed, onCloseSidebar, onToggleCollapsed } = props;
   const { pathname } = useLocation();
-  const { t } = useTranslation('section');
-  const sections = useMemo(() => Sections(t), [t]);
+  const sections = useMemo(() => Sections(), []);
   const theme = useTheme();
   const prevPathName = usePrevious(pathname);
 
@@ -79,6 +79,7 @@ const Sidebar = (props: Props) => {
               >
                 <Logo />
               </Box>
+              {!collapsed && <ProfileSection/>}
               {sections.map((section, i) => (
                 <MenuSection key={i} pathname={pathname} {...section} />
               ))}

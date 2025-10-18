@@ -18,34 +18,17 @@ interface Section {
   items: SectionItem[];
 }
 
-const Sections = (t: TFunction): Section[] => {
-  return AdminSections(t);
+const Sections = (): Section[] => {
+  return AdminSections();
 };
-const AdminSections = (t: TFunction): Section[] => [
+const AdminSections = (): Section[] => [
   {
     section: null,
     items: [
       {
-        title: t('home'),
-        path: ROUTE_PATH.HOME,
+        title: 'Dashboard quản lý',
+        path: `${ROUTE_PATH.MANAGE_HOME}`,
         icon: HomeOutlined,
-      },
-    ],
-  },
-  {
-    section: null,
-    items: [
-      {
-        title: t('customer'),
-        path: ROUTE_PATH.CUSTOMERS,
-        icon: PeopleOutlined,
-        children: [
-          {
-            title: t('customer'),
-            icon: PeopleOutline,
-            path: ROUTE_PATH.CUSTOMERS_LIST,
-          },
-        ],
       },
     ],
   },
