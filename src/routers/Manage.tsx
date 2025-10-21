@@ -7,6 +7,8 @@ const Home = Loadable(lazy(() => import('@/views/Manage/Home/index')));
 const Account = Loadable(lazy(() => import('@/views/Manage/Account/index')));
 const Information = Loadable(lazy(() => import('@/views/Manage/Information/index')));
 const Job = Loadable(lazy(() => import('@/views/Manage/Job/index')));
+const Action = Loadable(lazy(() => import('@/views/Manage/Permission/Action/index')));
+const Menu = Loadable(lazy(() => import('@/views/Manage/Permission/Menu/index')));
 
 const manageRoutes: RouteObject[] = [
     { index: true, element: <Navigate to={ROUTE_PATH.MANAGE_HOME} replace/>},
@@ -14,6 +16,8 @@ const manageRoutes: RouteObject[] = [
     { path: ROUTE_PATH.MANAGE_DECENTRALIZATION_ACCOUNT, element: <Account/>},
     { path: ROUTE_PATH.MANAGE_JOB, element: <Job/>},
     { path: ROUTE_PATH.MANAGE_INFORMATION, element: <Information/>},
+    { path: ROUTE_PATH.MANAGE_ACTION, element: <Action/>},
+    { path: ROUTE_PATH.MANAGE_MENU, element: <Menu/>},
 ];
 
 export default manageRoutes;

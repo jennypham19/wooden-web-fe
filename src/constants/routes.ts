@@ -9,7 +9,6 @@ export const ROUTE_PATH = {
   MANAGE_DECENTRALIZATION_ACCOUNT: 'decentralization_account',
   MANAGE_JOB: 'job',
   MANAGE_INFORMATION: 'information',
-  MANAGE_PACKAGE: 'package',
   MANAGE_ACTION: 'action',
   MANAGE_MENU: 'menu',
 

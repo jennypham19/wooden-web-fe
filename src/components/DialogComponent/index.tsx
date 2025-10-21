@@ -1,6 +1,4 @@
 import { ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
-
 import { Box, DialogProps } from '@mui/material';
 import ActionButton from '@/components/ProButton/ActionButton';
 import DialogContainer from '@/components/ProDialog/DialogContainer';
@@ -16,6 +14,12 @@ interface Props extends Omit<DialogProps, 'open' | 'fullScreen'> {
   dialogContentHeight?: string | number;
   showSaveButton?: boolean;
   customButtons?: ReactNode;
+  hasError?: boolean,
+  isActiveFooter?:boolean,
+  isCenter?:boolean,
+  isActiveHeader?:boolean,
+  maxWidth?: any,
+  toolTip?: string,
 }
 
 const DialogComponent = ({
@@ -26,21 +30,29 @@ const DialogComponent = ({
   dialogContentHeight = 500,
   showSaveButton = false,
   customButtons,
+  hasError,
+  isActiveFooter = true,
+  isCenter=true,
+  isActiveHeader=true,
+  maxWidth,
+  toolTip = dialogTitle,
   ...rest
 }: Props) => {
-  const { t } = useTranslation('common', { keyPrefix: 'actions' });
   return (
-    <DialogContainer {...rest} open={!!dialogKey} onClose={handleClose}>
-      <DialogHeader title={dialogTitle || ''} marginTop={2} />
-      <DialogContent>
-        <Box sx={{ height: dialogContentHeight, padding: 2 }}>{children}</Box>
+    <DialogContainer {...rest} open={!!dialogKey} onClose={handleClose} maxWidth={maxWidth}>
+      {isActiveHeader && <DialogHeader toolTip={toolTip} onClose={handleClose} title={dialogTitle || ''} marginTop={2} />}
+      <DialogContent sx={{ textAlign: isCenter ? "" : "center", maxHeight: 'fit-content'}}>
+        <Box sx={{ padding: 2 }}>{children}</Box>
       </DialogContent>
-      <DialogFooter>
-        <ActionButton actionType='cancel' onClick={handleClose}>
-          {t('cancel')}
-        </ActionButton>
-        {customButtons}
-      </DialogFooter>
+      {isActiveFooter && (
+        <DialogFooter>
+          {customButtons}
+          <ActionButton actionType='cancel' onClick={handleClose}>
+            Hủy
+          </ActionButton>
+        </DialogFooter>        
+      )}
+
     </DialogContainer>
   );
 };

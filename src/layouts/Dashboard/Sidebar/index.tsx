@@ -71,14 +71,6 @@ const Sidebar = (props: Props) => {
         <SidebarContext.Provider value={openSidebar}>
           <CollapseContext.Provider value={collapsed}>
             <Scrollbar>
-              <Box
-                sx={{
-                  borderBottom: 'thin solid #E6E8F0',
-                  height: '64px',
-                }}
-              >
-                <Logo />
-              </Box>
               {!collapsed && <ProfileSection/>}
               {sections.map((section, i) => (
                 <MenuSection key={i} pathname={pathname} {...section} />
@@ -170,7 +162,7 @@ interface MenuItemsProps {
 }
 const MenuItems = (props: MenuItemsProps) => {
   const { items, pathname, level } = props;
-
+  
   return (
     <List disablePadding>
       {items.reduce<ReactNode[]>((acc, item, i) => {
@@ -178,7 +170,7 @@ const MenuItems = (props: MenuItemsProps) => {
         const key = `${title}-${level}-${i}`;
         // const partialMatch = pathname.startsWith(path);
         const exactMatch = pathname === path || pathname.startsWith(`${path}/`);
-
+        
         if (children) {
           acc.push(
             <MenuItem
@@ -340,7 +332,7 @@ const MenuItem: FC<MenuItemProps> = (props) => {
           size='medium'
           fullWidth
           sx={{
-            color: 'neutral.800',
+            color: '#416327',
             p: 1.25,
             pl: `${paddingLeft}px`,
             textAlign: 'left',
@@ -359,6 +351,7 @@ const MenuItem: FC<MenuItemProps> = (props) => {
               whiteSpace: 'nowrap',
               '& .MuiTypography-root': {
                 fontSize: '14px',
+                fontWeight: 700,
               },
             }}
           />
@@ -391,15 +384,18 @@ const MenuItem: FC<MenuItemProps> = (props) => {
         size='medium'
         fullWidth
         sx={{
-          color: 'neutral.800',
+          color: '#416327',
           p: 1.25,
           pl: `${paddingLeft}px`,
           '&:hover': {
-            bgcolor: alpha('#000', 0.08),
+            color: '#FFF',
+            bgcolor: '#416327',
+            borderRadius: 8
           },
           ...(active && {
-            color: 'info.main',
-            bgcolor: '#e6f4ff',
+            color: '#FFF',
+            bgcolor: '#416327',
+            borderRadius: 8
           }),
           flexShrink: 0,
         }}
@@ -414,6 +410,7 @@ const MenuItem: FC<MenuItemProps> = (props) => {
             '& .MuiTypography-root': {
               whiteSpace: 'nowrap',
               fontSize: '14px',
+              fontWeight: 700,
             },
           }}
         />
