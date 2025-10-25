@@ -74,7 +74,7 @@ const Profile = () => {
             src={avatar1}
             sx={{ width: 32, height: 32, borderRadius: '100%' }}
           />
-          <Typography variant='subtitle1'>{profile?.email}</Typography>
+          <Typography variant='subtitle1'>{profile?.fullName}</Typography>
         </Stack>
       </ButtonBase>
       <Popper

@@ -35,6 +35,8 @@ import usePrevious from '@/hooks/usePrevious';
 import { useAppSelector } from '@/store';
 import type { MouseEvent } from '@/types/react';
 import ProfileSection from './ProfileSection';
+import { IPermission } from '@/types/permission';
+import { useSidebarTilte } from '@/contexts/SidebarTitleContext';
 
 export const CollapseContext = createContext<boolean | null>(null);
 export const SidebarContext = createContext<boolean | null>(null);
@@ -44,11 +46,12 @@ interface Props {
   collapsed: boolean;
   onCloseSidebar: () => void;
   onToggleCollapsed: () => void;
+  menuData: IPermission | null;
 }
 const Sidebar = (props: Props) => {
-  const { openSidebar, collapsed, onCloseSidebar, onToggleCollapsed } = props;
+  const { openSidebar, collapsed, onCloseSidebar, onToggleCollapsed, menuData } = props;
   const { pathname } = useLocation();
-  const sections = useMemo(() => Sections(), []);
+  const sections = useMemo(() => Sections(menuData), [menuData]);
   const theme = useTheme();
   const prevPathName = usePrevious(pathname);
 
@@ -59,6 +62,7 @@ const Sidebar = (props: Props) => {
       onCloseSidebar();
     }
   }, [pathname, onCloseSidebar, openSidebar, prevPathName]);
+
 
   if (lgUp) {
     return (
@@ -236,12 +240,20 @@ const MenuItem: FC<MenuItemProps> = (props) => {
 
   const { pathname } = useLocation();
   const prevPathName = usePrevious(pathname);
+  const { setTitle } = useSidebarTilte();
+
 
   useEffect(() => {
     if (prevPathName !== pathname && collapsed) {
       setAnchor(null);
     }
   }, [pathname, collapsed, prevPathName]);
+
+  useEffect(() => {
+    if(active && title) {
+      setTitle(title)
+    }
+  }, [active, title, setTitle])
 
   const handleToggle = (): void => {
     setExpanded(!expanded);

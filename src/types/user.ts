@@ -1,3 +1,5 @@
+import { IMenu } from "./permission";
+
 export interface IUser{
     id: string,
     email: string,
@@ -15,5 +17,7 @@ export interface IUser{
     phone: string,
     role: string,
     updatedAt?: string,
-    work: string
+    work: string,
+    isPermission: boolean,
+    permissions: IMenu[]
 }

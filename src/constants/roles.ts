@@ -3,6 +3,7 @@ export const ROLE = {
   SALES: 'SALES',
   ACCOUNTANT: 'ACCOUNTANT',
   WAREHOUSE_STAFF: 'WAREHOUSE_STAFF',
+  EMPLOYEE: 'employee'
 };
 
 export const permissions = {

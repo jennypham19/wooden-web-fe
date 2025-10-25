@@ -8,6 +8,11 @@ import { FormDataMenus } from "@/views/Manage/Permission/Menu";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'; 
 const prefix = `${API_BASE_URL}/api/permissions`;
 
+interface UserPermissionResquest{
+  userId: string,
+  permissions: IMenu[]
+}
+
 export interface GetParams{
     page: number;
     limit: number;
@@ -67,4 +72,22 @@ export const getMenu = (id: number) => {
 // Cập nhật chức năng
 export const updateMenu = (id: number, payload: FormDataMenus ) => {
     return HttpClient.put<any, HttpResponse<IMenu>>(`${prefix}/update-menu/${id}`, payload)
+}
+
+// Lấy danh sách chức năng kèm thao tác
+export const getAllModules = () => {
+    return HttpClient.get<any, HttpResponse<IMenu>>(`${prefix}/menu-with-action`);
+}
+
+/* 3. Quyền */
+// Tạo quyền
+export const createUserRole = (data: UserPermissionResquest) => {
+  const endpoint = `${prefix}/create-user-permission`;
+  return HttpClient.post<any, HttpResponse>(endpoint, data)
+}
+
+// Chỉnh sửa quyền
+export const updateUserRole = (data: UserPermissionResquest) => {
+  const endpoint = `${prefix}/update-user-permission`;
+  return HttpClient.put<any, HttpResponse>(endpoint,data)
 }

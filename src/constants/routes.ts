@@ -11,6 +11,9 @@ export const ROUTE_PATH = {
   MANAGE_INFORMATION: 'information',
   MANAGE_ACTION: 'action',
   MANAGE_MENU: 'menu',
+  MANAGE_ORDER: 'order',
+  MANAGE_CUSTOMER: 'customer',
+  MANAGE_REPORT: 'report',
 
   PRODUCT_CATEGORY: '/products/categories',
   PRODUCT_CATEGORY_CREATE: '/products/categories/create',

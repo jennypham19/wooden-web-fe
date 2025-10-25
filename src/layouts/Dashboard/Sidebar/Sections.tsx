@@ -4,6 +4,8 @@ import type { SvgIconComponent } from '@mui/icons-material';
 import { AccountCircle, Build, HomeOutlined, List, LockOutlined, PeopleOutline, PeopleOutlined, Settings, WorkOutline } from '@mui/icons-material';
 
 import { ROUTE_PATH } from '@/constants/routes';
+import { IPermission } from '@/types/permission';
+import { mapPermissionsToSectionItems } from '@/utils/data';
 
 export interface SectionItem {
   title: string;
@@ -18,8 +20,16 @@ interface Section {
   items: SectionItem[];
 }
 
-const Sections = (): Section[] => {
-  return AdminSections();
+const Sections = (menuData: IPermission | null): Section[] => {
+  const sectionItems = menuData ? mapPermissionsToSectionItems(menuData) : [];
+  let accountItem: SectionItem[] = sectionItems;
+  return [
+    {
+      section: null,
+      items: accountItem
+    }
+  ]
+  // return AdminSections();
 };
 const AdminSections = (): Section[] => [
   {

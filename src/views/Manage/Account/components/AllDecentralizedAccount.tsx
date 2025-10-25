@@ -2,78 +2,37 @@ import React, { useState } from "react";
 import NavigateBack from "../../components/NavigateBack";
 import SearchBox from "../../components/SearchBox";
 import { Alert, Box, Button, Typography } from "@mui/material";
-import { Add } from "@mui/icons-material";
+import { People } from "@mui/icons-material";
 import { COLORS } from "@/constants/colors";
-import CreateAccount from "./CreateAccount";
 import FilterTabs from "../../components/FilterTabs";
 import { useDataList } from "@/hooks/useDataList";
 import { IUser } from "@/types/user";
-import { getAccounts } from "@/services/user-service";
+import { getDecentralizedAccounts } from "@/services/user-service";
 import Backdrop from "@/components/Backdrop";
 import Grid from "@mui/material/Grid2";
 import CustomPagination from "@/components/Pagination/CustomPagination";
 import CardAccountData from "./CardAccountData";
-import DetailAccount from "./DetailAccount";
+import DetailDecentralizedAccount from "./DetailDecentralizedAccount";
 
 
-interface AllManagedAccountProps {
+interface AllDecentralizedAccountProps {
     onClose: () => void;
 }
 
-const DataStatus: {id: number, value: string, label: string}[] = [
+const DataStatus: {id: number, value: boolean, label: string}[] = [
   {
     id: 1,
-    value: 'all',
-    label: 'Tất cả',
+    value: true,
+    label: 'Tài khoản gán quyền',
   },
   {
     id: 2,
-    value: 'employee',
-    label: 'Nhân viên kinh doanh',
-  },
-  {
-    id: 3,
-    value: 'factory_manager',
-    label: 'Quản lý xưởng',
-  },
-  {
-    id: 4,
-    value: 'production_planner',
-    label: 'Nhân viên kế hoạch sản xuất',
-  },
-  {
-    id: 5,
-    value: 'production_supervisor',
-    label: 'Tổ trưởng sản xuất',
-  },
-  {
-    id: 6,
-    value: 'carpenter',
-    label: 'Thợ mộc'
-  },
-  {
-    id: 7,
-    value: 'qc',
-    label: 'Kiểm tra chất lượng'
-  },
-  {
-    id: 8,
-    value: 'inventory_manager',
-    label: 'Quản lý kho'
-  },
-  {
-    id: 9,
-    value: 'technical_design',
-    label: 'Kỹ thuật thiết kế'
-  },
-  {
-    id: 10,
-    value: 'accounting',
-    label: 'Kế toán'
+    value: false,
+    label: 'Tài khoản chưa gán quyền',
   }
 ];
 
-const AllManagedAccount: React.FC<AllManagedAccountProps> = (props) => {
+const AllDecentralizedAccount: React.FC<AllDecentralizedAccountProps> = (props) => {
     const { onClose } = props;
     const [openAccount, setOpenAccount] = useState<{open: boolean, type: string}>({
         open: false,
@@ -81,7 +40,7 @@ const AllManagedAccount: React.FC<AllManagedAccountProps> = (props) => {
     })
     const [openDetailAccount, setOpenDetailAccount] = useState(false);
     const [account, setAccount] = useState<IUser | null>(null);
-    const [viewMode, setViewMode] = useState<'all' | 'employee' | 'factory_manager' | 'production_planner' | 'production_supervisor' | 'carpenter' | 'qc' | 'inventory_manager' | 'technical_design' | 'accounting'>('all');
+    const [viewMode, setViewMode] = useState<true | false>(true);
     const {
         listData,
         searchTerm,
@@ -93,25 +52,29 @@ const AllManagedAccount: React.FC<AllManagedAccountProps> = (props) => {
         page,
         rowsPerPage,
         fetchData
-    } = useDataList<IUser>((params) => getAccounts(params), 8, viewMode);
-    
+    } = useDataList<IUser>((params) => getDecentralizedAccounts(params), 8, 'all', viewMode);
+
+
     const handleOpenAddAccount = () => {
         setOpenAccount({ type: 'add', open: true });
     }
     const handleCloseAddAccount = () => {
         setOpenAccount({ type: 'add', open: false})
-        fetchData(page, rowsPerPage, viewMode)
+        fetchData(page, rowsPerPage, 'all', viewMode)
     }
 
     const handleOpenDetailAccount = (account: IUser) => {
-        setOpenDetailAccount(true)
+        console.log("account: ", account);
+        setOpenAccount({ type: 'view', open: true });
         setAccount(account)
     }
 
     const handleCloseDetailAccount = () => {
-        setOpenDetailAccount(false)
-        setAccount(null)
+        setOpenAccount({ type: 'view', open: false})
+        setAccount(null);
+        fetchData(page, rowsPerPage, 'all', viewMode)
     }
+
     return(
         <Box>
             {!openAccount.open && (
@@ -123,14 +86,14 @@ const AllManagedAccount: React.FC<AllManagedAccountProps> = (props) => {
                     >
                         <Button
                             variant="outlined"
-                            startIcon={<Add/>}
+                            startIcon={<People/>}
                             sx={{
                                 border: `1px solid ${COLORS.BUTTON}`,
                                 color: COLORS.BUTTON
                             }}
                             onClick={handleOpenAddAccount}
                         >
-                            Tạo tài khoản
+                            Phân quyền nhóm
                         </Button>
                     </SearchBox>
                     <NavigateBack
@@ -174,21 +137,17 @@ const AllManagedAccount: React.FC<AllManagedAccountProps> = (props) => {
                     )}
                 </>
             )}
-            {openAccount.open && openAccount.type === 'add' && (
-                <CreateAccount
-                    onClose={handleCloseAddAccount}
-                />
-            )}
-            {openDetailAccount && account && (
-                <DetailAccount
-                    open={openDetailAccount}
+            {openAccount.open && openAccount.type === 'view' && account && (
+                <DetailDecentralizedAccount
+                    open={openAccount.open}
                     onClose={handleCloseDetailAccount}
-                    account={account}
+                    id={account.id}
                     works={account.work.split('.')}
+                    isPermission={account.isPermission}
                 />
             )}
         </Box>
     )
 }
 
-export default AllManagedAccount;
+export default AllDecentralizedAccount;
