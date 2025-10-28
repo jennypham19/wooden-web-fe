@@ -65,3 +65,35 @@ export const RENDER_LABELS: { [key in RenderUser]: string } = {
     [RenderUser.MALE]: 'Nam giới',
 
 }
+
+export const ProccessOrder = {
+    NOT_START_0: 'not_started_0%',
+    IN_PROGRESS_25: 'in_progress_25%',
+    IN_PROGRESS_50: 'in_progress_50%',
+    IN_PROGRESS_75: 'in_progress_75%',
+    COMPLETED_100: 'completed_100%',
+}
+
+export type ProccessOrder = typeof ProccessOrder[keyof typeof ProccessOrder];
+
+export const PROCCESS_ORDER_LABELS: { [key in ProccessOrder]: string } = {
+    [ProccessOrder.NOT_START_0]: 'Chưa hoạt động 0%',
+    [ProccessOrder.IN_PROGRESS_25]: 'Đang hoạt động 25%',
+    [ProccessOrder.IN_PROGRESS_50]: 'Đang hoạt động 50%',
+    [ProccessOrder.IN_PROGRESS_75]: 'Đang hoạt động 75%',
+    [ProccessOrder.COMPLETED_100]: 'Đã hoàn thành 100%',
+}
+
+export const StatusOrder = {
+    PENDING: 'pending',
+    IN_PROGRESS: 'in_progress',
+    COMPLETED: 'completed',
+}
+
+export type StatusOrder = typeof StatusOrder[keyof typeof StatusOrder];
+
+export const STATUS_ORDER_LABELS: { [key in StatusOrder]: string } = {
+    [StatusOrder.PENDING]: 'Chưa hoạt động',
+    [StatusOrder.IN_PROGRESS]: 'Đang hoạt động',
+    [StatusOrder.COMPLETED]: 'Đã hoàn thành',
+}

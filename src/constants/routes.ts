@@ -14,6 +14,12 @@ export const ROUTE_PATH = {
   MANAGE_ORDER: 'order',
   MANAGE_CUSTOMER: 'customer',
   MANAGE_REPORT: 'report',
+  MANAGE_DESIGN_REQUESTS: 'design-requests',
+  MANAGE_BOM: 'bom',
+  MANAGE_PRODUCTION_SUPPORT: 'production-support',
+  MANAGE_MACHINES: 'machines',
+  MANAGE_AS_BUILT: 'as-built',
+  MANAGE_DOCUMENTS: 'documents',
 
   PRODUCT_CATEGORY: '/products/categories',
   PRODUCT_CATEGORY_CREATE: '/products/categories/create',

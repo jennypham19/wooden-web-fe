@@ -1,6 +1,6 @@
 import { SectionItem } from "@/layouts/Dashboard/Sidebar/Sections";
 import { IMenu, IPermission } from "@/types/permission";
-import { AccountCircle, Build, ContentPaste, Group, HomeOutlined, List, ListAlt, LockOutlined, Settings, SvgIconComponent, WorkOutline } from "@mui/icons-material";
+import { AccountCircle, Assignment, Build, Construction, ContentPaste, DrawOutlined, Group, HomeOutlined, InventoryOutlined, List, ListAlt, LockOutlined, MenuBookOutlined, PrecisionManufacturing, Settings, SvgIconComponent, WorkOutline } from "@mui/icons-material";
 
 export const iconMap: Record<string, SvgIconComponent> = {
     HomeOutlined,
@@ -12,7 +12,13 @@ export const iconMap: Record<string, SvgIconComponent> = {
     List,
     ContentPaste,
     Group,
-    ListAlt
+    ListAlt,
+    Assignment,
+    InventoryOutlined,
+    PrecisionManufacturing,
+    Construction,
+    DrawOutlined,
+    MenuBookOutlined
 }
 
 export const mapMenuToSectionItems = (menus: IMenu[]): SectionItem[] => {

@@ -121,47 +121,47 @@ const InputText: React.FC<CustomInputProps> = ({
             },
             ...commonSlotTextFieldProps
            },
-           popper: {
-              modifiers: [
-                {
-                  name: 'offset',
-                  options: {
-                    offset: [0, 10],
-                  },
-                },
-                {
-                  name: 'sameWidth',
-                  enabled:  true,
-                  phase: 'beforeWrite',
-                  requires: ['commonSlotTextFieldProps'],
-                  fn({ state }){
-                    state.styles.popper.width = `${state.rects.reference.width}px`;
-                  }
-                }
-              ],
-            },
-            layout: {
-              sx: {
-                borderRadius: 2,
-              },
-            },
-            day: {
-              sx: {
-                borderRadius: '6px',
-                fontSize: '14px',
-                '&.Mui-selected': {
-                  backgroundColor: '#1976d2',
-                },
-              },
-            },
-            calendarHeader: {
-              sx: {
-                '& .MuiPickersCalendarHeader-label': {
-                  fontWeight: 500,
-                  textTransform: 'capitalize',
-                },
-              },
-            },
+          //  popper: {
+          //     modifiers: [
+          //       {
+          //         name: 'offset',
+          //         options: {
+          //           offset: [0, 10],
+          //         },
+          //       },
+          //       {
+          //         name: 'sameWidth',
+          //         enabled:  true,
+          //         phase: 'beforeWrite',
+          //         requires: ['commonSlotTextFieldProps'],
+          //         fn({ state }){
+          //           state.styles.popper.width = `${state.rects.reference.width}px`;
+          //         }
+          //       }
+          //     ],
+          //   },
+          //   layout: {
+          //     sx: {
+          //       borderRadius: 2,
+          //     },
+          //   },
+          //   day: {
+          //     sx: {
+          //       borderRadius: '6px',
+          //       fontSize: '14px',
+          //       '&.Mui-selected': {
+          //         backgroundColor: '#1976d2',
+          //       },
+          //     },
+          //   },
+          //   calendarHeader: {
+          //     sx: {
+          //       '& .MuiPickersCalendarHeader-label': {
+          //         fontWeight: 500,
+          //         textTransform: 'capitalize',
+          //       },
+          //     },
+          //   },
         }}
         format="DD/MM/YYYY"
         {...datePickerProps}
