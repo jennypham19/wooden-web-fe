@@ -1,10 +1,10 @@
-import InputSelect from "@/components/InputSelect";
 import { FormDataProducts } from "@/types/product";
 import { IUser } from "@/types/user";
 import { getProccessOrderLabel, getStatusOrderLabel } from "@/utils/labelEntoVni";
 import { Box, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { FormProductErrors } from "./DialogAddOrder";
+import InputSelect from "./InputSelect";
 
 interface InputTextProps{
     index: number,
@@ -126,7 +126,8 @@ const ProductOrder = (props: ProductOrderProps) => {
                     </Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
                         <Typography fontWeight={700} fontSize='15px'>Người quản lý</Typography>
-                        {/* <InputSelect
+                        <InputSelect
+                            index={index - 1}
                             label=""
                             name="managerId"
                             value={formData.managerId}
@@ -141,7 +142,7 @@ const ProductOrder = (props: ProductOrderProps) => {
                             placeholder="Chọn người quản lý"
                             error={!!errors.managerId}
                             helperText={errors.managerId}
-                        /> */}
+                        />
                     </Grid>
                 </Grid>
         </Box>

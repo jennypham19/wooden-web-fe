@@ -1,21 +1,19 @@
 import Page from "@/components/Page";
-import SearchBox from "../components/SearchBox";
 import { useState } from "react";
-import { Alert, Avatar, Box, Button, Card, CardContent, Chip, Stack, Typography } from "@mui/material";
-import { COLORS } from "@/constants/colors";
-import { Add, Visibility } from "@mui/icons-material";
-import DialogAddOrder from "./components/DialogAddOrder";
+import { Alert, Avatar, Box, Card, CardContent, Chip, Stack, Typography } from "@mui/material";
+import { Visibility } from "@mui/icons-material";
 import { useFetchData } from "@/hooks/useFetchData";
 import { IOrder } from "@/types/order";
 import { getOrders } from "@/services/order-service";
 import Backdrop from "@/components/Backdrop";
 import OverviewData from "../components/OverviewData";
 import Grid from "@mui/material/Grid2";
-import avatar from "@/assets/images/users/default-avatar.jpg"
+import avatar from "@/assets/images/users/default-avatar.jpg";
 import { getProccessOrderLabel, getStatusOrderColor, getStatusOrderLabel } from "@/utils/labelEntoVni";
 import DateTime from "@/utils/DateTime";
 import IconButton from "@/components/IconButton/IconButton";
 import AllListOrders from "./components/AllListOrders";
+import DetailOrder from "./components/DetailOrder";
 
 
 const Orders = () => {
@@ -23,7 +21,9 @@ const Orders = () => {
     const [showOrders, setShowOrders] = useState<{ open: boolean, type: string}>({
         open: false,
         type: ''
-    })
+    });
+    const [viewOrder, setViewOrder] = useState(false);
+    const [order, setOrder] = useState<IOrder | null>(null);
 
     const { error, fetchData, listData, loading, page, rowsPerPage} = useFetchData<IOrder>(getOrders);
 
@@ -48,6 +48,16 @@ const Orders = () => {
         setShowOrders({ open: false, type: 'checked-orders'})
         fetchData(page, rowsPerPage)
     }
+
+    const handleOpenViewOrder = (order: IOrder) => {
+        setOrder(order);
+        setViewOrder(true)
+    }
+
+    const handleCloseViewOrder = () => {
+        setOrder(null);
+        setViewOrder(false)
+    }
     return (
         <Page title="Quản lý đơn hàng">
             {!showAll && (
@@ -70,6 +80,7 @@ const Orders = () => {
                                             <Grid key={index} size={{ xs: 12, md: 4 }}>
                                                 <Card
                                                     sx={{ m: 2, boxShadow: "0px 2px 1px 1px rgba(0, 0, 0, 0.2)", borderRadius: 4 }}
+                                                    onClick={() => order && handleOpenViewOrder(order)}
                                                 >
                                                     <CardContent>
                                                         <Box display='flex' justifyContent='space-between'>
@@ -129,6 +140,13 @@ const Orders = () => {
             {showAll && showOrders.open && showOrders.type === 'list-orders' && (
                 <AllListOrders
                     onBack={handleCloseShowAllListOrders}
+                />
+            )}
+            {viewOrder && order && (
+                <DetailOrder
+                    open={viewOrder}
+                    data={order}
+                    onClose={handleCloseViewOrder}
                 />
             )}
         </Page>

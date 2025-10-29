@@ -146,7 +146,7 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
         setProductErrors(newProductErrors)
         return Object.keys(newErros).length === 0 && !!code && !hasProductError;
     }
-    
+
     const handleSave = async() => {
         if(!validateForm()){
             return;
@@ -162,9 +162,15 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
                 status: formData.status,
                 amount: Number(formData.amount),
                 requiredNote: formData.requiredNote,
-                products: []
+                products: formDataProduct.map((p) => ({
+                    name: p.name,
+                    description: p.description,
+                    target: p.target,
+                    proccess: p.proccess,
+                    status: p.status,
+                    managerId: p.managerId
+                }))
             };
-            return;
             const res = await createOrder(payload);
             notify({
                 message: res.message,

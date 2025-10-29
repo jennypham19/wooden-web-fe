@@ -10,7 +10,7 @@ export interface FormDataProducts{
 }
 export interface IProduct{
     id: string,
-    nameManager: string,
+    manager: string,
     name: string,
     description: string,
     target: string,

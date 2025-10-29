@@ -1,6 +1,6 @@
 import { ProccessOrder, StatusOrder } from "@/constants/status";
 import { Dayjs } from "dayjs";
-import { FormDataProducts } from "./product";
+import { FormDataProducts, IProduct } from "./product";
 
 export interface FormDataOrders{
     customerId: string,
@@ -25,5 +25,6 @@ export interface IOrder{
     amount: number,
     requiredNote: string,
     createdAt: string,
-    updatedAt: string
+    updatedAt: string,
+    products: IProduct[]
 }
