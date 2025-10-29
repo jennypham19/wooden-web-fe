@@ -29,8 +29,11 @@ const Sections = (menuData: IPermission | null): Section[] => {
       items: accountItem
     }
   ]
-  // return AdminSections();
 };
+
+// const Sections = (): Section[] => {
+//   return AdminSections();
+// };
 const AdminSections = (): Section[] => [
   {
     section: null,

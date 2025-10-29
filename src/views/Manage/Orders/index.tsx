@@ -1,3 +1,4 @@
+import Dashboard from "./components/Dashboard";
 import Page from "@/components/Page";
 import { useState } from "react";
 import { Alert, Avatar, Box, Card, CardContent, Chip, Stack, Typography } from "@mui/material";
