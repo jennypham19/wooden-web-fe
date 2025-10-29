@@ -42,3 +42,8 @@ export const getCustomers = async(getParams: GetParams): Promise<HttpResponse<Pa
 export const updateCustomer = (id: string, payload: FormDataCustomer) => {
   return HttpClient.put(`${prefix}/update-customer/${id}`, payload);
 }
+
+// Xóa khách hàng
+export const deleteCustomer = (id: string) => {
+  return HttpClient.delete(`${prefix}/delete-customer/${id}`)
+}

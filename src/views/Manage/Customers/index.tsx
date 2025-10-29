@@ -1,19 +1,22 @@
-import Page from "@/components/Page";
-import { Alert, Avatar, Box, Button, Card, CardContent, Chip, Stack, Typography } from "@mui/material";
-import SearchBox from "../components/SearchBox";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { COLORS } from "@/constants/colors";
-import { Add, Visibility } from "@mui/icons-material";
-import { ICustomer } from "@/types/customer";
-import DialogAddCustomer, { FormDataCustomer } from "./components/DialogAddCustomer";
-import useNotification from "@/hooks/useNotification";
-import { createCustomer, getCustomers, updateCustomer } from "@/services/customer-service";
 import { debounce } from "lodash";
-import Backdrop from "@/components/Backdrop";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Add, Visibility } from "@mui/icons-material";
+import { Alert, Avatar, Box, Button, Card, CardContent, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import avatar from "@/assets/images/users/default-avatar.jpg";
-import IconButton from "@/components/IconButton/IconButton";
+import DialogConfirm from "../components/DialogConfirm";
+import SearchBox from "../components/SearchBox";
+import DialogAddCustomer, { FormDataCustomer } from "./components/DialogAddCustomer";
 import DialogEditCustomer from "./components/DialogEditCustomer";
+import Backdrop from "@/components/Backdrop";
+import IconButton from "@/components/IconButton/IconButton";
+import Page from "@/components/Page";
+import avatar from "@/assets/images/users/default-avatar.jpg";
+import { COLORS } from "@/constants/colors";
+import useNotification from "@/hooks/useNotification";
+import { createCustomer, deleteCustomer, getCustomers, updateCustomer } from "@/services/customer-service";
+import { ICustomer } from "@/types/customer";
+import CustomPagination from "@/components/Pagination/CustomPagination";
+
 
 const Customer = () => {
     const notify = useNotification();
@@ -68,16 +71,34 @@ const Customer = () => {
         setPage(newPage);
     }
 
-    // Thêm tài khoản
+    // Thêm khách hàng
     const handleOpenAddCustomer = () => {
         setOpenCustomer({ open: true, type: 'add' });
     }
 
     const handleCloseAddCustomer = () => {
-        setOpenCustomer({ open: false, type: 'add' })
-    }
+      setOpenCustomer({ open: false, type: 'add' });
+    };
 
-    // Chỉnh sửa tài khoản
+    const handleSave = async (data: FormDataCustomer) => {
+      const payload = { ...data };
+      try {
+        const res = await createCustomer(payload);
+        notify({
+          message: res.message,
+          severity: 'success',
+        });
+        handleCloseAddCustomer();
+        fetchListCustomers(page, rowsPerPage);
+      } catch (error: any) {
+        notify({
+          message: error.message,
+          severity: 'error',
+        });
+      }
+    };
+
+    // Chỉnh sửa khách hàng
     const handleOpenEditCustomer = (customer: ICustomer) => {
         setOpenCustomer({ open: true, type: 'edit' });
         setCustomer(customer)
@@ -88,33 +109,43 @@ const Customer = () => {
         setCustomer(null)
     }
 
-    const handleSave = async(data: FormDataCustomer) => {
-        const payload = { ...data }
-        try {
-            const res = await createCustomer(payload);
-            notify({
-                message: res.message,
-                severity: 'success'
-            });
-            handleCloseAddCustomer();
-            fetchListCustomers(page, rowsPerPage)
-        } catch (error: any) {
-            notify({
-                message: error.message,
-                severity: 'error'
-            })
-        }
+    const handleEditSave = async (id: string, data: FormDataCustomer) => {
+      const payload = { ...data };
+      try {
+        const res = await updateCustomer(id, payload);
+        notify({
+          message: res.message,
+          severity: 'success',
+        });
+        handleCloseEditCustomer();
+        fetchListCustomers(page, rowsPerPage);
+      } catch (error: any) {
+        notify({
+          message: error.message,
+          severity: 'error',
+        });
+      }
+    };
+
+    // Xóa khách hàng
+    const handleOpenDeleteCustomer = (customer: ICustomer) => {
+        setOpenCustomer({ open: true, type: 'delete' });
+        setCustomer(customer)
     }
 
-    const handleEditSave = async(id: string, data: FormDataCustomer) => {
-        const payload = { ...data };
+    const handleCloseDeleteCustomer = () => {
+        setOpenCustomer({ open: false, type: 'delete' });
+        setCustomer(null)
+    }
+
+    const handleAgreeDelete = async () => {
         try {
-            const res = await updateCustomer(id, payload);
+            const res = customer && await deleteCustomer(customer.id);
             notify({
                 message: res.message,
                 severity: 'success'
-            });
-            handleCloseEditCustomer();
+            })
+            handleCloseDeleteCustomer();
             fetchListCustomers(page, rowsPerPage)
         } catch (error: any) {
             notify({
@@ -123,7 +154,6 @@ const Customer = () => {
             })
         }
     }
-    
     return (
         <Page title="Quản lý khách hàng">
             <SearchBox
@@ -190,6 +220,7 @@ const Customer = () => {
                                                         variant="outlined"
                                                         sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
                                                         fullWidth
+                                                        onClick={() => customer && handleOpenDeleteCustomer(customer)}
                                                     >
                                                         Xóa
                                                     </Button>
@@ -201,6 +232,14 @@ const Customer = () => {
                             })
                         )}
                     </Grid>
+                    <Box display='flex' justifyContent='space-between'>
+                        <CustomPagination
+                            page={page}
+                            rowsPerPage={rowsPerPage}
+                            count={total}
+                            onPageChange={handlePageChange}
+                        />
+                    </Box>
                 </>
             )}
             {openCustomer.type === 'add' && (
@@ -216,6 +255,14 @@ const Customer = () => {
                     onClose={handleCloseEditCustomer}
                     onSave={handleEditSave}
                     customer={customer}
+                />
+            )}
+            {openCustomer.type === 'delete' && customer && (
+                <DialogConfirm
+                    open={openCustomer.open}
+                    onClose={handleCloseDeleteCustomer}
+                    onAgree={handleAgreeDelete}
+                    title={`Bạn có muốn xóa khách hàng ${customer.name} này không?`}
                 />
             )}
         </Page>
