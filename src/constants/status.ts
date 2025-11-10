@@ -97,3 +97,23 @@ export const STATUS_ORDER_LABELS: { [key in StatusOrder]: string } = {
     [StatusOrder.IN_PROGRESS]: 'Đang hoạt động',
     [StatusOrder.COMPLETED]: 'Đã hoàn thành',
 }
+
+export const StatusMachine = {
+    OPERATING: 'operating',
+    PAUSED: 'paused',
+    STOPPED: 'stopped',
+    UNDER_MAINTENANCE: 'under_maintenance',
+    UNDER_REPAIR: 'under_repair',
+    FAULTY: 'faulty',
+}
+
+export type StatusMachine = typeof StatusMachine[keyof typeof StatusMachine];
+
+export const STATUS_MACHINE_LABELS: { [key in StatusMachine]: string } = {
+    [StatusMachine.OPERATING]: 'Đang hoạt động',
+    [StatusMachine.PAUSED]: 'Tạm dừng',
+    [StatusMachine.STOPPED]: 'Ngừng hoạt động',
+    [StatusMachine.UNDER_MAINTENANCE]: 'Đang bảo trì',
+    [StatusMachine.UNDER_REPAIR]: 'Đang sửa chữa',
+    [StatusMachine.FAULTY]: 'Lỗi/Hỏng',
+}

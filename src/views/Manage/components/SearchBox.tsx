@@ -12,7 +12,8 @@ interface SearchBoxProps{
     status?: any;
     listStatus?: IStatus[];
     onChangeStatus?: (value: any) => void;
-    isPermission?: boolean
+    isPermission?: boolean,
+    isBorder?: boolean
 }
 const SearchBox = ({
     children,
@@ -23,10 +24,11 @@ const SearchBox = ({
     status,
     listStatus,
     onChangeStatus,
-    isPermission = false
+    isPermission = false,
+    isBorder = false
 } : SearchBoxProps) => {
     return (
-        <Box py={1.5} borderTop='2px solid #d3d3d3ff' bgcolor='#FFFFFF' display='flex' justifyContent={{ xs: 'flex-start', md: 'space-between'}} flexDirection={{ xs: 'column', md: 'row'}}>
+        <Box py={1.5} borderTop={isBorder ? 'none' : '2px solid #d3d3d3ff'} bgcolor='#FFFFFF' display='flex' justifyContent={{ xs: 'flex-start', md: 'space-between'}} flexDirection={{ xs: 'column', md: 'row'}}>
             <Box display='flex' flexDirection='row' px={4} sx={{ width: isPermission ? "100%" : { xs: '100%', md: '50%'}}}>
                 <Box width='100%'>
                     <InputSearch

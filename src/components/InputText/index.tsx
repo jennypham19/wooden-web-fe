@@ -59,6 +59,7 @@ interface CustomInputProps {
   onlyPositiveNumber?: boolean;
   from?: string;
   startAdornment?: React.ReactNode;
+  mt?: any
 }
 
 const InputText: React.FC<CustomInputProps> = ({
@@ -84,7 +85,8 @@ const InputText: React.FC<CustomInputProps> = ({
   onlyPositiveNumber = false,
   maxDate,
   from,
-  startAdornment
+  startAdornment,
+  mt
 }) => {
 
   const commonSlotTextFieldProps = {
@@ -110,7 +112,7 @@ const InputText: React.FC<CustomInputProps> = ({
         slotProps={{
           textField: {
             sx:{
-                mt: 0,
+                mt: mt,
                 "& .MuiOutlinedInput-notchedOutline":{
                     border:"1px solid rgb(53, 50, 50)",
                     borderRadius:"8px",

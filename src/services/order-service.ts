@@ -1,7 +1,6 @@
 import { HttpResponse } from "@/types/common";
 import HttpClient from "@/utils/HttpClient";
 import { PaginatedResponse } from "./base-service";
-import { ICustomer } from "@/types/customer";
 import { Dayjs } from "dayjs";
 import { IOrder } from "@/types/order";
 import { FormDataProducts } from "@/types/product";

@@ -4,3 +4,10 @@ export interface PaginatedResponse<T>{
     currentPage: number;
     total: number;
 }
+
+export interface GetParams {
+    page: number,
+    limit: number,
+    searchTerm?: string,
+    status?: string
+}

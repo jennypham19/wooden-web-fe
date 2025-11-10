@@ -39,7 +39,8 @@ interface InputSelectProps {
   MenuProps?: SelectProps["MenuProps"];
   title?: string,
   loadingTitle?: string,
-  renderChips?: boolean // hiển thị selected dưới dạng Chip
+  renderChips?: boolean, // hiển thị selected dưới dạng Chip
+  margin?: any
 }
 
 const InputSelect: React.FC<InputSelectProps> = ({
@@ -62,7 +63,8 @@ const InputSelect: React.FC<InputSelectProps> = ({
   MenuProps = undefined,
   title,
   loadingTitle,
-  renderChips = false // default = text
+  renderChips = false, // default = text
+  margin
 }) => {
   const handleChange = (event: SelectChangeEvent<typeof value>) => {
     const selectedValue = multiple ? event.target.value : event.target.value;
@@ -170,6 +172,7 @@ const InputSelect: React.FC<InputSelectProps> = ({
       required={required}
       disabled={disabled}
       error={error}
+      margin={margin}
       sx={{
         '& .MuiOutlinedInput-notchedOutline': {
           border: '1px solid rgb(53, 50, 50)',
@@ -178,6 +181,7 @@ const InputSelect: React.FC<InputSelectProps> = ({
         '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
           border: '1px solid rgb(53, 50, 50)',
         },
+        
         ...sx,
       }}
     >

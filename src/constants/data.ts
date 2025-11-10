@@ -103,3 +103,19 @@ export const WORK_DATA: { id: number, value: string, label: string, role: string
     { id: 41, value: 'Theo dõi báo cáo tiến độ, lỗi, năng suất, chi phí.', label: 'Theo dõi báo cáo tiến độ, lỗi, năng suất, chi phí.', role: 'factory_manager'},
     { id: 42, value: 'Ra quyết định điều phối hoặc tối ưu quy trình sản xuất.', label: 'Ra quyết định điều phối hoặc tối ưu quy trình sản xuất.', role: 'factory_manager'},
 ]
+
+export const MAINTENANCE_PERCENTAGE_DATA: { id: number, label: string, value: string }[] = [
+    { id: 1, label: '0%', value: '0%' },
+    { id: 2, label: '25%', value: '25%' },
+    { id: 3, label: '50%', value: '50%' },
+    { id: 4, label: '100%', value: '100%' },
+]
+
+export const STATUS_MACHINE_DATA: { id: number, label: string, value: string }[] = [
+    { id: 1, label: 'Đang hoạt động', value: 'operating' },
+    { id: 2, label: 'Tạm dừng', value: 'paused' },
+    { id: 3, label: 'Ngừng hoạt động', value: 'stopped' },
+    { id: 4, label: 'Đang bảo trì', value: 'under_maintenance' },
+    { id: 5, label: 'Đang sửa chữa', value: 'under_repair' },
+    { id: 6, label: 'Lỗi/ Hỏng', value: 'faulty' }
+]

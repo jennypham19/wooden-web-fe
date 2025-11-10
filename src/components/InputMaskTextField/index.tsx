@@ -5,17 +5,18 @@ import InputMask from "react-input-mask";
 export interface InputMaskTextFieldProps extends Omit<TextFieldProps, "onChange"> {
     mask: string;
     value: string;
-    onChange: (value: string) => void;
+    onChange: (value: string, index?: number, ) => void;
     error?: boolean;
     helperText?: string | null;
+    index?: number;
 }
 
-const InputMaskTextField: React.FC<InputMaskTextFieldProps> = ({ mask, value, onChange, error, helperText, ...props}) => {
+const InputMaskTextField: React.FC<InputMaskTextFieldProps> = ({ mask, value, onChange, error, helperText, index, ...props}) => {
     return (
         <InputMask
             mask={mask}
             value={value}
-            onChange={(e: any) => onChange(e.target.value)}
+            onChange={(e: any) => onChange(e.target.value, index)}
         >
             {(inputProps: any) => 
             <TextField 

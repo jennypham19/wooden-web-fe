@@ -1,4 +1,4 @@
-import { PROCCESS_ORDER_LABELS, ProccessOrder, RENDER_LABELS, RenderUser, ROLE_CODES, ROLE_DEPARTMENT, ROLE_LABELS, RoleUser, STATUS_ORDER_LABELS, StatusOrder } from "@/constants/status";
+import { PROCCESS_ORDER_LABELS, ProccessOrder, RENDER_LABELS, RenderUser, ROLE_CODES, ROLE_DEPARTMENT, ROLE_LABELS, RoleUser, STATUS_MACHINE_LABELS, STATUS_ORDER_LABELS, StatusMachine, StatusOrder } from "@/constants/status";
 
 export const getRoleLabel = (role: RoleUser | null | undefined) : string => {
     if(!role) return "Chưa xác định";
@@ -39,3 +39,8 @@ export const getStatusOrderColor = (status: string | null) => {
       return { color: 'error' as const };
   }
 };
+
+export const getStatusMachineLabel = (status: StatusMachine | null | undefined): string => {
+  if(!status) return 'Chưa xác định';
+  return STATUS_MACHINE_LABELS[status] || status;
+}
