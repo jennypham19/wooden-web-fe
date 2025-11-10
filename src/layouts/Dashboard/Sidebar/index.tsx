@@ -52,6 +52,7 @@ const Sidebar = (props: Props) => {
   const { openSidebar, collapsed, onCloseSidebar, onToggleCollapsed, menuData } = props;
   const { pathname } = useLocation();
   const sections = useMemo(() => Sections(menuData), [menuData]);
+  // const sections = useMemo(() => Sections(), []);
   const theme = useTheme();
   const prevPathName = usePrevious(pathname);
 

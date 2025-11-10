@@ -1,9 +1,16 @@
-import DialogComponent from "@/components/DialogComponent";
 import React, { useState } from "react";
-import Grid from "@mui/material/Grid2";
+
+
+
 import { Button, Typography } from "@mui/material";
-import { COLORS } from "@/constants/colors";
+import Grid from "@mui/material/Grid2";
+import DialogComponent from "@/components/DialogComponent";
 import InputText from "@/components/InputText";
+
+
+
+import { COLORS } from "@/constants/colors";
+
 
 interface DialogAddCustomerProps{
     open: boolean;
@@ -47,7 +54,8 @@ const DialogAddCustomer: React.FC<DialogAddCustomerProps> = ( props ) => {
         if(!validateForm()){
             return;
         }
-        onSave(formData)
+        onSave(formData);
+        handleClose()
     }
 
     const phoneRegex = /^(0|\+84)(3[2-9]|5[6|8|9]|7[0|6-9]|8[1-5]|9[0-9])[0-9]{7}$/;
