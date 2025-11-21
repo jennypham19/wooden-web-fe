@@ -1,6 +1,6 @@
 import { SectionItem } from "@/layouts/Dashboard/Sidebar/Sections";
 import { IMenu, IPermission } from "@/types/permission";
-import { AccountCircle, Assignment, Build, Construction, ContentPaste, DrawOutlined, Group, HomeOutlined, InventoryOutlined, List, ListAlt, LockOutlined, MenuBookOutlined, PrecisionManufacturing, Settings, SvgIconComponent, WorkOutline } from "@mui/icons-material";
+import { AccountCircle, Analytics, Assessment, Assignment, Build, BuildCircle, Construction, ContentPaste, DashboardCustomize, DrawOutlined, EventNote, Group, HomeOutlined, Hub, InventoryOutlined, List, ListAlt, LockOutlined, MenuBook, MenuBookOutlined, Notifications, PrecisionManufacturing, Settings, SupportAgent, SvgIconComponent, Timeline, TrackChanges, WorkOutline } from "@mui/icons-material";
 
 export const iconMap: Record<string, SvgIconComponent> = {
     HomeOutlined,
@@ -18,7 +18,18 @@ export const iconMap: Record<string, SvgIconComponent> = {
     PrecisionManufacturing,
     Construction,
     DrawOutlined,
-    MenuBookOutlined
+    MenuBookOutlined,
+    EventNote,
+    DashboardCustomize,
+    TrackChanges,
+    Hub,
+    BuildCircle,
+    Assessment,
+    Timeline,
+    Analytics,
+    SupportAgent,
+    Notifications,
+    MenuBook
 }
 
 export const mapMenuToSectionItems = (menus: IMenu[]): SectionItem[] => {

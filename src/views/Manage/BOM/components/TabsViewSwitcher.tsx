@@ -1,6 +1,6 @@
+import { CategoryType, ViewModeProps } from '@/types/tab';
 import { Box, Tabs, Tab } from '@mui/material';
 import React from 'react';
-import { CategoryType, ViewModeProps } from '..';
 
 
 interface Props {

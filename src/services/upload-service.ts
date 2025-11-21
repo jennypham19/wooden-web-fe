@@ -43,3 +43,17 @@ export const uploadVideos = (files: File[], type: string): Promise<HttpResponse<
     { headers: { 'Content-Type': 'multipart/form-data' } }
   );
 };
+
+export const uploadFiles = (files: File[], type: string): Promise<HttpResponse<{ files: any[], folder: string }>> => {
+  const formData = new FormData();
+  formData.append('type', type);
+  files.forEach((file) => {
+    formData.append("files", file); // Mỗi file là 1 Blob
+  });
+  
+  return HttpClient.post(
+    `${prefix}/upload-files`, 
+    formData,
+    { headers: { 'Content-Type': 'multipart/form-data' } }
+  );
+};

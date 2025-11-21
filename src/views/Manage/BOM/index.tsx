@@ -8,13 +8,8 @@ import CreateBom from "./components/CreateBom";
 import { useFetchData } from "@/hooks/useFetchData";
 import { IBOM } from "@/types/bom";
 import { getBoms } from "@/services/bom-service";
+import { CategoryType, ViewModeProps } from "@/types/tab";
 
-export type CategoryType = 0 | 1;
-export interface ViewModeProps{
-    id: string | number,
-    label: string,
-    value: CategoryType,
-}
 const DataViewMode: ViewModeProps[] = [
     {
         id: 1,

@@ -117,3 +117,31 @@ export const STATUS_MACHINE_LABELS: { [key in StatusMachine]: string } = {
     [StatusMachine.UNDER_REPAIR]: 'Đang sửa chữa',
     [StatusMachine.FAULTY]: 'Lỗi/Hỏng',
 }
+
+export const PriorityDesignRequest = {
+    LOW: 'low',
+    MEDIUM: 'medium',
+    HIGH: 'high',
+    URGENT: 'urgent'
+}
+
+export type PriorityDesignRequest = typeof PriorityDesignRequest[keyof typeof PriorityDesignRequest];
+
+export const PRIORITY_DESIGN_REQUEST_LABELS: { [key in PriorityDesignRequest]: string } = {
+    [PriorityDesignRequest.LOW]: 'Thấp',
+    [PriorityDesignRequest.MEDIUM]: 'Trung bình',
+    [PriorityDesignRequest.HIGH]: 'Cao',
+    [PriorityDesignRequest.URGENT]: 'Khẩn cấp',
+}
+
+export const StatusDesignRequest = {
+    PENDING: 'pending',
+    DONE: 'done',
+}
+
+export type StatusDesignRequest = typeof StatusDesignRequest[keyof typeof StatusDesignRequest];
+
+export const STATUS_DESIGN_REQUEST_LABELS: { [key in StatusOrder]: string } = {
+    [StatusDesignRequest.PENDING]: 'Đang thiết kế',
+    [StatusDesignRequest.DONE]: 'Đã hoàn thành',
+}

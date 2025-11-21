@@ -1,145 +1,118 @@
-import {
-  Box, Button, Chip, Drawer, Grid, Paper, Select, MenuItem, Stack,
-  Tab, Tabs, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography
-} from "@mui/material";
-import { useState } from "react";
-import AddIcon from "@mui/icons-material/Add";
 import Page from "@/components/Page";
+import { CategoryType, ViewModeProps } from "@/types/tab";
+import { Box, Stack, useMediaQuery, useTheme } from "@mui/material";
+import { useState } from "react";
+import TabsViewSwitcher from "../BOM/components/TabsViewSwitcher";
+import ListDesignRequests from "./components/ListDesignRequests";
+import DesignTechnicalDrawing from "./components/DesignTechnicalDrawing";
+import CreateDesignRequest from "./components/designRequest/CreateDesignRequest";
+import { useFetchData } from "@/hooks/useFetchData";
+import { IDesignRequest } from "@/types/design-request";
+import { getListDesignRequests } from "@/services/design-request-service";
 
-interface DesignRequest {
-  id: string;
-  project: string;
-  customer: string;
-  designer: string;
-  status: string;
-  deadline: string;
-}
-
-interface TechnicalDrawing {
-  id: string;
-  project: string;
-  designer: string;
-  version: string;
-  status: string;
-  updatedAt: string;
-}
-
-const REQUESTS: DesignRequest[] = [
-  { id: "REQ-001", project: "Căn hộ Sunshine", customer: "Nguyễn Văn A", designer: "Minh", status: "Đang thiết kế", deadline: "2025-11-10" },
-];
-
-const DRAWINGS: TechnicalDrawing[] = [
-  { id: "DWG-001", project: "Căn hộ Sunshine", designer: "Minh", version: "V1", status: "Chờ duyệt", updatedAt: "2025-10-25" },
-  { id: "DWG-002", project: "Văn phòng Funi", designer: "Hoa", version: "V2", status: "Đã duyệt", updatedAt: "2025-10-27" },
-];
+const DataViewMode: ViewModeProps[] = [
+  {
+    id: 1,
+    label: 'Danh sách yêu cầu thiết kế',
+    value: 0
+  },
+  {
+    id: 2,
+    label: 'Thiết kế bản vẽ kỹ thuật',
+    value: 1
+  }
+]
 
 const DesignRequests = () => {
-  const [tab, setTab] = useState(0);
-  const [openDrawer, setOpenDrawer] = useState(false);
-  const [selected, setSelected] = useState<any>(null);
-    return (
-        <Page title="Yêu cầu thiết kế">
-    <Box p={3}>
-      {/* Header */}
-      <Stack direction="row" justifyContent="space-between" mb={2}>
-        <Typography variant="h5" fontWeight={600}>
-          Yêu cầu & Thiết kế bản vẽ kỹ thuật
-        </Typography>
-        <Button variant="contained" startIcon={<AddIcon />}>Tạo mới</Button>
-      </Stack>
+  const [activeCategory, setActiveCategory] = useState<CategoryType>(0);
+  const theme = useTheme();
+  const mdUp = useMediaQuery(theme.breakpoints.down('md'));
+  const [openRequestAndDrawing, setOpenRequestAndDrawing] = useState<{ open: boolean, type: string }>({
+    open: false,
+    type: ''
+  });
 
-      {/* Tabs */}
-      <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
-        <Tab label="Danh sách yêu cầu thiết kế" />
-        <Tab label="Thiết kế bản vẽ kỹ thuật" />
-      </Tabs>
+  const handleOpenAddDesignRequests = () => {
+    setOpenRequestAndDrawing({ open: true, type: 'design_request'})
+  }
 
-      {/* Tab 1: Danh sách yêu cầu */}
-      {tab === 0 && (
-        <Paper>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Mã yêu cầu</TableCell>
-                <TableCell>Tên dự án</TableCell>
-                <TableCell>Khách hàng</TableCell>
-                <TableCell>Người phụ trách</TableCell>
-                <TableCell>Trạng thái</TableCell>
-                <TableCell>Hạn nộp</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {REQUESTS.map((r) => (
-                <TableRow key={r.id} hover onClick={() => { setSelected(r); setOpenDrawer(true); }}>
-                  <TableCell>{r.id}</TableCell>
-                  <TableCell>{r.project}</TableCell>
-                  <TableCell>{r.customer}</TableCell>
-                  <TableCell>{r.designer}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={r.status}
-                      color={r.status === "Hoàn thành" ? "success" : "warning"}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>{r.deadline}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Paper>
-      )}
+  const handleCloseAddDesignRequests = async() => {
+    setOpenRequestAndDrawing({ open: false, type: 'design_request'})
+    await getListDesignRequests({ page: 1, limit: 10 })
+  }
 
-      {/* Tab 2: Thiết kế bản vẽ kỹ thuật */}
-      {tab === 1 && (
-        <Paper>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Mã bản vẽ</TableCell>
-                <TableCell>Dự án</TableCell>
-                <TableCell>Người thiết kế</TableCell>
-                <TableCell>Phiên bản</TableCell>
-                <TableCell>Trạng thái</TableCell>
-                <TableCell>Cập nhật</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {DRAWINGS.map((d) => (
-                <TableRow key={d.id} hover onClick={() => { setSelected(d); setOpenDrawer(true); }}>
-                  <TableCell>{d.id}</TableCell>
-                  <TableCell>{d.project}</TableCell>
-                  <TableCell>{d.designer}</TableCell>
-                  <TableCell>{d.version}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={d.status}
-                      color={d.status === "Đã duyệt" ? "success" : "warning"}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>{d.updatedAt}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Paper>
-      )}
+  const handleActiveCategory = (category: CategoryType) => {
+    setActiveCategory(category);
+    switch (category) {
+      case 0:
+        
+        break;
+      case 1:
+        break;
+    }
+  }
 
-      {/* Drawer chi tiết */}
-      <Drawer anchor="right" open={openDrawer} onClose={() => setOpenDrawer(false)}>
-        <Box width={480} p={3}>
-          <Typography variant="h6" mb={2}>Chi tiết</Typography>
-          <Stack spacing={2}>
-            {Object.entries(selected || {}).map(([k, v]) => (
-              <TextField key={k} label={k.toUpperCase()} value={String(v)} fullWidth />
-            ))}
-          </Stack>
+  return (
+    <Page title="Yêu cầu thiết kế">
+      {!openRequestAndDrawing.open && (
+        <Box bgcolor='#fff' height='100%'>
+          <Box>
+            {mdUp ? (
+              <Stack
+                direction='column'
+                spacing={1}
+                sx={{
+                  mb: 2,
+                  width: '100%'
+                }}
+              >
+                {DataViewMode.map((category, idx) => (
+                  <Box
+                    key={idx}
+                    onClick={() => category.value && handleActiveCategory(category.value)}
+                    sx={{
+                      px: 2,
+                      py: 1,
+                      borderRadius: 2,
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      bgcolor: activeCategory === category.value ? '#fff' : 'transparent',
+                      color: '#000',
+                      fontWeight: activeCategory === category.value ? 700 : 400,
+                      border: '1px solid #000',
+                      transition: '0.3s',
+                      "&:hover": {
+                        bgcolor: activeCategory === category.value ? "#fff" : 'rgba(255,255,255,0.1)'
+                      } 
+                    }}
+                  >
+                    {category.value}
+                  </Box>
+                ))}
+              </Stack>
+            ) : (
+              <TabsViewSwitcher DataViewMode={DataViewMode} viewMode={activeCategory} onChange={handleActiveCategory}/>
+            )}
+          </Box>
+          {activeCategory === 0 && (
+            <ListDesignRequests
+              onAddDesignRequest={handleOpenAddDesignRequests}
+            />
+          )}
+          {activeCategory === 1 && (
+            <DesignTechnicalDrawing/>
+          )}
         </Box>
-      </Drawer>
-    </Box>
-        </Page>
-    )
+      )}
+
+      {openRequestAndDrawing.open && openRequestAndDrawing.type === 'design_request' && (
+        <CreateDesignRequest
+          onBack={handleCloseAddDesignRequests}
+          open={openRequestAndDrawing.open}
+        />
+      )}
+    </Page>
+  )
 }
 
 export default DesignRequests;

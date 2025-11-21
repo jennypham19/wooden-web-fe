@@ -1,4 +1,4 @@
-import { PROCCESS_ORDER_LABELS, ProccessOrder, RENDER_LABELS, RenderUser, ROLE_CODES, ROLE_DEPARTMENT, ROLE_LABELS, RoleUser, STATUS_MACHINE_LABELS, STATUS_ORDER_LABELS, StatusMachine, StatusOrder } from "@/constants/status";
+import { PRIORITY_DESIGN_REQUEST_LABELS, PriorityDesignRequest, PROCCESS_ORDER_LABELS, ProccessOrder, RENDER_LABELS, RenderUser, ROLE_CODES, ROLE_DEPARTMENT, ROLE_LABELS, RoleUser, STATUS_DESIGN_REQUEST_LABELS, STATUS_MACHINE_LABELS, STATUS_ORDER_LABELS, StatusDesignRequest, StatusMachine, StatusOrder } from "@/constants/status";
 
 export const getRoleLabel = (role: RoleUser | null | undefined) : string => {
     if(!role) return "Chưa xác định";
@@ -28,6 +28,16 @@ export const getStatusOrderLabel = (status: StatusOrder | null | undefined): str
     return STATUS_ORDER_LABELS[status] || status;
 }
 
+export const getStatusDesignRequestLabel = (status: StatusDesignRequest | null | undefined): string => {
+  if(!status) return "Chưa xác định";
+  return STATUS_DESIGN_REQUEST_LABELS[status] || status;
+}
+
+export const getPriorityDesignRequestLabel = (priority: PriorityDesignRequest | null | undefined): string => {
+  if(!priority) return "Chưa xác định";
+  return PRIORITY_DESIGN_REQUEST_LABELS[priority] || priority;
+}
+
 export const getStatusOrderColor = (status: string | null) => {
   switch (status) {
     case 'completed':
@@ -37,6 +47,16 @@ export const getStatusOrderColor = (status: string | null) => {
     case 'pending':
     default:
       return { color: 'error' as const };
+  }
+};
+
+export const getStatusDesignRequestColor = (status: string | null) => {
+  switch (status) {
+    case 'done':
+      return { color: 'success' as const };
+    case 'pending':
+    default:
+      return { color: 'warning' as const };
   }
 };
 

@@ -15,7 +15,10 @@ export interface FormDataOrders{
 }
 export interface IOrder{
     id: string,
-    nameCustomer: string,
+    customer: {
+        id: string,
+        name: string
+    },
     codeOrder: string,
     name: string,
     dateOfReceipt: string,

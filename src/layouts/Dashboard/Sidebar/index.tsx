@@ -417,16 +417,18 @@ const MenuItem: FC<MenuItemProps> = (props) => {
           to: path,
         })}
       >
-        <ListItemText
-          primary={title}
-          sx={{
-            '& .MuiTypography-root': {
-              whiteSpace: 'nowrap',
-              fontSize: '14px',
-              fontWeight: 700,
-            },
-          }}
-        />
+        <Tooltip title={title}>
+          <ListItemText
+            primary={title}
+            sx={{
+              '& .MuiTypography-root': {
+                whiteSpace: 'normal',
+                fontSize: '14px',
+                fontWeight: 700,
+              },
+            }}
+          />
+        </Tooltip>
         {Info && <Info />}
       </Button>
     </ListItem>
