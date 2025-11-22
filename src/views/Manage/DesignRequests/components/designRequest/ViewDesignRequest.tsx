@@ -1,17 +1,15 @@
-import { getDetailDesignRequest, updateStatusAndDate } from "@/services/design-request-service";
-import { FormDataUpdateDesignRequest, IDesignRequest, IInputFile } from "@/types/design-request";
+import { getDetailDesignRequest } from "@/services/design-request-service";
+import { IDesignRequest } from "@/types/design-request";
 import NavigateBack from "@/views/Manage/components/NavigateBack";
 import { Avatar, Box, Button, Card, CardMedia, Chip, Divider, IconButton, Link, Paper, Stack, Table, TableBody, TableCell, TableRow, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid2";
 import { COLORS } from "@/constants/colors";
-import { getPriorityDesignRequestLabel, getStatusDesignRequestColor, getStatusDesignRequestLabel } from "@/utils/labelEntoVni";
+import { getPriorityDesignRequestLabel, getStatusDesignRequestLabel } from "@/utils/labelEntoVni";
 import DateTime from "@/utils/DateTime";
 import { Description, Download, Image, InsertDriveFile, Link as LinkIcon, PlayCircle } from "@mui/icons-material";
-import DialogUpdateStatusDate from "./DialogUpdateStatusDate";
-import useNotification from "@/hooks/useNotification";
 
-interface UpdateStatusAndDateProps{
+interface ViewDesignRequestProps{
     onBack: () => void;
     open: boolean,
     id: string
@@ -26,88 +24,26 @@ const getMimeTypeFromName = (name = "") => {
   return "other";
 };
 
-
-const UpdateStatusAndDate = (props: UpdateStatusAndDateProps) => {
+const ViewDesignRequest = (props: ViewDesignRequestProps) => {
     const { onBack, open, id } = props;
-    const notify = useNotification();
-    const [designRequest, setDesignRequest] = useState<IDesignRequest | null>(null);
-    const [openUpdateStatusDate, setOpenUpdateStatusDate] = useState(false);
-    const [formData, setFormData] = useState<FormDataUpdateDesignRequest>({
-        status: 'done', completedDate: null
-    });
-    const [errorDate, setErrorDate] = useState<string | null>(null)
-
-    const getDetail = async() => {
-        const res = await getDetailDesignRequest(id);
-        const data = res.data as any as IDesignRequest;
-        setDesignRequest(data);
-    };
+    const [designRequest, setDesignRequest] = useState<IDesignRequest | null>(null)
 
     useEffect(() => {
         if(open && id) {
+            const getDetail = async() => {
+                const res = await getDetailDesignRequest(id);
+                const data = res.data as any as IDesignRequest;
+                setDesignRequest(data);
+            };
             getDetail()
         }
     },[open, id]);
 
-    const handleOpenUpdateStatusDate = () => {
-        setOpenUpdateStatusDate(true)
-    }
 
-    const handleCloseUpdateStatusDate = () => {
-        setOpenUpdateStatusDate(false);
-        setErrorDate(null);
-        setFormData({ status: 'done', completedDate: null });
-        getDetail();
-    }
-
-    const handleInputChange = (name: string, value: any) => {
-        setFormData(prev => ({ ...prev, [name]: value }));
-        setErrorDate(null)
-    }
-
-    const handleSubmit = async() => {
-        if(!formData.completedDate){
-            setErrorDate("Ngày hoàn thành không được để trống");
-            return;
-        }
-        try {
-            const payload: FormDataUpdateDesignRequest = {...formData}
-            const res = await updateStatusAndDate(id, payload);
-            notify({
-                message: res.message,
-                severity: 'success'
-            });
-            handleCloseUpdateStatusDate()
-        } catch (error: any) {
-            notify({
-                message: error.message,
-                severity: 'error'
-            })
-        }
-    }
-
-    const downloadFile = (file: IInputFile) => {
-        try {
-            // Tạo thẻ <a> tạm để tải
-            const link = document.createElement("a");
-            link.href = file.url;
-            link.download = file.name.split("/").pop() || file.name; // chỉ lấy tên file cuối cùng
-            console.log("link.download: ", link.download);
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        } catch (error: any) {
-            notify({
-                message: ` Lỗi khi tải file: ${error.message}`,
-                severity: 'error'
-            })
-        }
-    }
     return(
         <Box>
             <NavigateBack
-                title="Cập nhật trạng thái và ngày hoàn thành yêu cầu thiết kế"
+                title="Chi tiết yêu cầu thiết kế"
                 onBack={onBack}
             />
             <Paper elevation={2} sx={{ p: 3, margin: '0 auto', m: 2, border: '1px solid #e7e5e5ff' }}>
@@ -126,7 +62,7 @@ const UpdateStatusAndDate = (props: UpdateStatusAndDateProps) => {
                                     {designRequest?.productName} — {designRequest?.orderName}
                                 </Typography>
                                 <Stack direction='row' spacing={1} sx={{ mt: 1 }}>
-                                    {designRequest?.status && <Chip label={getStatusDesignRequestLabel(designRequest?.status)} color={getStatusDesignRequestColor(designRequest?.status).color}/>}
+                                    <Chip label={getStatusDesignRequestLabel(designRequest?.status)}/>
                                     <Chip label={`Độ ưu tiên: ${getPriorityDesignRequestLabel(designRequest?.priority)}`}/>
                                     <Chip label={`Deadline hoàn thành: ${DateTime.FormatDate(designRequest?.dueDate)}`}/>
                                 </Stack>
@@ -168,9 +104,6 @@ const UpdateStatusAndDate = (props: UpdateStatusAndDateProps) => {
                                                     <IconButton component="a" href={input.url} target="_blank">
                                                         {kind === "image" ? <Image/> : kind === "video" ? <PlayCircle/> : <InsertDriveFile/>}
                                                     </IconButton>
-                                                    {/* <IconButton onClick={() => downloadFile(input)}>
-                                                        <Download/>
-                                                    </IconButton> */}
                                                     <IconButton component="a" href={input.url} target="_blank" download>
                                                         <Download/>
                                                     </IconButton>
@@ -179,8 +112,7 @@ const UpdateStatusAndDate = (props: UpdateStatusAndDateProps) => {
 
                                             {/* Preview area */}
                                             {kind === "image" && (
-                                                // <CardMedia component="img" image={input.url} alt={input.name ?? "image"} sx={{ mt: 1, maxHeight: 220 }} />
-                                                <img src={input.url} style={{ width: "100%", maxHeight: 320 }}/>
+                                                <CardMedia component="img" image={input.url} alt={input.name ?? "image"} sx={{ mt: 1, maxHeight: 220 }} />
                                             )}
                                             {kind === "video" && (
                                                 <Box sx={{ mt: 1 }}>
@@ -191,7 +123,6 @@ const UpdateStatusAndDate = (props: UpdateStatusAndDateProps) => {
                                                 <Box mt={1}>
                                                     <iframe
                                                         src={input.url}
-                                                        style={{ width: "100%", height: 250, border: "none" }}
                                                     />
                                                 </Box>
                                             )}
@@ -214,7 +145,7 @@ const UpdateStatusAndDate = (props: UpdateStatusAndDateProps) => {
                     <Grid size={{ xs: 12, md: 4 }}>
                         <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
                             <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-                                Thông tin
+                                <Description sx={{ mr: 1 }}/>Thông tin
                             </Typography>
 
                             <Table size="small">
@@ -245,17 +176,11 @@ const UpdateStatusAndDate = (props: UpdateStatusAndDateProps) => {
                                 </TableRow>
                                 </TableBody>
                             </Table>
-
-                            <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
-                                <Button disabled={!!designRequest?.completedDate} fullWidth variant="contained" sx={{ bgcolor: COLORS.BUTTON }} onClick={handleOpenUpdateStatusDate}>
-                                    Xác nhận hoàn thành
-                                </Button>
-                            </Stack>
                         </Paper>
 
                         <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
                             <Typography variant="subtitle1" gutterBottom fontWeight={600}>
-                                <LinkIcon sx={{ mr: 1 }}/> Reference Links
+                                <LinkIcon sx={{ mr: 1 }}/> Danh sách link tài liệu tham khảo
                             </Typography>
                             <Stack spacing={1} direction='column'>
                                 {designRequest?.referenceLinks?.map((link) => (
@@ -305,18 +230,8 @@ const UpdateStatusAndDate = (props: UpdateStatusAndDateProps) => {
                     </Grid>
                 </Grid>
             </Paper>
-            {openUpdateStatusDate && (
-                <DialogUpdateStatusDate
-                    open={openUpdateStatusDate}
-                    onClose={handleCloseUpdateStatusDate}
-                    formData={formData}
-                    error={errorDate}
-                    onInputChange={handleInputChange}
-                    onSubmit={handleSubmit}
-                />
-            )}
         </Box>
     )
 };
 
-export default UpdateStatusAndDate;
+export default ViewDesignRequest;

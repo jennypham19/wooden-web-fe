@@ -12,6 +12,7 @@ import DateTime from "@/utils/DateTime";
 import CustomPagination from "@/components/Pagination/CustomPagination";
 import IconButton from "@/components/IconButton/IconButton";
 import UpdateStatusAndDate from "./designRequest/UpdateStatusAndDate";
+import ViewDesignRequest from "./designRequest/ViewDesignRequest";
 
 interface ListDesignRequestsProps {
   onAddDesignRequest: () => void;
@@ -36,6 +37,17 @@ const ListDesignRequests = (props: ListDesignRequestsProps) => {
 
   const handleCloseUpdateStatusAndDate = () => {
     setOpenDesignRequest({ open: false, type: 'update-status-and-date' });
+    setId(null);
+    fetchData(page, rowsPerPage)
+  }
+
+  const handleOpenViewDesignRequest = (id: string) => {
+    setOpenDesignRequest({ open: true, type: 'view-design-request' });
+    setId(id)
+  }
+
+  const handleCloseViewDesignRequest = () => {
+    setOpenDesignRequest({ open: false, type: 'view-design-request' });
     setId(null);
     fetchData(page, rowsPerPage)
   }
@@ -97,11 +109,11 @@ const ListDesignRequests = (props: ListDesignRequestsProps) => {
                                                       />
                                                     </TableCell>
                                                     <TableCell align="center">{DateTime.FormatDate(designRequest.dueDate)}</TableCell>
-                                                    <TableCell align="center">{designRequest.completedDate !== null ? "" : DateTime.FormatDate(designRequest.completedDate)}</TableCell>
+                                                    <TableCell align="center">{DateTime.FormatDate(designRequest.completedDate) || ""}</TableCell>
                                                     <TableCell align="center">
                                                       <IconButton
                                                         tooltip="Xem chi tiết"
-                                                        handleFunt={() => {}}
+                                                        handleFunt={() => designRequest && handleOpenViewDesignRequest(designRequest.id)}
                                                         icon={<Visibility color="info"/>}
                                                       />
                                                       <IconButton
@@ -133,6 +145,13 @@ const ListDesignRequests = (props: ListDesignRequestsProps) => {
           {openDesignRequest.open && openDesignRequest.type === 'update-status-and-date' && id && (
             <UpdateStatusAndDate
               onBack={handleCloseUpdateStatusAndDate}
+              id={id}
+              open={openDesignRequest.open}
+            />
+          )}
+          {openDesignRequest.open && openDesignRequest.type === 'view-design-request' && id && (
+            <ViewDesignRequest
+              onBack={handleCloseViewDesignRequest}
               id={id}
               open={openDesignRequest.open}
             />

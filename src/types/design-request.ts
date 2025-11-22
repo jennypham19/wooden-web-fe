@@ -31,6 +31,11 @@ export interface FormDataDesignRequets{
     specialRequirement: string,
 }
 
+export interface FormDataUpdateDesignRequest{
+    status: string,
+    completedDate: Dayjs | null
+}
+
 export interface DesignRequestPayload{
     requestCode: string,
     title: string,

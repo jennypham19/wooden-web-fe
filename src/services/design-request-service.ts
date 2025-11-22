@@ -1,7 +1,7 @@
 import HttpClient from "@/utils/HttpClient";
 import { GetParams, PaginatedResponse } from "./base-service";
 import { HttpResponse } from "@/types/common";
-import { DesignRequestPayload, IDesignRequest } from "@/types/design-request";
+import { DesignRequestPayload, FormDataUpdateDesignRequest, IDesignRequest } from "@/types/design-request";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'; 
 const prefix = `${API_BASE_URL}/api/design-requests`;
@@ -36,4 +36,9 @@ export const createDesignRequest = async(payload: DesignRequestPayload) => {
 // Lấy chi tiết bản ghi
 export const getDetailDesignRequest = async(id: string) => {
     return HttpClient.get<any, HttpResponse<IDesignRequest>>(`${prefix}/detail-design-request/${id}`)
+}
+
+// update trạng thái và ngày hoàn thành
+export const updateStatusAndDate = async(id: string, payload: FormDataUpdateDesignRequest) => {
+    return HttpClient.put<any>(`${prefix}/update-status-date/${id}`, payload as any);
 }
