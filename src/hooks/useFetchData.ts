@@ -16,7 +16,7 @@ export const useFetchData = <T>(
     status?: string,
 ) => {
     const [listData, setListData] = useState<T[]>([]);
-    const [total, setTotal] = useState(0);
+    const [total, setTotal] = useState<number>(0);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null);
@@ -32,10 +32,10 @@ export const useFetchData = <T>(
             const res = await fn({ page: page, limit: limit, searchTerm: searchTerm, status: status });
             // Chặn kết quả cũ ghi đè khi debounce bị overlap
             if (latestFetchRef.current !== fetchId) return;
-
             const data = res.data?.data as any as T[];
             setListData(data);
-            res.data?.total && setTotal(res.data.total)
+            const total = res.data?.total as any as number;
+            setTotal(total)
         } catch (error: any) {
             if (latestFetchRef.current !== fetchId) return;
             setError(error.message);

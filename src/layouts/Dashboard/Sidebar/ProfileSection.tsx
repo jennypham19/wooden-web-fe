@@ -20,7 +20,7 @@ const ProfileSection = () => {
         <Box sx={{ p: 2, textAlign: 'center', mt: 5}}>
             <Avatar
                 alt={profile.fullName}
-                src={profile.avatarUrl && getPathImage(profile.avatarUrl) || avatar1}
+                src={profile.avatarUrl || avatar1}
                 sx={{
                     width: 80,
                     height: 80,

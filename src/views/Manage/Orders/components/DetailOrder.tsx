@@ -30,7 +30,7 @@ const DetailOrder = (props: DetailOrderProps) => {
                     />
                     <Stack margin='auto 0' direction='column'>
                         <Typography variant="caption">Khách hàng</Typography>
-                        <Typography fontSize='15px' fontWeight={600}>{data.nameCustomer}</Typography>
+                        <Typography fontSize='15px' fontWeight={600}>{data.customer.name}</Typography>
                     </Stack>
                 </Box>
                 <Box margin='auto 0'>

@@ -3,7 +3,7 @@ import { FormDataOrders } from "@/types/order";
 import React, { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid2"
 import dayjs from "dayjs";
-import { Box, Button, Input, Typography } from "@mui/material";
+import { Box, Button, Input, Stack, TextField, Typography } from "@mui/material";
 import { ICustomer } from "@/types/customer";
 import { getCustomers } from "@/services/customer-service";
 import InputSelect from "@/components/InputSelect";
@@ -18,6 +18,10 @@ import ProductOrder from "./ProductOrder";
 import { getAccounts } from "@/services/user-service";
 import { IUser } from "@/types/user";
 import { FormDataProducts } from "@/types/product";
+import { Add, RemoveCircleOutline } from "@mui/icons-material";
+import IconButton from "@/components/IconButton/IconButton";
+import LabeledStack from "@/components/LabeledStack";
+import FilesUpload from "../../components/FilesUpload";
 
 interface DialogAddOrderProps{
     open: boolean,
@@ -46,8 +50,8 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
     const [amountProduct, setAmountProduct] = useState<number | null>(null);
     const [products, setProducts] = useState<number[]>([]);
     const [formDataProduct, setFormDataProduct] = useState<FormDataProducts[]>([])
-
     const [productErrors, setProductErrors] = useState<FormProductErrors[]>([])
+    const [referenceLinkSlots, setReferenceLinkSlots] = useState<(string | null)[]>([]);
 
     useEffect(() => {
         if(open){
@@ -63,6 +67,7 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
             }
             fetchCustomers();
             fetchManagers();
+            setReferenceLinkSlots([null])
         }
     },[open])
 
@@ -71,7 +76,8 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
         setFormData({ customerId: '', name: '', dateOfReceipt: dayjs(), dateOfPayment: null, proccess: 'not_started_0%', status: 'pending', amount: null, requiredNote: '', products: [] });
         setErrors({});
         setErrorCode(null)
-        setCode('')
+        setCode('');
+        setReferenceLinkSlots([])
     }
 
     const handleInputChange = (name: string, value: any) => {
@@ -116,8 +122,22 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
         });
     }
 
-    // console.log("formDataProduct: ", formDataProduct);
-    
+    // Link tài liệu
+    const handleAddReferenceLinkSlot = () => {
+        setReferenceLinkSlots(prev => [...prev, null]);
+    }
+
+    const handleRemoveReferenceLinkSlot = (indexToRemove: number) => {
+        setReferenceLinkSlots(prev => prev.filter((_, index) => index !== indexToRemove))
+    }
+
+    const handleReferenceLinkSlotChange = (index: number, newValue: string) => {
+        setReferenceLinkSlots(prev => {
+            const newSlots = [...prev];
+            newSlots[index] = newValue;
+            return newSlots;
+        })
+    }
     
     const validateForm = (): boolean => {
         const newErros: FormErrors = {};
@@ -300,6 +320,8 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
                     <Grid size={{ xs: 12 }}>
                         <Typography fontWeight={700} fontSize='15px'>Yêu cầu</Typography>
                         <InputText
+                            multiline
+                            rows={6}
                             label=""
                             name="requiredNote"
                             type="text"
@@ -308,6 +330,67 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
                             error={!!errors.requiredNote}
                             helperText={errors.requiredNote}
                         />
+                    </Grid>
+                    <Grid size={{ xs: 12 }}>
+                        <FilesUpload
+                            onFilesSelect={() => {}}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12 }}>
+                        <LabeledStack
+                            sx={{ borderRadius: 3 }}
+                            label="Link tài liệu"
+                            stackProps={{ direction: "column", my: 2, p: 2 }}
+                        >
+                            {referenceLinkSlots.map((slot, index) => (
+                                <React.Fragment key={index}>
+                                    <Typography fontWeight={600} fontSize='15px'>{`Link tài liệu thứ ${index + 1}`}</Typography>
+                                    <Stack direction="row" spacing={1} alignItems="center">
+                                        <TextField
+                                            label=''
+                                            name="url"
+                                            type="text"
+                                            value={slot}
+                                            onChange={(newValue: any) => handleReferenceLinkSlotChange(index, newValue.target.value)}
+                                            placeholder="Nhập thông tin"
+                                            InputProps={{
+                                                sx: {
+                                                    "& .MuiOutlinedInput-notchedOutline": {
+                                                        border: '1px solid rgb(53, 50, 50)',
+                                                        borderRadius: '8px'
+                                                    },
+                                                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                                                        border: '1px solid rgb(53, 50, 50)'
+                                                    },
+                                                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                                                        border: '1px solid rgb(53, 50, 50)'
+                                                    },
+                                                    color: '#000'
+                                                }
+                                            }}
+                                        /> 
+                                        <IconButton
+                                            aria-label={`Remove slot ${index + 1}`}
+                                            handleFunt={() => handleRemoveReferenceLinkSlot(index)}
+                                            size="small"
+                                            color="error"
+                                            disabled={referenceLinkSlots.length === 1}
+                                            icon={<RemoveCircleOutline sx={{ color: COLORS.BUTTON }}/>}
+                                        />   
+                                    </Stack>
+                                </React.Fragment>
+                            ))}
+                            {referenceLinkSlots.length && (
+                                <Button
+                                    variant="outlined"
+                                    startIcon={<Add sx={{ color: COLORS.BUTTON }}/>}
+                                    onClick={handleAddReferenceLinkSlot}
+                                    sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
+                                >
+                                    Thêm link tài liệu
+                                </Button>
+                            )}
+                        </LabeledStack>
                     </Grid>
                 </Grid>
                     {amountProduct !== null && products.length > 0 && (

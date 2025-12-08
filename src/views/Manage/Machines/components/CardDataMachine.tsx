@@ -1,0 +1,77 @@
+import CommonImage from "@/components/Image/index";
+import { IMachine } from "@/types/machine";
+import DateTime from "@/utils/DateTime";
+import { getStatusMachineColor, getStatusMachineLabel } from "@/utils/labelEntoVni";
+import { Box, Button, Card, Chip, Stack, Typography } from "@mui/material";
+import Grid from "@mui/material/Grid2"
+import RenderButtonByStatus from "./buttons/RenderButtonByStatus";
+import { StatusMachine } from "@/constants/status";
+
+interface CardDataMachineProps{
+    machine: IMachine,
+    onViewMachine: (id: string) => void;
+    onUpdateMachine: (id: string, type: string) => void;
+}
+
+const CardDataMachine = (props: CardDataMachineProps) => {
+    const { machine, onViewMachine, onUpdateMachine } = props;
+    return(
+        <Card
+            sx={{ p: 1, borderRadius: 2 }}
+        >
+            <Grid container>
+                <Grid sx={{ display: 'flex', justifyContent: 'center'}} size={{ xs: 12, md: 4 }}>
+                    <Box display='flex' flexDirection='column' p={2}>
+                        <Chip
+                            label={getStatusMachineLabel(machine.status)}
+                            color={getStatusMachineColor(machine.status).color}
+                            sx={{ mb: 2 }}
+                        />
+                        <CommonImage
+                            src={machine.imageUrl}
+                            alt={machine.nameUrl}
+                            sx={{ height: 200 }}
+                        />
+                    </Box>
+                </Grid>
+                <Grid sx={{ display: 'flex', alignItems: 'center'}} size={{ xs: 12, md: 8 }}>
+                    <Box margin='auto 0' mx={1}>
+                        <Typography fontWeight={500}>{machine.name.toLocaleUpperCase()}</Typography>
+                        <Box my={2} display='flex' justifyContent='space-between'>
+                            <Stack direction='column' pr={2.5} sx={{ borderRight: '1px solid #979595ff'}}>
+                                <Typography fontSize={{ xs: '14px', md: '16px'}}>Mã máy: {machine.code}</Typography>
+                                <Typography fontSize={{ xs: '14px', md: '16px'}}>Trọng lượng: {machine.weight}</Typography>
+                                <Typography fontSize={{ xs: '14px', md: '16px'}}>Kích thước: {machine.dimensions}</Typography>
+                                <Typography fontSize={{ xs: '14px', md: '16px'}}>Công suất: {machine.power}</Typography>
+                            </Stack>
+                            <Stack direction='column' pl={2}>
+                                <Typography fontSize={{ xs: '14px', md: '16px'}}>Thương hiệu: {machine.brand}</Typography>
+                                <Typography fontSize={{ xs: '14px', md: '16px'}}>Ngày hết hạn bảo hành: {DateTime.FormatDate(machine.warrantyExpirationDate)}</Typography>
+                                {machine.status === StatusMachine.PAUSED && machine.startAgainDate && (
+                                    <Typography fontSize={{ xs: '14px', md: '16px'}}>Ngày hoạt động lại: {DateTime.FormatDate(machine.startAgainDate)}</Typography>
+                                )}
+                                {machine.status === StatusMachine.UNDER_MAINTENANCE && machine.maintenanceDate && machine.maintenancePercentage &&  (
+                                    <>
+                                        <Typography fontSize={{ xs: '14px', md: '16px'}}>Ngày bảo dưỡng: {DateTime.FormatDate(machine.maintenanceDate)}</Typography>
+                                        <Typography fontSize={{ xs: '14px', md: '16px'}}>Phần trăm bảo dưỡng: {machine.maintenancePercentage}</Typography>
+                                    </>
+                                )}
+                                {machine.status === StatusMachine.UNDER_REPAIR && machine.repairedDate && (
+                                    <Typography fontSize={{ xs: '14px', md: '16px'}}>Ngày sửa chữa: {DateTime.FormatDate(machine.repairedDate)}</Typography>
+                                )}
+                            </Stack>
+                        </Box>
+                        <RenderButtonByStatus 
+                            status={machine.status}
+                            machine={machine}
+                            onViewMachine={onViewMachine}
+                            onUpdateMachine={onUpdateMachine}
+                        />
+                    </Box>
+                </Grid>
+            </Grid>
+        </Card>
+    )
+};
+
+export default CardDataMachine;

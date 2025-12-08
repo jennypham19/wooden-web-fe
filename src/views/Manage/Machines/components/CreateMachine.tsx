@@ -1,16 +1,17 @@
-import { Avatar, Box, Button, Divider, Typography } from "@mui/material";
+import { Box, Button, Divider, Typography } from "@mui/material";
 import NavigateBack from "../../components/NavigateBack";
 import Grid from "@mui/material/Grid2";
 import InputText from "@/components/InputText";
 import { DataMachinesRequest, FormDataMachines } from "@/types/machine";
 import useNotification from "@/hooks/useNotification";
-import { ChangeEvent, useRef, useState } from "react";
+import { useState } from "react";
 import { COLORS } from "@/constants/colors";
 import InputSelect from "@/components/InputSelect";
 import { STATUS_MACHINE_DATA } from "@/constants/data";
-import { resizeImage } from "@/utils/common";
-import CommonImage from "@/components/Image/index";
 import ImageUpload from "../../components/ImageUpload";
+import { uploadImage } from "@/services/upload-service";
+import Backdrop from "@/components/Backdrop";
+import { createMachine } from "@/services/machine-service";
 
 interface CreateMachineProps{
     onBack: () => void;
@@ -20,12 +21,12 @@ export type FormErrors = {
     [K in keyof FormDataMachines]?: string
 }
 
+
 const CreateMachine = ( props: CreateMachineProps ) => {
     const { onBack } = props;
     const notify = useNotification();
-    const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [formData, setFormData] = useState<FormDataMachines>({
-        name: '', code: '', specification: '', brand: '', weight: '', dimensions: '', power: '', maintenancePercentage: '', status: 'operating', maintenanceDate: null, completionDate: null, purchaseDate: null, warrantyExpirationDate: null, description: '', reason: '', startAgainDate: null
+        name: '', code: '', brand: '', weight: '', dimensions: '', power: '', maintenancePercentage: '', status: 'operating', maintenanceDate: null, completionDate: null, purchaseDate: null, warrantyExpirationDate: null, description: '', reason: '', startAgainDate: null
     })
     const [errors, setErrors] = useState<FormErrors>({});
     const [imageFile, setImageFile] = useState<File | null>(null);
@@ -34,7 +35,7 @@ const CreateMachine = ( props: CreateMachineProps ) => {
 
     const handleBack = () => {
         onBack();
-        setFormData({ name: '', code: '', specification: '', brand: '', weight: '', dimensions: '', power: '', maintenancePercentage: '', status: 'operating', maintenanceDate: null, completionDate: null, purchaseDate: null, warrantyExpirationDate: null, description: '', reason: '', startAgainDate: null })
+        setFormData({ name: '', code: '', brand: '', weight: '', dimensions: '', power: '', maintenancePercentage: '', status: 'operating', maintenanceDate: null, completionDate: null, purchaseDate: null, warrantyExpirationDate: null, description: '', reason: '', startAgainDate: null })
         setErrors({})
     }
 
@@ -58,7 +59,6 @@ const CreateMachine = ( props: CreateMachineProps ) => {
         const newErrors: FormErrors = {};
         if(!formData.name) newErrors.name = 'Vui lòng nhập tên máy';
         if(!formData.code) newErrors.code = 'Vui lòng nhập mã máy';
-        if(!formData.specification) newErrors.specification = 'Vui lòng nhập thông số';
         if(!formData.brand) newErrors.brand = 'Vui lòng nhập thương hiệu';
         if(!formData.weight) newErrors.weight = 'Vui lòng nhập trọng lượng';
         if(!formData.dimensions) newErrors.dimensions = 'Vui lòng nhập kích thước';
@@ -79,14 +79,13 @@ const CreateMachine = ( props: CreateMachineProps ) => {
         setIsSubmitting(true);
         try {
             let uploadResponse:  any;
-            uploadResponse = await uploadResponse(imageFile!, 'machines');
+            uploadResponse = await uploadImage(imageFile!, 'machines');
             if(!uploadResponse.success || !uploadResponse.data.file){
                throw new Error('Upload ảnh thất bại hoặc không nhận được URL ảnh'); 
             }
             const payload: DataMachinesRequest = {
                 name: formData.name,
                 code: formData.code,
-                specification: formData.specification,
                 brand: formData.brand,
                 weight: formData.weight,
                 dimensions: formData.dimensions,
@@ -102,8 +101,12 @@ const CreateMachine = ( props: CreateMachineProps ) => {
                 imageUrl: uploadResponse.data.file.imageUrl,
                 nameUrl: uploadResponse.data.file.fileName
             }
-
-            console.log("payload: ", payload);  
+            const res = await createMachine(payload);
+            notify({
+                message: res.message,
+                severity: 'success'
+            })
+            handleBack()  
         } catch (error: any) {
             notify({
                 message: error.message,
@@ -123,7 +126,8 @@ const CreateMachine = ( props: CreateMachineProps ) => {
             />
             <Box
                 sx={{
-                    m: 2, boxShadow: "0px 1px 2px 1px rgba(0, 0, 0, 0.2)", borderRadius: 4, p: 2
+                    m: 2, boxShadow: "0px 1px 2px 1px rgba(0, 0, 0, 0.2)", borderRadius: 4, p: 2,
+                    bgcolor: '#fff'
                 }}
             >
                 <Typography fontWeight={600}>Thông tin máy móc</Typography>
@@ -162,19 +166,6 @@ const CreateMachine = ( props: CreateMachineProps ) => {
                         />
                     </Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
-                        <Typography fontWeight={600} fontSize='15px'>Thông số</Typography>
-                        <InputText
-                            label=""
-                            type="text"
-                            name="specification"
-                            value={formData.specification}
-                            onChange={handleInputChange}
-                            margin="dense"
-                            error={!!errors.specification}
-                            helperText={errors.specification}
-                        />
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 4 }}>
                         <Typography fontWeight={600} fontSize='15px'>Thương hiệu</Typography>
                         <InputText
                             label=""
@@ -187,6 +178,7 @@ const CreateMachine = ( props: CreateMachineProps ) => {
                             helperText={errors.brand}
                         />
                     </Grid>
+                    <Grid size={{ xs: 12, md: 4 }}></Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
                         <Typography fontWeight={600} fontSize='15px'>Trọng lượng</Typography>
                         <InputText
@@ -315,6 +307,9 @@ const CreateMachine = ( props: CreateMachineProps ) => {
                     </Button>
                 </Box>
             </Box>
+            {isSubmitting && (
+                <Backdrop open={isSubmitting}/>
+            )}
         </Box>
     )
 }

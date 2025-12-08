@@ -23,7 +23,7 @@ const EditMachine = ( props: EditMachineProps ) => {
     const { onBack } = props;
     const notify = useNotification();
     const [formData, setFormData] = useState<FormDataMachines>({
-        name: '', code: '', specification: '', brand: '', weight: '', dimensions: '', power: '', maintenancePercentage: '', status: 'operating', maintenanceDate: null, completionDate: null, purchaseDate: null, warrantyExpirationDate: null, description: '', reason: '', startAgainDate: null
+        name: '', code: '',brand: '', weight: '', dimensions: '', power: '', maintenancePercentage: '', status: 'operating', maintenanceDate: null, completionDate: null, purchaseDate: null, warrantyExpirationDate: null, description: '', reason: '', startAgainDate: null
     })
     const [errors, setErrors] = useState<FormErrors>({});
     const [maintenancePercentage, setMaintenancePercentage] = useState('');
@@ -31,7 +31,7 @@ const EditMachine = ( props: EditMachineProps ) => {
 
     const handleBack = () => {
         onBack();
-        setFormData({ name: '', code: '', specification: '', brand: '', weight: '', dimensions: '', power: '', maintenancePercentage: '', status: 'operating', maintenanceDate: null, completionDate: null, purchaseDate: null, warrantyExpirationDate: null, description: '', reason: '', startAgainDate: null })
+        setFormData({ name: '', code: '', brand: '', weight: '', dimensions: '', power: '', maintenancePercentage: '', status: 'operating', maintenanceDate: null, completionDate: null, purchaseDate: null, warrantyExpirationDate: null, description: '', reason: '', startAgainDate: null })
         setErrors({})
     }
     const handleInputChange = (name: string, value: any) => {
@@ -54,7 +54,6 @@ const EditMachine = ( props: EditMachineProps ) => {
         const newErrors: FormErrors = {};
         if(!formData.name) newErrors.name = 'Vui lòng nhập tên máy';
         if(!formData.code) newErrors.code = 'Vui lòng nhập mã máy';
-        if(!formData.specification) newErrors.specification = 'Vui lòng nhập thông số';
         if(!formData.brand) newErrors.brand = 'Vui lòng nhập thương hiệu';
         if(!formData.weight) newErrors.weight = 'Vui lòng nhập trọng lượng';
         if(!formData.dimensions) newErrors.dimensions = 'Vui lòng nhập kích thước';
@@ -113,17 +112,6 @@ const EditMachine = ( props: EditMachineProps ) => {
                         />
                     </Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
-                        <Typography fontWeight={600} fontSize='15px'>Thông số</Typography>
-                        <InputText
-                            label=""
-                            type="text"
-                            name="specification"
-                            value={formData.specification}
-                            onChange={handleInputChange}
-                            margin="dense"
-                            error={!!errors.specification}
-                            helperText={errors.specification}
-                        />
                     </Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
                         <Typography fontWeight={600} fontSize='15px'>Thương hiệu</Typography>

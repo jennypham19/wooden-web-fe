@@ -113,9 +113,9 @@ export const STATUS_MACHINE_LABELS: { [key in StatusMachine]: string } = {
     [StatusMachine.OPERATING]: 'Đang hoạt động',
     [StatusMachine.PAUSED]: 'Tạm dừng',
     [StatusMachine.STOPPED]: 'Ngừng hoạt động',
-    [StatusMachine.UNDER_MAINTENANCE]: 'Đang bảo trì',
+    [StatusMachine.UNDER_MAINTENANCE]: 'Đang bảo dưỡng',
     [StatusMachine.UNDER_REPAIR]: 'Đang sửa chữa',
-    [StatusMachine.FAULTY]: 'Lỗi/Hỏng',
+    [StatusMachine.FAULTY]: 'Gặp sự cố',
 }
 
 export const PriorityDesignRequest = {

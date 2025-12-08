@@ -15,6 +15,7 @@ import DateTime from "@/utils/DateTime";
 import IconButton from "@/components/IconButton/IconButton";
 import AllListOrders from "./components/AllListOrders";
 import DetailOrder from "./components/DetailOrder";
+import { StatusOrder } from "@/constants/status";
 
 
 const Orders = () => {
@@ -113,11 +114,13 @@ const Orders = () => {
                                                         </Stack>
                                                         <Stack mt={1} display='flex' justifyContent='space-between'>
                                                             <Typography fontSize='15px'><b>Số lượng sản phẩm:</b> {order.amount} sản phẩm/ đơn hàng</Typography>
-                                                            <IconButton
-                                                                handleFunt={() => {}}
-                                                                icon={<Visibility/>}
-                                                                height={0}
-                                                            />
+                                                            {order.status === StatusOrder.COMPLETED && (
+                                                                <IconButton
+                                                                    handleFunt={() => {}}
+                                                                    icon={<Visibility/>}
+                                                                    height={0}
+                                                                />
+                                                            )}
                                                         </Stack>
                                                         <Typography mt={1} fontSize='15px'><b>Yêu cầu:</b> {order.requiredNote}</Typography>
                                                     </CardContent>

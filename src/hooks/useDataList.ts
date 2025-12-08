@@ -37,7 +37,8 @@ export const useDataList = <T>(
 
             const data = res.data?.data as any as T[];
             setListData(data);
-            res.data?.total && setTotal(res.data.total)
+            const total = res.data?.total as any as number;
+            setTotal(total)
         } catch (error: any) {
             if (latestFetchRef.current !== fetchId) return;
             setError(error.message);

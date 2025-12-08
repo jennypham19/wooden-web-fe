@@ -64,3 +64,21 @@ export const getStatusMachineLabel = (status: StatusMachine | null | undefined):
   if(!status) return 'Chưa xác định';
   return STATUS_MACHINE_LABELS[status] || status;
 }
+
+export const getStatusMachineColor = (status: string | null) => {
+  switch (status) {
+    case 'faulty':
+      return { color: 'error' as const };
+    case 'paused':
+      return { color: 'warning' as const };
+    case 'under_maintenance':
+      return { color: 'info' as const };
+    case 'under_repair':
+      return { color: 'secondary' as const };
+    case 'stopped':
+      return { color: 'default' as const };
+    case 'operating':
+    default:
+      return { color: 'success' as const };
+  }
+};

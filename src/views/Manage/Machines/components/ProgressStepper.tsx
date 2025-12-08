@@ -16,7 +16,7 @@ const ColorConnector = styled(StepConnector)<{ activeStep: number }>(
             height: 3,
             border: 8,
             backgroundColor: '#eaeaf0',
-            borderRadius: 1,
+            borderRadius: 1
         },
 
         [`&.${stepConnectorClasses.active}`]: {
@@ -37,7 +37,7 @@ const ColorConnector = styled(StepConnector)<{ activeStep: number }>(
 )
 
 interface ProgressStepperProps{
-    maintenancePercentage: string
+    maintenancePercentage: string | null
 }
 
 const ProgressStepper: React.FC<ProgressStepperProps> = ({ maintenancePercentage }) => {
@@ -50,7 +50,6 @@ const ProgressStepper: React.FC<ProgressStepperProps> = ({ maintenancePercentage
                 justifyContent: "center",
                 alignItems: "center",
                 py: 3,
-                
             }}
         >
             <Stepper

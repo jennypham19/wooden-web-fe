@@ -60,7 +60,7 @@ const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
 
     const handleCloseAddOrder = () => {
         setOpenOrder({ open: false, type: 'add' });
-        fetchData(page, rowsPerPage, viewMode)
+        fetchData(page, rowsPerPage, '', viewMode)
     }
 
     return(
@@ -112,7 +112,7 @@ const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
                                                                     />
                                                                     <Stack margin='auto 0' direction='column'>
                                                                         <Typography variant="caption">Khách hàng</Typography>
-                                                                        <Typography fontSize='15px' fontWeight={600}>{order.nameCustomer}</Typography>
+                                                                        <Typography fontSize='15px' fontWeight={600}>{order.customer.name}</Typography>
                                                                     </Stack>
                                                                 </Box>
                                                                 <Box margin='auto 0'>
