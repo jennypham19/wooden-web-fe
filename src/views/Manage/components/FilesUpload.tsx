@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Box, Typography, Button, IconButton } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { FolderCopyOutlined } from '@mui/icons-material';
+import { Box, Typography, Button, IconButton, InputAdornment } from '@mui/material';
+import { Add, Close, FolderCopyOutlined, InsertDriveFile } from '@mui/icons-material';
+import InputText from '@/components/InputText';
+import LabeledStack from '@/components/LabeledStack';
+import { COLORS } from '@/constants/colors';
 
 interface FilesUploadProps {
   onFilesSelect: (files: File[]) => void;
@@ -15,6 +17,7 @@ const FilesUpload: React.FC<FilesUploadProps> = ({ onFilesSelect, initialImages,
 
   const [urlFiles, setUrlFiles] = useState<string[]>([]);
   const [files, setFiles] = useState<File[]>([]);
+  const [openFiles, setOpenFiles] = useState(false);
   
   useEffect(() => {
     if (initialImages) {
@@ -26,21 +29,28 @@ const FilesUpload: React.FC<FilesUploadProps> = ({ onFilesSelect, initialImages,
     const files = event.target.files;
     if (files) {
         const arrFiles = Array.from(files); // Convert FileList => File[]
-        onFilesSelect(arrFiles);
-        setFiles(arrFiles);
+
+        // Callback to parent
+        onFilesSelect([...(files || []), ...arrFiles]);
+
+        // update files
+        setFiles(prev => [...(prev || []), ...arrFiles]);
 
         // Update preview images
         const previewUrls = arrFiles.map(file => URL.createObjectURL(file));
-        setUrlFiles(previewUrls)
+        setUrlFiles(prev => [...(prev || []), ...previewUrls]);
     }
     event.target.value = "";
   };
 
   const handleRemoveImage = (index: number) => {
-    setUrlFiles(prev => prev.filter((_, i) => i !== index));
-    setFiles(prev => prev.filter((_, i) => i !== index));
+    const newFiles = (files || []).filter((_, i) => i !== index);
+    const newUrls = (urlFiles || []).filter((_, i) => i !== index);
 
-    onFilesSelect(files.filter((_, i) => i !== index));
+    setUrlFiles(newUrls);
+    setFiles(newFiles);
+
+    onFilesSelect(newFiles);
 
     if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -51,8 +61,6 @@ const FilesUpload: React.FC<FilesUploadProps> = ({ onFilesSelect, initialImages,
     fileInputRef.current?.click();
   };
 
-  console.log("files: ", files);
-  
   return (
     <Box>
       <input
@@ -63,10 +71,27 @@ const FilesUpload: React.FC<FilesUploadProps> = ({ onFilesSelect, initialImages,
         style={{ display: 'none' }}
       />
       
-      {urlFiles && urlFiles.length > 0 ? (
-        urlFiles.map((file, index) => (
-            <Box key={index} sx={{ position: 'relative', width: '100%', height: '300px', border: '1px dashed grey', borderRadius: 2, overflow: 'hidden' }}>
-                <img src={file} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'fill' }} />
+      {files && files.length > 0 ? (
+        <LabeledStack
+          sx={{ borderRadius: 3 }}
+          label='Files dữ liệu'
+          stackProps={{ direction: 'column', my: 2, p: 2 }}
+        >          
+          {files.map((file, index) => (
+            <Box key={index} sx={{ position: 'relative', overflow: 'hidden' }}>
+                <InputText
+                  label=''
+                  placeholder='Tài liệu'
+                  value={file.name}
+                  name=''
+                  type='text'
+                  onChange={() => {}}
+                  startAdornment={
+                    <InputAdornment position='start'>
+                      <InsertDriveFile/>
+                    </InputAdornment>
+                  }
+                />
                 <IconButton
                     onClick={() => handleRemoveImage(index)}
                     sx={{
@@ -77,10 +102,40 @@ const FilesUpload: React.FC<FilesUploadProps> = ({ onFilesSelect, initialImages,
                         '&:hover': { backgroundColor: 'rgba(255, 255, 255, 1)' }
                     }}
                 >
-                    <DeleteIcon />
+                    <Close />
                 </IconButton>
             </Box>
-        ))
+          ))}
+          <Button
+            variant="outlined"
+            startIcon={<Add sx={{ color: COLORS.BUTTON }}/>}
+            onClick={() => { setOpenFiles(true) }}
+            sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
+          >
+            Thêm files dữ liệu
+          </Button>
+          {openFiles && (
+            <Box
+              onClick={handleBoxClick}
+              sx={{
+                border: errorImage ? '2px dashed #d82020ff' : '2px dashed #ccc',
+                borderRadius: 2,
+                p: 3,
+                textAlign: 'center',
+                cursor: 'pointer',
+                '&:hover': { borderColor: 'primary.main' },
+                height: 200,
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+            >
+              <Box sx={{ margin: 'auto 0'}}>
+                <FolderCopyOutlined sx={{ fontSize: 48, color: 'text.secondary' }} />
+                <Typography>Thêm files dữ liệu: PDF, XXML, PPTX, SVG, AI,...</Typography>
+              </Box>
+            </Box>
+          )}
+        </LabeledStack>  
       ) : (
         <Box
           onClick={handleBoxClick}

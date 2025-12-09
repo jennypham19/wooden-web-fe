@@ -1,31 +1,10 @@
 import { HttpResponse } from "@/types/common";
 import HttpClient from "@/utils/HttpClient";
-import { PaginatedResponse } from "./base-service";
-import { Dayjs } from "dayjs";
-import { IOrder } from "@/types/order";
-import { FormDataProducts } from "@/types/product";
+import { GetParams, PaginatedResponse } from "./base-service";
+import { IOrder, OrderPayloadRequest } from "@/types/order";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'; 
 const prefix = `${API_BASE_URL}/api/orders`;
 
-export interface OrderPayloadRequest{
-    customerId: string,
-    codeOrder: string,
-    name: string,
-    dateOfReceipt: Dayjs | null | string,
-    dateOfPayment: Dayjs | null | string,
-    proccess: string,
-    status: string,
-    amount: number | null,
-    requiredNote: string,
-    products: FormDataProducts[]
-}
-
-interface GetParams {
-    page: number,
-    limit: number,
-    searchTerm?: string,
-    status?: string
-}
 // Tạo đơn hàng
 export const createOrder = (payload: OrderPayloadRequest) => {
     return HttpClient.post(`${prefix}/create-order`, payload)

@@ -1,5 +1,5 @@
 import DialogComponent from "@/components/DialogComponent";
-import { FormDataOrders } from "@/types/order";
+import { FormDataInputFiles, FormDataOrders, FormDataReferenceLinks, OrderPayloadRequest } from "@/types/order";
 import React, { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid2"
 import dayjs from "dayjs";
@@ -12,7 +12,7 @@ import { getProccessOrderLabel, getStatusOrderLabel } from "@/utils/labelEntoVni
 import { COLORS } from "@/constants/colors";
 import useNotification from "@/hooks/useNotification";
 import InputMaskTextField from "@/components/InputMaskTextField";
-import { createOrder, OrderPayloadRequest } from "@/services/order-service";
+import { createOrder } from "@/services/order-service";
 import NavigateBack from "../../components/NavigateBack";
 import ProductOrder from "./ProductOrder";
 import { getAccounts } from "@/services/user-service";
@@ -22,6 +22,7 @@ import { Add, RemoveCircleOutline } from "@mui/icons-material";
 import IconButton from "@/components/IconButton/IconButton";
 import LabeledStack from "@/components/LabeledStack";
 import FilesUpload from "../../components/FilesUpload";
+import { uploadFiles } from "@/services/upload-service";
 
 interface DialogAddOrderProps{
     open: boolean,
@@ -52,6 +53,7 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
     const [formDataProduct, setFormDataProduct] = useState<FormDataProducts[]>([])
     const [productErrors, setProductErrors] = useState<FormProductErrors[]>([])
     const [referenceLinkSlots, setReferenceLinkSlots] = useState<(string | null)[]>([]);
+    const [files, setFiles] = useState<File[]>([])
 
     useEffect(() => {
         if(open){
@@ -138,7 +140,10 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
             return newSlots;
         })
     }
-    
+    const handleFilesSelect = (files: File[]) => {
+        setFiles(files)
+    }
+
     const validateForm = (): boolean => {
         const newErros: FormErrors = {};
         if(!formData.customerId) newErros.customerId = 'Vui lòng chọn khách hàng';
@@ -171,6 +176,20 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
         if(!validateForm()){
             return;
         }
+
+        const payloadReferenceLink: FormDataReferenceLinks[] = referenceLinkSlots.map((slot) => ({
+            url: slot
+        }));
+
+        const uploadFilesResponses = files && await uploadFiles(files, 'order');
+        if(!uploadFilesResponses.success || !uploadFilesResponses.data?.files){
+            throw new Error('Upload ảnh thất bại hoặc không nhận được URL ảnh');
+        }
+        const payloadInputFiles: FormDataInputFiles[] = uploadFilesResponses.data.files.map((file) => ({
+            name: file.originalname,
+            url: file.url
+        }))
+
         try {
             const payload: OrderPayloadRequest = {
                 customerId: formData.customerId,
@@ -189,7 +208,10 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
                     proccess: p.proccess,
                     status: p.status,
                     managerId: p.managerId
-                }))
+                })),
+                inputFiles: files.length > 0 ? payloadInputFiles : [],
+                referenceLinks: referenceLinkSlots[0] === null ? [] : payloadReferenceLink,
+
             };
             const res = await createOrder(payload);
             notify({
@@ -204,7 +226,7 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
             })
         }
     }
-  
+
     return(
         <Box>
             <NavigateBack
@@ -333,7 +355,7 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
                     </Grid>
                     <Grid size={{ xs: 12 }}>
                         <FilesUpload
-                            onFilesSelect={() => {}}
+                            onFilesSelect={handleFilesSelect}
                         />
                     </Grid>
                     <Grid size={{ xs: 12 }}>
