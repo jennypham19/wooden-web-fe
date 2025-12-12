@@ -10,22 +10,13 @@ import DateTime from "@/utils/DateTime";
 import { Description, Download, Image, InsertDriveFile, Link as LinkIcon, PlayCircle } from "@mui/icons-material";
 import DialogUpdateStatusDate from "./DialogUpdateStatusDate";
 import useNotification from "@/hooks/useNotification";
+import { getMimeTypeFromName } from "@/utils/file";
 
 interface UpdateStatusAndDateProps{
     onBack: () => void;
     open: boolean,
     id: string
 }
-
-const getMimeTypeFromName = (name = "") => {
-  const lower = name.toLowerCase();
-  if (lower.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\.|$)/)) return "image";
-  if (lower.match(/\.(mp4|webm|ogg|mov)(\.|$)/)) return "video";
-  if (lower.match(/\.(pdf)(\.|$)/)) return "pdf";
-  if (lower.match(/\.(doc|docx|ppt|pptx|xls|xlsx)(\.|$)/)) return "office";
-  return "other";
-};
-
 
 const UpdateStatusAndDate = (props: UpdateStatusAndDateProps) => {
     const { onBack, open, id } = props;

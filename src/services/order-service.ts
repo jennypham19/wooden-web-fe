@@ -34,3 +34,8 @@ export const getOrders = async(getParams: GetParams): Promise<HttpResponse<Pagin
         throw new Error(response.message || 'Failed to fetch list orders')
     }
 }
+
+// Lấy chi tiết đơn hàng
+export const getDetailOrder = (id: string) => {
+    return HttpClient.get<HttpResponse<IOrder>>(`${prefix}/detail-order/${id}`)
+}

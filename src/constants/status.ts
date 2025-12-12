@@ -145,3 +145,37 @@ export const STATUS_DESIGN_REQUEST_LABELS: { [key in StatusOrder]: string } = {
     [StatusDesignRequest.PENDING]: 'Đang thiết kế',
     [StatusDesignRequest.DONE]: 'Đã hoàn thành',
 }
+
+
+// Product
+export const ProccessProduct = {
+    NOT_START_0: 'not_started_0%',
+    IN_PROGRESS_25: 'in_progress_25%',
+    IN_PROGRESS_50: 'in_progress_50%',
+    IN_PROGRESS_75: 'in_progress_75%',
+    COMPLETED_100: 'completed_100%',
+}
+
+export type ProccessProduct = typeof ProccessProduct[keyof typeof ProccessProduct];
+
+export const PROCCESS_PRODUCT_LABELS: { [key in ProccessProduct]: string } = {
+    [ProccessProduct.NOT_START_0]: 'Chưa hoạt động 0%',
+    [ProccessProduct.IN_PROGRESS_25]: 'Đang hoạt động 25%',
+    [ProccessProduct.IN_PROGRESS_50]: 'Đang hoạt động 50%',
+    [ProccessProduct.IN_PROGRESS_75]: 'Đang hoạt động 75%',
+    [ProccessProduct.COMPLETED_100]: 'Đã hoàn thành 100%',
+}
+
+export const StatusProduct = {
+    PENDING: 'pending',
+    IN_PROGRESS: 'in_progress',
+    COMPLETED: 'completed',
+}
+
+export type StatusProduct = typeof StatusProduct[keyof typeof StatusProduct];
+
+export const STATUS_PRODUCT_LABELS: { [key in StatusProduct]: string } = {
+    [StatusProduct.PENDING]: 'Chưa hoạt động',
+    [StatusProduct.IN_PROGRESS]: 'Đang hoạt động',
+    [StatusProduct.COMPLETED]: 'Đã hoàn thành',
+}

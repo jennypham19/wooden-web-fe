@@ -1,4 +1,4 @@
-import { PRIORITY_DESIGN_REQUEST_LABELS, PriorityDesignRequest, PROCCESS_ORDER_LABELS, ProccessOrder, RENDER_LABELS, RenderUser, ROLE_CODES, ROLE_DEPARTMENT, ROLE_LABELS, RoleUser, STATUS_DESIGN_REQUEST_LABELS, STATUS_MACHINE_LABELS, STATUS_ORDER_LABELS, StatusDesignRequest, StatusMachine, StatusOrder } from "@/constants/status";
+import { PRIORITY_DESIGN_REQUEST_LABELS, PriorityDesignRequest, PROCCESS_ORDER_LABELS, PROCCESS_PRODUCT_LABELS, ProccessOrder, ProccessProduct, RENDER_LABELS, RenderUser, ROLE_CODES, ROLE_DEPARTMENT, ROLE_LABELS, RoleUser, STATUS_DESIGN_REQUEST_LABELS, STATUS_MACHINE_LABELS, STATUS_ORDER_LABELS, STATUS_PRODUCT_LABELS, StatusDesignRequest, StatusMachine, StatusOrder, StatusProduct } from "@/constants/status";
 
 export const getRoleLabel = (role: RoleUser | null | undefined) : string => {
     if(!role) return "Chưa xác định";
@@ -18,6 +18,7 @@ export const getRenderLabel = (gender: RenderUser | null | undefined) : string =
     return RENDER_LABELS[gender] || gender;
 }
 
+//Order
 export const getProccessOrderLabel = (proccess: ProccessOrder | null | undefined): string => {
     if(!proccess) return "Chưa xác định";
     return PROCCESS_ORDER_LABELS[proccess] || proccess;
@@ -27,6 +28,19 @@ export const getStatusOrderLabel = (status: StatusOrder | null | undefined): str
     if(!status) return "Chưa xác định";
     return STATUS_ORDER_LABELS[status] || status;
 }
+// End order
+
+// Product
+export const getProccessProductLabel = (proccess: ProccessProduct | null | undefined): string => {
+    if(!proccess) return "Chưa xác định";
+    return PROCCESS_PRODUCT_LABELS[proccess] || proccess;
+}
+
+export const getStatusProductLabel = (status: StatusProduct | null | undefined): string => {
+    if(!status) return "Chưa xác định";
+    return STATUS_PRODUCT_LABELS[status] || status;
+}
+// End product
 
 export const getStatusDesignRequestLabel = (status: StatusDesignRequest | null | undefined): string => {
   if(!status) return "Chưa xác định";
@@ -41,12 +55,12 @@ export const getPriorityDesignRequestLabel = (priority: PriorityDesignRequest | 
 export const getStatusOrderColor = (status: string | null) => {
   switch (status) {
     case 'completed':
+      return { color: 'error' as const };
+    case 'in_progress':
       return { color: 'success' as const };
-    case 'in_proccess':
-      return { color: 'warning' as const };
     case 'pending':
     default:
-      return { color: 'error' as const };
+      return { color: 'warning' as const };
   }
 };
 
@@ -82,3 +96,18 @@ export const getStatusMachineColor = (status: string | null) => {
       return { color: 'success' as const };
   }
 };
+
+export const getNumber = (number: string) => {
+  switch (number) {
+    case 'two':
+      return 2;
+    case 'three':
+      return 3
+    case 'four':
+      return 4
+    case 'five':
+      return 5
+    default:
+      return 1;
+  }
+}

@@ -50,10 +50,14 @@ export const uploadFiles = (files: File[], type: string): Promise<HttpResponse<{
   files.forEach((file) => {
     formData.append("files", file); // Mỗi file là 1 Blob
   });
+  try {
+    return HttpClient.post(
+      `${prefix}/upload-files`, 
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    );    
+  } catch (error: any) {
+      throw error;
+  }
   
-  return HttpClient.post(
-    `${prefix}/upload-files`, 
-    formData,
-    { headers: { 'Content-Type': 'multipart/form-data' } }
-  );
 };

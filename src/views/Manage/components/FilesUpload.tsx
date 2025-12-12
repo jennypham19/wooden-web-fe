@@ -30,24 +30,19 @@ const FilesUpload: React.FC<FilesUploadProps> = ({ onFilesSelect, initialImages,
     if (files) {
         const arrFiles = Array.from(files); // Convert FileList => File[]
 
-        // Callback to parent
-        onFilesSelect([...(files || []), ...arrFiles]);
-
         // update files
-        setFiles(prev => [...(prev || []), ...arrFiles]);
+        setFiles(prev => {
+          const newFiles = [...(prev || []), ...arrFiles];
+          onFilesSelect(newFiles);  // cb đồng bộ với state
+          return newFiles
+        });
 
-        // Update preview images
-        const previewUrls = arrFiles.map(file => URL.createObjectURL(file));
-        setUrlFiles(prev => [...(prev || []), ...previewUrls]);
     }
     event.target.value = "";
   };
 
   const handleRemoveImage = (index: number) => {
     const newFiles = (files || []).filter((_, i) => i !== index);
-    const newUrls = (urlFiles || []).filter((_, i) => i !== index);
-
-    setUrlFiles(newUrls);
     setFiles(newFiles);
 
     onFilesSelect(newFiles);

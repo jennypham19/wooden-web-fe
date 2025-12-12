@@ -1,7 +1,6 @@
-import Dashboard from "./components/Dashboard";
 import Page from "@/components/Page";
 import { useState } from "react";
-import { Alert, Avatar, Box, Card, CardContent, Chip, Stack, Typography } from "@mui/material";
+import { Alert, Avatar, Box, Button, Card, CardContent, Chip, Stack, Typography } from "@mui/material";
 import { Visibility } from "@mui/icons-material";
 import { useFetchData } from "@/hooks/useFetchData";
 import { IOrder } from "@/types/order";
@@ -16,9 +15,15 @@ import IconButton from "@/components/IconButton/IconButton";
 import AllListOrders from "./components/AllListOrders";
 import DetailOrder from "./components/DetailOrder";
 import { StatusOrder } from "@/constants/status";
+import { COLORS } from "@/constants/colors";
+import useAuth from "@/hooks/useAuth";
+import { ROLE } from "@/constants/roles";
+import CardDataOrder from "./components/CardDataOrder";
+import JobInOrder from "./components/JobInOrder";
 
 
 const Orders = () => {
+    const { profile } = useAuth();
     const [showAll, setShowAll] = useState(false);
     const [showOrders, setShowOrders] = useState<{ open: boolean, type: string}>({
         open: false,
@@ -51,6 +56,7 @@ const Orders = () => {
         fetchData(page, rowsPerPage)
     }
 
+    // View order
     const handleOpenViewOrder = (order: IOrder) => {
         setOrder(order);
         setViewOrder(true)
@@ -60,6 +66,7 @@ const Orders = () => {
         setOrder(null);
         setViewOrder(false)
     }
+
     return (
         <Page title="Quản lý đơn hàng">
             {!showAll && (
@@ -80,51 +87,10 @@ const Orders = () => {
                                     ) : (
                                         listData.slice(0,3).map((order, index) => (
                                             <Grid key={index} size={{ xs: 12, md: 4 }}>
-                                                <Card
-                                                    sx={{ m: 2, boxShadow: "0px 2px 1px 1px rgba(0, 0, 0, 0.2)", borderRadius: 4 }}
-                                                    onClick={() => order && handleOpenViewOrder(order)}
-                                                >
-                                                    <CardContent>
-                                                        <Box display='flex' justifyContent='space-between'>
-                                                            <Box display='flex' flexDirection='row'>
-                                                                <Avatar 
-                                                                    src={avatar} 
-                                                                    sx={{ width: 80, height: 80, borderRadius: '50%', mr: 1 }}
-                                                                />
-                                                                <Stack margin='auto 0' direction='column'>
-                                                                    <Typography variant="caption">Khách hàng</Typography>
-                                                                    <Typography fontSize='15px' fontWeight={600}>{order.customer.name}</Typography>
-                                                                </Stack>
-                                                            </Box>
-                                                            <Box margin='auto 0'>
-                                                                <Chip label={getStatusOrderLabel(order.status)} color={getStatusOrderColor(order.status).color}/>
-                                                            </Box>
-                                                        </Box>
-                                                        <Stack mt={1} display='flex' justifyContent='space-between'>
-                                                            <Typography fontSize='15px'><b>Đơn hàng:</b> {order.name}</Typography>
-                                                            <Typography fontSize='15px'><b>ID đơn:</b> {order.codeOrder}</Typography>
-                                                        </Stack>
-                                                        <Stack mt={1} display='flex' justifyContent='space-between'>
-                                                            <Typography fontSize='15px'><b>Ngày nhận:</b> {DateTime.FormatDate(order.dateOfReceipt)}</Typography>
-                                                            <Typography fontSize='15px'><b>Hạn trả:</b> {DateTime.FormatDate(order.dateOfPayment)}</Typography>
-                                                        </Stack>
-                                                        <Stack mt={1} display='flex' justifyContent='space-between'>
-                                                            <Typography fontSize='15px'><b>Tiến độ:</b> {getProccessOrderLabel(order.proccess)}</Typography>
-                                                            <Typography fontSize='15px'><b>Trạng thái:</b> {getStatusOrderLabel(order.status)}</Typography>
-                                                        </Stack>
-                                                        <Stack mt={1} display='flex' justifyContent='space-between'>
-                                                            <Typography fontSize='15px'><b>Số lượng sản phẩm:</b> {order.amount} sản phẩm/ đơn hàng</Typography>
-                                                            {order.status === StatusOrder.COMPLETED && (
-                                                                <IconButton
-                                                                    handleFunt={() => {}}
-                                                                    icon={<Visibility/>}
-                                                                    height={0}
-                                                                />
-                                                            )}
-                                                        </Stack>
-                                                        <Typography mt={1} fontSize='15px'><b>Yêu cầu:</b> {order.requiredNote}</Typography>
-                                                    </CardContent>
-                                                </Card>
+                                                <CardDataOrder
+                                                    order={order}
+                                                    onViewOrder={handleOpenViewOrder}
+                                                />
                                             </Grid>                                    
                                         ))
 

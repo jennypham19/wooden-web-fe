@@ -15,6 +15,13 @@ import { getProccessOrderLabel, getStatusOrderColor, getStatusOrderLabel } from 
 import DateTime from "@/utils/DateTime";
 import IconButton from "@/components/IconButton/IconButton";
 import DialogAddOrder from "./DialogAddOrder";
+import { StatusOrder } from "@/constants/status";
+import DetailOrder from "./DetailOrder";
+import useAuth from "@/hooks/useAuth";
+import CardDataOrder from "./CardDataOrder";
+import { ROLE } from "@/constants/roles";
+import CustomPagination from "@/components/Pagination/CustomPagination";
+import JobInOrder from "./JobInOrder";
 
 
 interface AllListOrdersProps{
@@ -46,13 +53,16 @@ const DataStatus: {id: number, value: string, label: string}[] = [
 
 const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
     const { onBack } = props;
+    const { profile } = useAuth();
     const [viewMode, setViewMode] = useState<'all' | 'pending' | 'in_progress' | 'completed'>('all')
     const [openOrder, setOpenOrder] = useState<{ open: boolean, type: string}>({
         open: false,
         type: ''
     });
-
-    const { error, fetchData, handlePageChange, handleSearch, listData, loading, page, rowsPerPage, searchTerm, total } = useFetchData<IOrder>(getOrders, 10, viewMode);
+    const [viewOrder, setViewOrder] = useState(false);
+    const [order, setOrder] = useState<IOrder | null>(null);
+    
+    const { error, fetchData, handlePageChange, handleSearch, listData, loading, page, rowsPerPage, searchTerm, total } = useFetchData<IOrder>(getOrders, 8, viewMode);
 
     const handleOpenAddOrder = () => {
         setOpenOrder({ open: true, type: 'add' })
@@ -63,13 +73,34 @@ const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
         fetchData(page, rowsPerPage, '', viewMode)
     }
 
+    const handleOpenViewOrder = (order: IOrder) => {
+        setOrder(order);
+        setViewOrder(true)
+    }
+
+    const handleCloseViewOrder = () => {
+        setOrder(null);
+        setViewOrder(false)
+    }
+
+    // Job order
+    const handleOpenJobOrder = (order: IOrder) => {
+        setOrder(order);
+        setOpenOrder({ open: true, type: 'job-order' });
+    }
+
+    const handleCloseJobOrder = () => {
+        setOrder(null);
+        setOpenOrder({ open: false, type: 'job-order' });
+    }
+
     return(
         <Box>
             {!openOrder.open && (
                 <>
                     <SearchBox
-                        initialValue=""
-                        onSearch={() => {}}
+                        initialValue={searchTerm}
+                        onSearch={handleSearch}
                         placeholder="Tìm kiếm theo tên, mã đơn hàng..."
                     >
                         <Button
@@ -94,59 +125,43 @@ const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
                         )}
                         {!loading && !error && (
                             <>
-                                    <Grid container spacing={2}>
+                                    <Grid container>
                                         {listData.length === 0 ? (
                                             <Typography p={2} fontWeight={700}>Không tồn tại bản ghi nào</Typography>
                                         ) : (
                                             listData.map((order, index) => (
                                                 <Grid key={index} size={{ xs: 12, md: 4 }}>
-                                                    <Card
-                                                        sx={{ m: 2, boxShadow: "0px 2px 1px 1px rgba(0, 0, 0, 0.2)", borderRadius: 4 }}
+                                                    <CardDataOrder
+                                                        order={order}
+                                                        onViewOrder={handleOpenViewOrder}
                                                     >
-                                                        <CardContent>
-                                                            <Box display='flex' justifyContent='space-between'>
-                                                                <Box display='flex' flexDirection='row'>
-                                                                    <Avatar 
-                                                                        src={avatar} 
-                                                                        sx={{ width: 80, height: 80, borderRadius: '50%', mr: 1 }}
-                                                                    />
-                                                                    <Stack margin='auto 0' direction='column'>
-                                                                        <Typography variant="caption">Khách hàng</Typography>
-                                                                        <Typography fontSize='15px' fontWeight={600}>{order.customer.name}</Typography>
-                                                                    </Stack>
-                                                                </Box>
-                                                                <Box margin='auto 0'>
-                                                                    <Chip label={getStatusOrderLabel(order.status)} color={getStatusOrderColor(order.status).color}/>
-                                                                </Box>
-                                                            </Box>
-                                                            <Stack mt={1} display='flex' justifyContent='space-between'>
-                                                                <Typography fontSize='15px'><b>Đơn hàng:</b> {order.name}</Typography>
-                                                                <Typography fontSize='15px'><b>ID đơn:</b> {order.codeOrder}</Typography>
-                                                            </Stack>
-                                                            <Stack mt={1} display='flex' justifyContent='space-between'>
-                                                                <Typography fontSize='15px'><b>Ngày nhận:</b> {DateTime.FormatDate(order.dateOfReceipt)}</Typography>
-                                                                <Typography fontSize='15px'><b>Hạn trả:</b> {DateTime.FormatDate(order.dateOfPayment)}</Typography>
-                                                            </Stack>
-                                                            <Stack mt={1} display='flex' justifyContent='space-between'>
-                                                                <Typography fontSize='15px'><b>Tiến độ:</b> {getProccessOrderLabel(order.proccess)}</Typography>
-                                                                <Typography fontSize='15px'><b>Trạng thái:</b> {getStatusOrderLabel(order.status)}</Typography>
-                                                            </Stack>
-                                                            <Stack mt={1} display='flex' justifyContent='space-between'>
-                                                                <Typography fontSize='15px'><b>Số lượng sản phẩm:</b> {order.amount} sản phẩm/ đơn hàng</Typography>
-                                                                <IconButton
-                                                                    handleFunt={() => {}}
-                                                                    icon={<Visibility/>}
-                                                                    height={0}
-                                                                />
-                                                            </Stack>
-                                                            <Typography mt={1} fontSize='15px'><b>Yêu cầu:</b> {order.requiredNote}</Typography>
-                                                        </CardContent>
-                                                    </Card>
+                                                        {profile?.role === ROLE.FACTORY_MANAGER && (
+                                                            <Button
+                                                                fullWidth
+                                                                variant="outlined"
+                                                                sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation()
+                                                                    order && handleOpenJobOrder(order)
+                                                                }}
+                                                            >
+                                                                Thêm công việc
+                                                            </Button>
+                                                        )}
+                                                    </CardDataOrder>
                                                 </Grid>                                    
                                             ))
 
                                         )}
                                     </Grid>
+                                    <Box mt={1.5} display='flex' justifyContent='center'>
+                                        <CustomPagination
+                                            page={page}
+                                            rowsPerPage={rowsPerPage}
+                                            count={total}
+                                            onPageChange={handlePageChange}
+                                        />
+                                    </Box>
                             </>
                         )}                   
                 </>
@@ -155,6 +170,19 @@ const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
                 <DialogAddOrder
                     open={openOrder.open}
                     onClose={handleCloseAddOrder}
+                />
+            )}
+            {viewOrder && order && (
+                <DetailOrder
+                    open={viewOrder}
+                    data={order}
+                    onClose={handleCloseViewOrder}
+                />
+            )}
+            {openOrder.open && openOrder.type === 'job-order' && order && (
+                <JobInOrder
+                    data={order}
+                    onClose={handleCloseJobOrder}
                 />
             )}
         </Box>

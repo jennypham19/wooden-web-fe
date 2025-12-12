@@ -23,6 +23,7 @@ import IconButton from "@/components/IconButton/IconButton";
 import LabeledStack from "@/components/LabeledStack";
 import FilesUpload from "../../components/FilesUpload";
 import { uploadFiles } from "@/services/upload-service";
+import Backdrop from "@/components/Backdrop";
 
 interface DialogAddOrderProps{
     open: boolean,
@@ -53,7 +54,8 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
     const [formDataProduct, setFormDataProduct] = useState<FormDataProducts[]>([])
     const [productErrors, setProductErrors] = useState<FormProductErrors[]>([])
     const [referenceLinkSlots, setReferenceLinkSlots] = useState<(string | null)[]>([]);
-    const [files, setFiles] = useState<File[]>([])
+    const [files, setFiles] = useState<File[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     useEffect(() => {
         if(open){
@@ -176,16 +178,26 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
         if(!validateForm()){
             return;
         }
-
+        setIsSubmitting(true)
         const payloadReferenceLink: FormDataReferenceLinks[] = referenceLinkSlots.map((slot) => ({
             url: slot
         }));
 
-        const uploadFilesResponses = files && await uploadFiles(files, 'order');
-        if(!uploadFilesResponses.success || !uploadFilesResponses.data?.files){
-            throw new Error('Upload ảnh thất bại hoặc không nhận được URL ảnh');
+        let uploadFilesResponses: any;
+        try {
+            uploadFilesResponses = files && await uploadFiles(files, 'order');
+            if(!uploadFilesResponses.success || !uploadFilesResponses.data?.files){
+                throw new Error('Upload ảnh thất bại hoặc không nhận được URL ảnh');
+            }            
+        } catch (error: any) {
+            notify({
+                message: error.message,
+                severity: 'error'
+            })
+            setIsSubmitting(false)
         }
-        const payloadInputFiles: FormDataInputFiles[] = uploadFilesResponses.data.files.map((file) => ({
+
+        const payloadInputFiles: FormDataInputFiles[] =  uploadFilesResponses.data.files.map((file: any) => ({
             name: file.originalname,
             url: file.url
         }))
@@ -220,10 +232,15 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
             })
             handleClose()
         } catch (error: any) {
+            console.log("error: ", error);
+            
             notify({
                 message: error.message,
                 severity: 'error'
             })
+            setIsSubmitting(false)
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
@@ -353,6 +370,16 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
                             helperText={errors.requiredNote}
                         />
                     </Grid>
+                </Grid>
+                {amountProduct !== null && products.length > 0 && (
+                    <Box mt={3}>
+                        <Typography fontWeight={600} mb={1} fontSize='15px'> Danh sách sản phẩm kèm theo</Typography>
+                        {formDataProduct.map((num, idx) => (
+                            <ProductOrder onInputChange={handleInputChangeProduct} errors={productErrors[idx] || {}} formData={num} key={idx} index={idx + 1} users={users}/>
+                        ))}
+                    </Box>
+                )}
+                <Grid sx={{ mt: 2}} container spacing={2}>
                     <Grid size={{ xs: 12 }}>
                         <FilesUpload
                             onFilesSelect={handleFilesSelect}
@@ -415,30 +442,25 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
                         </LabeledStack>
                     </Grid>
                 </Grid>
-                    {amountProduct !== null && products.length > 0 && (
-                        <Box mt={3}>
-                            <Typography fontWeight={600} mb={1} fontSize='15px'> Danh sách sản phẩm kèm theo</Typography>
-                            {formDataProduct.map((num, idx) => (
-                                <ProductOrder onInputChange={handleInputChangeProduct} errors={productErrors[idx] || {}} formData={num} key={idx} index={idx + 1} users={users}/>
-                            ))}
-                        </Box>
-                    )}
-                    <Box mt={2} sx={{ display: 'flex', justifyContent: 'center' }}>
-                        <Button
-                            sx={{ bgcolor: COLORS.BUTTON, width: 100, mr: 2 }}
-                            onClick={handleSave}
-                        >
-                            Lưu
-                        </Button>
-                        <Button
-                            variant="outlined"
-                            sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, width: 100 }}
-                            onClick={handleClose}
-                        >
-                            Hủy
-                        </Button>
-                    </Box>
+                <Box mt={2} sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <Button
+                        sx={{ bgcolor: COLORS.BUTTON, width: 100, mr: 2 }}
+                        onClick={handleSave}
+                    >
+                        Lưu
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, width: 100 }}
+                        onClick={handleClose}
+                    >
+                        Hủy
+                    </Button>
+                </Box>
             </Box>
+            {isSubmitting && (
+                <Backdrop open={isSubmitting}/>
+            )}
         </Box>
     )
 }
