@@ -59,6 +59,14 @@ export interface OrderPayloadRequest{
     products: FormDataProducts[]
 }
 
+export interface WorkOderPayload{
+    managerId: string,
+    productId: string,
+    workMilestone: string,
+    workers: {carpenterId: string}[],
+    workMilestones: FormDataWorkMilestone[]
+}
+
 
 // đầu ra
 export interface IOrder{

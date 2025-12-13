@@ -14,14 +14,16 @@ interface InputTextProps{
     error?: boolean,
     helperText?: string;
     label: string;
-    disabled?: boolean
+    disabled?: boolean;
+    onlyPositiveNumber?: boolean;
+    placeholder?: string
 }
 
 const InputText = (props: InputTextProps) => {
-    const { onInputChange, index, name, value, error, helperText, label, disabled } = props;
+    const { onInputChange, index, name, value, error, helperText, label, disabled, onlyPositiveNumber = false, placeholder = 'Nhập thông tin' } = props;
     return (
         <TextField
-            placeholder="Nhập thông tin"
+            placeholder={placeholder}
             label={label}
             name={name}
             type="text"
@@ -29,7 +31,27 @@ const InputText = (props: InputTextProps) => {
             error={error}
             helperText={helperText}
             disabled={disabled}
-            onChange={(e) => onInputChange(index, name, e.target.value)}
+            onChange={(e) => {
+                const val = e.target.value;
+                if(onlyPositiveNumber){
+                    // Cho phép xóa trắng
+                    if(val.trim() === ''){
+                        onInputChange(index, name, val);
+                        return;
+                    }
+
+                    // Kiểm tra số dương hợp lệ (số thực hoặc số nguyên dương)
+                    const numVal = Number(val);
+
+                    if(!isNaN(numVal) && /^\d*\.?\d*$/.test(val)){
+                        onInputChange(index, name, val);
+                    }
+
+                    // Nếu không hợp lệ thì bỏ qua, không gọi onChange => không update value
+                }else{
+                    onInputChange(index, name, e.target.value)
+                }
+            }}
             InputProps={{
                 sx:{
                     "& .MuiOutlinedInput-notchedOutline":{
@@ -62,10 +84,11 @@ const InputText = (props: InputTextProps) => {
 interface WorkMilestoneProps{
     formDataWorkMilestone: FormDataWorkMilestone[],
     onBack: () => void,
-    onInputChange: (index: number, name: string, value: any) => void
+    onInputChange: (index: number, name: string, value: any) => void;
+    onSave: (data: FormDataWorkMilestone[]) => void;
 }
 
-const WorkMilestone: FC<WorkMilestoneProps> = ({ formDataWorkMilestone, onBack, onInputChange }) => {
+const WorkMilestone: FC<WorkMilestoneProps> = ({ formDataWorkMilestone, onBack, onInputChange, onSave }) => {
     const [stepErrors, setStepErrors] = useState<FormStepErrors[]>([])
     const [numStep, setNumStep] = useState<number[]>([]);
     const [workMilestoneErrors, setWorkMilestoneErrors] = useState<FormWorkMilestoneErrors[]>([])
@@ -73,8 +96,16 @@ const WorkMilestone: FC<WorkMilestoneProps> = ({ formDataWorkMilestone, onBack, 
     // --------------- Cập nhật mốc công việc + khởi tạo steps --------
     const handleInputChangeWorkMilestone = (index: number, name: string, value: any) => {
         const validName = name as keyof FormDataWorkMilestone;
-        
         if(validName === 'step'){
+            const stepValid = value.replace(/\s|-/g, '');
+            
+            if(!/^\d+$/.test(stepValid)) {
+                setWorkMilestoneErrors((prev) => {
+                    const updated = [...prev];
+                    updated[index] = { ...updated[index], 'step': 'Mốc công việc bắt buộc là số' };
+                    return updated;
+                });
+            }
             const valueNum = Number(value);
             if(!isNaN(valueNum) && valueNum > 0){
                 setNumStep(Array.from({ length: valueNum }, (_, i) => i + 1 ))
@@ -151,9 +182,7 @@ const WorkMilestone: FC<WorkMilestoneProps> = ({ formDataWorkMilestone, onBack, 
         if(!validateSubmit()){
             return
         }
-
-        console.log("formDataWorkMilestone", formDataWorkMilestone);
-        
+        onSave(formDataWorkMilestone)
     }
 
     return(
@@ -187,6 +216,9 @@ const WorkMilestone: FC<WorkMilestoneProps> = ({ formDataWorkMilestone, onBack, 
                                     onInputChange={handleInputChangeWorkMilestone}
                                     error={!!errors.step}
                                     helperText={errors.step}
+                                    onlyPositiveNumber={true}
+                                    placeholder="Chỉ nhập số"
+                                    
                                 />
                             </Grid>
                             <Grid size={{ xs: 12 }}>

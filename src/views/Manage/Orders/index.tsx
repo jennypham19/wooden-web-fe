@@ -1,123 +1,24 @@
 import Page from "@/components/Page";
-import { useState } from "react";
-import { Alert, Avatar, Box, Button, Card, CardContent, Chip, Stack, Typography } from "@mui/material";
-import { Visibility } from "@mui/icons-material";
-import { useFetchData } from "@/hooks/useFetchData";
-import { IOrder } from "@/types/order";
-import { getOrders } from "@/services/order-service";
-import Backdrop from "@/components/Backdrop";
-import OverviewData from "../components/OverviewData";
-import Grid from "@mui/material/Grid2";
-import avatar from "@/assets/images/users/default-avatar.jpg";
-import { getProccessOrderLabel, getStatusOrderColor, getStatusOrderLabel } from "@/utils/labelEntoVni";
-import DateTime from "@/utils/DateTime";
-import IconButton from "@/components/IconButton/IconButton";
-import AllListOrders from "./components/AllListOrders";
-import DetailOrder from "./components/DetailOrder";
-import { StatusOrder } from "@/constants/status";
-import { COLORS } from "@/constants/colors";
 import useAuth from "@/hooks/useAuth";
 import { ROLE } from "@/constants/roles";
-import CardDataOrder from "./components/CardDataOrder";
-import JobInOrder from "./components/JobInOrder";
+import ManagementOrderEmployee from "../Role/Employee/ManagementOrder";
+import ManagementOrderFactoryManager from "../Role/FactoryManager/ManagementOrder";
+import ManagementOrderCarpenter from "../Role/Carpenter/ManagementOrder";
 
 
 const Orders = () => {
     const { profile } = useAuth();
-    const [showAll, setShowAll] = useState(false);
-    const [showOrders, setShowOrders] = useState<{ open: boolean, type: string}>({
-        open: false,
-        type: ''
-    });
-    const [viewOrder, setViewOrder] = useState(false);
-    const [order, setOrder] = useState<IOrder | null>(null);
-
-    const { error, fetchData, listData, loading, page, rowsPerPage} = useFetchData<IOrder>(getOrders);
-
-    const handleOpenShowAllListOrders = () => {
-        setShowAll(true);
-        setShowOrders({ open: true, type: 'list-orders'})
-    }
-
-    const handleCloseShowAllListOrders = () => {
-        setShowAll(false);
-        setShowOrders({ open: false, type: 'list-orders'})
-        fetchData(page, rowsPerPage)
-    }
-
-    const handleOpenShowAllCheckedOrders = () => {
-        setShowAll(true);
-        setShowOrders({ open: true, type: 'checked-orders'})
-    }
-
-    const handleCloseShowAllCheckedOrders = () => {
-        setShowAll(false);
-        setShowOrders({ open: false, type: 'checked-orders'})
-        fetchData(page, rowsPerPage)
-    }
-
-    // View order
-    const handleOpenViewOrder = (order: IOrder) => {
-        setOrder(order);
-        setViewOrder(true)
-    }
-
-    const handleCloseViewOrder = () => {
-        setOrder(null);
-        setViewOrder(false)
-    }
 
     return (
         <Page title="Quản lý đơn hàng">
-            {!showAll && (
-                <>
-                    {loading && <Backdrop open={loading}/>}
-                    {error && !loading && (
-                        <Alert severity="error" sx={{ my: 2 }}>{error}</Alert>
-                    )}
-                    {!loading && !error && (
-                        <>
-                            <OverviewData
-                                title="Danh sách đơn hàng"
-                                onShowAll={handleOpenShowAllListOrders}
-                            >
-                                <Grid container spacing={2}>
-                                    {listData.length === 0 ? (
-                                        <Typography p={2} fontWeight={700}>Không tồn tại bản ghi nào</Typography>
-                                    ) : (
-                                        listData.slice(0,3).map((order, index) => (
-                                            <Grid key={index} size={{ xs: 12, md: 4 }}>
-                                                <CardDataOrder
-                                                    order={order}
-                                                    onViewOrder={handleOpenViewOrder}
-                                                />
-                                            </Grid>                                    
-                                        ))
-
-                                    )}
-                                </Grid>
-                            </OverviewData>
-                            <OverviewData
-                                title="Kiểm soát đơn hàng"
-                                onShowAll={handleOpenShowAllCheckedOrders}
-                            >
-                                <Grid container spacing={2}></Grid>
-                            </OverviewData>
-                        </>
-                    )}   
-                </>
+            {profile?.role === ROLE.EMPLOYEE && (
+                <ManagementOrderEmployee/>
             )}
-            {showAll && showOrders.open && showOrders.type === 'list-orders' && (
-                <AllListOrders
-                    onBack={handleCloseShowAllListOrders}
-                />
+            {profile?.role === ROLE.FACTORY_MANAGER && (
+                <ManagementOrderFactoryManager/>
             )}
-            {viewOrder && order && (
-                <DetailOrder
-                    open={viewOrder}
-                    data={order}
-                    onClose={handleCloseViewOrder}
-                />
+            {profile?.role === ROLE.CARPENTER && (
+                <ManagementOrderCarpenter/>
             )}
         </Page>
     )

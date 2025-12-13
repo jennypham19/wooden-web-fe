@@ -1,53 +1,54 @@
 import { useFetchData } from "@/hooks/useFetchData";
 import { getOrders } from "@/services/order-service";
 import { IOrder } from "@/types/order";
-import { Alert, Avatar, Box, Button, Card, CardContent, Chip, Stack, Typography } from "@mui/material";
+import { Alert, Box, Button, Typography } from "@mui/material";
 import React, { useState } from "react";
 import SearchBox from "../../components/SearchBox";
 import { COLORS } from "@/constants/colors";
-import { Add, Visibility } from "@mui/icons-material";
+import { Add, AllInbox, Autorenew, CheckCircle,  Schedule } from "@mui/icons-material";
 import NavigateBack from "../../components/NavigateBack";
-import FilterTabs from "../../components/FilterTabs";
 import Backdrop from "@/components/Backdrop";
 import Grid from "@mui/material/Grid2";
-import avatar from "@/assets/images/users/default-avatar.jpg"
-import { getProccessOrderLabel, getStatusOrderColor, getStatusOrderLabel } from "@/utils/labelEntoVni";
-import DateTime from "@/utils/DateTime";
-import IconButton from "@/components/IconButton/IconButton";
 import DialogAddOrder from "./DialogAddOrder";
-import { StatusOrder } from "@/constants/status";
 import DetailOrder from "./DetailOrder";
 import useAuth from "@/hooks/useAuth";
 import CardDataOrder from "./CardDataOrder";
 import { ROLE } from "@/constants/roles";
 import CustomPagination from "@/components/Pagination/CustomPagination";
 import JobInOrder from "./JobInOrder";
+import Tabs from "../../components/Tabs";
 
 
 interface AllListOrdersProps{
-    onBack: () => void;
+    onBack?: () => void;
 }
 
-const DataStatus: {id: number, value: string, label: string}[] = [
+const DataStatus: {id: number, value: string, label: string, icon: React.ReactNode}[] = [
     {
         id: 1,
         value: 'all',
-        label: 'Tất cả'
+        label: 'Tất cả',
+        icon: <AllInbox/>
     },
     {
         id: 2,
         value: 'pending',
-        label: 'Đơn hàng chưa làm'
+        label: 'Đơn hàng chưa làm',
+        icon: <Schedule/>
+
     },
     {
         id: 3,
         value: 'in_progress',
-        label: 'Đơn hàng đang làm'
+        label: 'Đơn hàng đang làm',
+        icon: <Autorenew/>
     },
     {
         id: 4,
         value: 'completed',
-        label: 'Đơn hàng hoàn thành'
+        label: 'Đơn hàng hoàn thành',
+        icon: <CheckCircle/>
+
     }
 ]
 
@@ -103,21 +104,25 @@ const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
                         onSearch={handleSearch}
                         placeholder="Tìm kiếm theo tên, mã đơn hàng..."
                     >
-                        <Button
-                            variant="outlined"
-                            sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
-                            startIcon={<Add/>}
-                            onClick={handleOpenAddOrder}
-                        >
-                            Tạo đơn hàng
-                        </Button>
+                        {profile?.role === ROLE.EMPLOYEE && (
+                            <Button
+                                variant="outlined"
+                                sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
+                                startIcon={<Add/>}
+                                onClick={handleOpenAddOrder}
+                            >
+                                Tạo đơn hàng
+                            </Button>
+                        )}
                     </SearchBox>
-                    <NavigateBack
-                        title="Danh sách đơn hàng"
-                        onBack={onBack}
-                    />
+                    {(profile?.role === ROLE.EMPLOYEE || profile?.role === ROLE.FACTORY_MANAGER) && onBack && (
+                        <NavigateBack
+                            title="Danh sách đơn hàng"
+                            onBack={onBack}
+                        />
+                    )}
                     <Box m={2}>
-                        <FilterTabs data={DataStatus} viewMode={viewMode} onChange={setViewMode} />
+                        <Tabs data={DataStatus} viewMode={viewMode} onChange={setViewMode} />
                     </Box>
                         {loading && <Backdrop open={loading}/>}
                         {error && !loading && (

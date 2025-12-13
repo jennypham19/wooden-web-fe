@@ -16,6 +16,7 @@ import InputSelect from "@/components/InputSelect";
 import useNotification from "@/hooks/useNotification";
 import { COLORS } from "@/constants/colors";
 import WorkMilestone from "./WorkMilestone";
+import DialogChooseWorkers from "./DialogChooseWorkers";
 
 interface JobInOrderProps{
     data: IOrder,
@@ -54,15 +55,18 @@ const JobInOrder = (props: JobInOrderProps) => {
     const { data, onClose } = props;
     const { profile } = useAuth();
     const notify = useNotification();
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [openDialogChooseWorkers, setOpenDialogChooseWorkers] = useState(false);
+    const [openWorkMilestone, setOpenWorkMilestone] = useState(false);
+
     const [order, setOrder] = useState<IOrder | null>(null);
     const [workMileStone, setWorkMilestone] = useState<string>('');
     const [errorWorkMileStone, setErrorWorkMilestone] = useState<string>('');
     const [carpenters, setCarpenters] = useState<IUser[]>([]);
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [numberWorkMilestone, setNumberWorkMilestone] = useState<number[]>([]);
-    const [openWorkMilestone, setOpenWorkMilestone] = useState(false);
-    const [formDataWorkMilestone, setFormDataWorkMilestone] = useState<FormDataWorkMilestone[]>([])
-    const [workMilestoneErrors, setWorkMilestoneErrors] = useState<FormWorkMilestoneErrors[]>([])
+    const [formDataWorkMilestone, setFormDataWorkMilestone] = useState<FormDataWorkMilestone[]>([]);
+    const [dataWorkMilestonePayload, setDataWorkMilestonePayload] = useState<FormDataWorkMilestone[]>([])
     
     useEffect(() => {
         if(data){
@@ -83,7 +87,11 @@ const JobInOrder = (props: JobInOrderProps) => {
         setErrorWorkMilestone('')
     }
 
-    const handleSelectInput = (name: string, value: any) => {
+    const handleOpenDialogChooseWorkers = () => {
+        setOpenDialogChooseWorkers(true)
+    }
+
+    const handleSelectInput = (index: number, productId: string, name: string, value: any) => {
         const number = value.split('_')[0];
         const newNumber = getNumber(number);
         if(newNumber > 0){
@@ -121,6 +129,11 @@ const JobInOrder = (props: JobInOrderProps) => {
         return !!workMileStone;
     }
 
+    const handleSaveMilestone = (data: FormDataWorkMilestone[]) => {
+        setDataWorkMilestonePayload(data);
+        setOpenWorkMilestone(false)
+    } 
+    
     const handleSave = async() => {
         if(!validateSubmit()){
             return;
@@ -186,10 +199,11 @@ const JobInOrder = (props: JobInOrderProps) => {
                                                 <Typography fontSize='15px' fontWeight={600}>Phân công nhân lực:</Typography>
                                                 <IconButton
                                                     tooltip="Mở dialog chọn nhân lực"
-                                                    handleFunt={() => {}}
+                                                    handleFunt={handleOpenDialogChooseWorkers}
                                                     icon={<Add/>}
                                                     height={0}
                                                     width={0}
+                                                    sx={{ pr: 1}}
                                                 />
                                             </Stack>
                                             <Stack direction='row' display='flex' justifyContent='center' alignItems='center'>
@@ -199,7 +213,7 @@ const JobInOrder = (props: JobInOrderProps) => {
                                                     label=""
                                                     value={workMileStone}
                                                     options={DATA_WORK_MILESTONE}
-                                                    onChange={handleSelectInput}
+                                                    onChange={(name, value) => handleSelectInput(index, product.id, name, value)}
                                                     placeholder="Chọn mốc công việc"
                                                     error={!!errorWorkMileStone}
                                                     helperText={errorWorkMileStone}
@@ -240,9 +254,18 @@ const JobInOrder = (props: JobInOrderProps) => {
                             formDataWorkMilestone={formDataWorkMilestone}
                             onBack={() => { setOpenWorkMilestone(false), setWorkMilestone('') }}
                             onInputChange={handleInputChangeWorkMilestone}
+                            onSave={handleSaveMilestone}
                         />
                     </Box>
                 </Box>
+            )}
+            {openDialogChooseWorkers && (
+                <DialogChooseWorkers
+                    open={openDialogChooseWorkers}
+                    onClose={() => {
+                        setOpenDialogChooseWorkers(false)
+                    }}
+                />
             )}
         </Box>
     )
