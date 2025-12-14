@@ -94,3 +94,8 @@ export const getDecentralizedAccounts = async<T>(getParams: GetParams) : Promise
 export const getDetailUserWithPermission = async(id: string) => {
   return HttpClient.get(`${prefix}/get-detail-account-with-permission/${id}`)
 }
+
+// Lấy danh sách thợ mộc
+export const getListCapenter = async(params: GetParams) => {
+  return HttpClient.get(`${prefix}/list-carpenters`, { params })
+}
