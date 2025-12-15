@@ -1,14 +1,8 @@
 import { useState } from "react";
-
-
-
 import { Alert, Avatar, Box, Button, Card, Checkbox, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import Backdrop from "@/components/Backdrop";
 import DialogComponent from "@/components/DialogComponent";
-
-
-
 import { useFetchData } from "@/hooks/useFetchData";
 import { getListCapenter } from "@/services/user-service";
 import { IUser } from "@/types/user";

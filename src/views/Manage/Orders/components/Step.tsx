@@ -76,40 +76,15 @@ const InputText = (props: InputTextProps) => {
 }
 
 interface StepProps{
-    index: number,
-    formData: FormDataStep,
-    errors: FormStepErrors,
-    onInputChange: (index: number, name: string, value: any) => void;  
+  
 }
 
 const Step = (props: StepProps) => {
-    const { index, formData, errors, onInputChange } = props;
+    const {  } = props;
 
     return(
         <Grid container spacing={2}>
-            <Grid size={{ xs: 12, md: 6 }}>
-                <InputText
-                    index={index} // Giữ nguyên index
-                    label={`Bước ${index + 1}`}
-                    name="name"
-                    value={formData.name}
-                    onInputChange={onInputChange}
-                    error={!!errors.name}
-                    helperText={errors.name}
-                />
-            </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
-                <InputSelect
-                    index={index} // Giữ nguyên index, không cần -1
-                    name="proccess"
-                    value={formData.proccess}
-                    label=""
-                    options={DATA_PROCCESS}
-                    onChange={onInputChange}
-                    placeholder="Chọn tiến độ"
-                    disabled
-                />
-            </Grid>
+
         </Grid>
     )
 }

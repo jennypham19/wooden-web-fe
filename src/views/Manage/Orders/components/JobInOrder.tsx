@@ -1,6 +1,6 @@
 import { getDetailOrder } from "@/services/order-service";
 import { FormDataWorkMilestone, FormWorkMilestoneErrors, IOrder } from "@/types/order";
-import { Box, Button, Paper, Stack, Typography } from "@mui/material"
+import { Box, Button, Divider, Paper, Stack, Typography } from "@mui/material"
 import { useEffect, useState } from "react";
 import CardDetailDataOrder from "./CardDetailDataOrder";
 import NavigateBack from "../../components/NavigateBack";
@@ -9,7 +9,7 @@ import Grid from "@mui/material/Grid2";
 import { getNumber, getProccessProductLabel, getStatusProductLabel } from "@/utils/labelEntoVni";
 import useAuth from "@/hooks/useAuth";
 import IconButton from "@/components/IconButton/IconButton";
-import { Add } from "@mui/icons-material";
+import { Add, Inventory } from "@mui/icons-material";
 import { v4 as uuidv4 } from "uuid";
 import { IUser } from "@/types/user";
 import InputSelect from "@/components/InputSelect";
@@ -17,6 +17,8 @@ import useNotification from "@/hooks/useNotification";
 import { COLORS } from "@/constants/colors";
 import WorkMilestone from "./WorkMilestone";
 import DialogChooseWorkers from "./DialogChooseWorkers";
+import { getProductsByOrderId } from "@/services/product-service";
+import { IProduct } from "@/types/product";
 
 interface JobInOrderProps{
     data: IOrder,
@@ -61,12 +63,17 @@ const JobInOrder = (props: JobInOrderProps) => {
     const [openWorkMilestone, setOpenWorkMilestone] = useState(false);
 
     const [order, setOrder] = useState<IOrder | null>(null);
+    const [products, setProducts] = useState<IProduct[]>([]);
     const [workMileStone, setWorkMilestone] = useState<string>('');
     const [errorWorkMileStone, setErrorWorkMilestone] = useState<string>('');
     const [carpenters, setCarpenters] = useState<IUser[]>([]);
     const [numberWorkMilestone, setNumberWorkMilestone] = useState<number[]>([]);
     const [formDataWorkMilestone, setFormDataWorkMilestone] = useState<FormDataWorkMilestone[]>([]);
-    const [dataWorkMilestonePayload, setDataWorkMilestonePayload] = useState<FormDataWorkMilestone[]>([])
+    const [dataWorkMilestonePayload, setDataWorkMilestonePayload] = useState<FormDataWorkMilestone[]>([]);
+    const [product, setProduct] = useState<IProduct | null>(null);
+    const [productSelected, setProductSelected] = useState<any>(null);
+    const [errorProductSelected, setErrorProductSelected] = useState<string>('');
+
     
     useEffect(() => {
         if(data){
@@ -76,7 +83,14 @@ const JobInOrder = (props: JobInOrderProps) => {
                 setOrder(newOrder)
             };
 
-            getOrder()
+            const getProductByOrder = async() => {
+                const res = await getProductsByOrderId(data.id);
+                const newProducts = res.data as any as IProduct[];
+                setProducts(newProducts)
+            }
+
+            getOrder();
+            getProductByOrder()
         }
     }, [data])
 
@@ -126,7 +140,10 @@ const JobInOrder = (props: JobInOrderProps) => {
         if(!workMileStone){
             setErrorWorkMilestone('Mốc công việc không được để trống.')
         }
-        return !!workMileStone;
+        if(!productSelected){
+            setErrorProductSelected('Sản phẩm để tạo công việc không được để trống. ')
+        }
+        return !!workMileStone && !!productSelected;
     }
 
     const handleSaveMilestone = (data: FormDataWorkMilestone[]) => {
@@ -150,115 +167,124 @@ const JobInOrder = (props: JobInOrderProps) => {
             setIsSubmitting(false)
         }
     }
+
+    const handleChangeSelect = (name: string, value: any) => {
+        setProductSelected(value);
+        const newProduct = order?.products.find(el => el.id === value);
+        newProduct && setProduct(newProduct)
+        setErrorProductSelected('')
+    }
     return(
         <Box>
-            {!openWorkMilestone && (
-                <>
-                    <NavigateBack
-                        title="Tạo công việc"
-                        onBack={handleClose}
-                    />
-                    <Paper sx={{ borderRadius: 2, m:1.5, p: 2 }}>
-                        <CardDetailDataOrder
-                            order={order}
-                        />
-                        <Grid container spacing={2}>
-                            {order && order.products.map((product, index) => {
-                                return(
-                                    <Grid size={{ xs: 12, md: 6 }}>
-                                        <LabeledStack 
-                                            sx={{ borderRadius: 3 }}
-                                            label={`Công việc ${index + 1}`}
-                                            stackProps={{ direction: "column", my: 2, p: 2 }}
-                                        >
-                                            <Stack direction='row'>
-                                                <Typography fontSize='15px' fontWeight={600}>Tên công việc:</Typography>
-                                                <Typography fontSize='15px'>{product.name}</Typography>
-                                            </Stack>
-                                            <Stack direction='row'>
-                                                <Typography sx={{ whiteSpace: 'nowrap' }} fontSize='15px' fontWeight={600}>Mô tả/ Yêu cầu:</Typography>
-                                                <Typography sx={{ whiteSpace: { xs: 'none', md: 'nowrap'} }} fontSize='15px'>{product.description}</Typography>
-                                            </Stack>
-                                            <Stack direction='row'>
-                                                <Typography sx={{ whiteSpace: 'nowrap' }} fontSize='15px' fontWeight={600}>Mục tiêu:</Typography>
-                                                <Typography sx={{ whiteSpace: { xs: 'none', md: 'nowrap'} }} fontSize='15px'>{product.target}</Typography>
-                                            </Stack>
-                                            <Stack direction='row'>
-                                                <Typography fontSize='15px' fontWeight={600}>Tiến độ:</Typography>
-                                                <Typography fontSize='15px'>{getProccessProductLabel(product.proccess)}</Typography>
-                                            </Stack>
-                                            <Stack direction='row'>
-                                                <Typography fontSize='15px' fontWeight={600}>Trạng thái:</Typography>
-                                                <Typography fontSize='15px'>{getStatusProductLabel(product.status)}</Typography>
-                                            </Stack>
-                                            <Stack direction='row'>
-                                                <Typography fontSize='15px' fontWeight={600}>Người quản lý:</Typography>
-                                                <Typography fontSize='15px'>{profile?.fullName}</Typography>
-                                            </Stack>
-                                            <Stack direction='row' display='flex' justifyContent='space-between'>
-                                                <Typography fontSize='15px' fontWeight={600}>Phân công nhân lực:</Typography>
-                                                <IconButton
-                                                    tooltip="Mở dialog chọn nhân lực"
-                                                    handleFunt={handleOpenDialogChooseWorkers}
-                                                    icon={<Add/>}
-                                                    height={0}
-                                                    width={0}
-                                                    sx={{ pr: 1}}
-                                                />
-                                            </Stack>
-                                            <Stack direction='row' display='flex' justifyContent='center' alignItems='center'>
-                                                <Typography sx={{ whiteSpace: "nowrap" }} fontSize='15px' fontWeight={600}>Mốc công việc:</Typography>
-                                                <InputSelect
-                                                    name="workMilestone"
-                                                    label=""
-                                                    value={workMileStone}
-                                                    options={DATA_WORK_MILESTONE}
-                                                    onChange={(name, value) => handleSelectInput(index, product.id, name, value)}
-                                                    placeholder="Chọn mốc công việc"
-                                                    error={!!errorWorkMileStone}
-                                                    helperText={errorWorkMileStone}
-                                                />
-                                            </Stack>
-                                        </LabeledStack>                               
-                                    </Grid>
-                                )
-                            })}
+            <NavigateBack
+                title="Tạo công việc"
+                onBack={handleClose}
+            />
+            <Paper sx={{ borderRadius: 2, m:1.5, p: 2 }}>
+                <CardDetailDataOrder
+                    order={order}
+                />
+                <Divider sx={{ mt: 3 }}/>
+                <Grid container spacing={2}>
+                    <Grid size={{ xs: 12, md: 6 }}>
+                        <Stack pb={1.5} direction='row' mt={2}>
+                            <Inventory/>
+                            <Typography fontWeight={600} fontSize='16px'>Chọn sản phẩm để tạo công việc</Typography>
+                        </Stack>
+                        <InputSelect
+                            label=""
+                            placeholder="Chọn sản phẩm"
+                            value={productSelected}
+                            onChange={handleChangeSelect}
+                            name="product"
+                            options={products}
+                            transformOptions={(data) => 
+                                data.map((item) => ({
+                                    value: item.id,
+                                    label: item.name
+                                }))
+                            }
+                            error={!!errorProductSelected}
+                            helperText={errorProductSelected}
+                        />                                
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 6 }}></Grid>
+                    {productSelected !== null && product && (
+                        <Grid size={{ xs: 12 }}>
+                            <LabeledStack 
+                                sx={{ borderRadius: 3 }}
+                                label={`Công việc`}
+                                stackProps={{ direction: "column", my: 2, p: 2 }}
+                            >
+                                <Stack direction='row'>
+                                    <Typography fontSize='15px' fontWeight={600}>Tên công việc:</Typography>
+                                    <Typography fontSize='15px'>{product.name}</Typography>
+                                </Stack>
+                                <Stack direction='row'>
+                                    <Typography sx={{ whiteSpace: 'nowrap' }} fontSize='15px' fontWeight={600}>Mô tả/ Yêu cầu:</Typography>
+                                    <Typography sx={{ whiteSpace: { xs: 'none', md: 'nowrap'} }} fontSize='15px'>{product.description}</Typography>
+                                </Stack>
+                                <Stack direction='row'>
+                                    <Typography sx={{ whiteSpace: 'nowrap' }} fontSize='15px' fontWeight={600}>Mục tiêu:</Typography>
+                                    <Typography sx={{ whiteSpace: { xs: 'none', md: 'nowrap'} }} fontSize='15px'>{product.target}</Typography>
+                                </Stack>
+                                <Stack direction='row'>
+                                    <Typography fontSize='15px' fontWeight={600}>Tiến độ:</Typography>
+                                    <Typography fontSize='15px'>{getProccessProductLabel(product.proccess)}</Typography>
+                                </Stack>
+                                <Stack direction='row'>
+                                    <Typography fontSize='15px' fontWeight={600}>Trạng thái:</Typography>
+                                    <Typography fontSize='15px'>{getStatusProductLabel(product.status)}</Typography>
+                                </Stack>
+                                <Stack direction='row'>
+                                    <Typography fontSize='15px' fontWeight={600}>Người quản lý:</Typography>
+                                    <Typography fontSize='15px'>{profile?.fullName}</Typography>
+                                </Stack>
+                                <Stack direction='row' display='flex' justifyContent='space-between'>
+                                    <Typography fontSize='15px' fontWeight={600}>Phân công nhân lực:</Typography>
+                                    <IconButton
+                                        tooltip="Mở dialog chọn nhân lực"
+                                        handleFunt={handleOpenDialogChooseWorkers}
+                                        icon={<Add/>}
+                                        height={0}
+                                        width={0}
+                                        sx={{ pr: 1}}
+                                    />
+                                </Stack>
+                                <Stack direction='row' display='flex' justifyContent='center' alignItems='center'>
+                                    <Typography sx={{ whiteSpace: "nowrap" }} fontSize='15px' fontWeight={600}>Mốc công việc:</Typography>
+                                    <InputSelect
+                                        name="workMilestone"
+                                        label=""
+                                        value={workMileStone}
+                                        options={DATA_WORK_MILESTONE}
+                                        onChange={(name, value) => {}}
+                                        placeholder="Chọn mốc công việc"
+                                        error={!!errorWorkMileStone}
+                                        helperText={errorWorkMileStone}
+                                    />
+                                </Stack>
+                            </LabeledStack>   
                         </Grid>
-                        <Box mt={2} display='flex' justifyContent='center'>
-                            <Button
-                                variant="outlined"
-                                sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, width: 150, mr: 2 }}
-                                onClick={handleSave}
-                            >
-                                Lưu
-                            </Button>
-                            <Button
-                                variant="outlined"
-                                sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, width: 150 }}
-                                onClick={handleClose}
-                            >
-                                Hủy
-                            </Button>
-                        </Box>
-                    </Paper>                
-                </>
-            )}
-            {openWorkMilestone && workMileStone !== '' && numberWorkMilestone.length > 0 && (
-                <Box>
-                    <NavigateBack
-                        title="Tạo mốc công việc"
-                        onBack={() => { setOpenWorkMilestone(false), setWorkMilestone('') }} 
-                    />
-                    <Box bgcolor='#fff' pb={1}>
-                        <WorkMilestone 
-                            formDataWorkMilestone={formDataWorkMilestone}
-                            onBack={() => { setOpenWorkMilestone(false), setWorkMilestone('') }}
-                            onInputChange={handleInputChangeWorkMilestone}
-                            onSave={handleSaveMilestone}
-                        />
-                    </Box>
+                    )}
+                </Grid>
+                <Box mt={2} display='flex' justifyContent='center'>
+                    <Button
+                        variant="outlined"
+                        sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, width: 150, mr: 2 }}
+                        onClick={handleSave}
+                    >
+                        Lưu
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, width: 150 }}
+                        onClick={handleClose}
+                    >
+                        Hủy
+                    </Button>
                 </Box>
-            )}
+            </Paper>   
             {openDialogChooseWorkers && (
                 <DialogChooseWorkers
                     open={openDialogChooseWorkers}
