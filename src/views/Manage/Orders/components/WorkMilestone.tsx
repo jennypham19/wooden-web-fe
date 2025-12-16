@@ -82,14 +82,117 @@ const InputText = (props: InputTextProps) => {
 }
 
 interface WorkMilestoneProps{
-
+    formDataWorkMilestone: FormDataWorkMilestone[],
+    onInputChange: (index: number, name: string, value: any) => void;
+    onBack: () => void,
+    onSave: (data: FormDataWorkMilestone[]) => void;
+    onStepErrors: (stepIndex: number, name: string) => void;
+    onWorkMilestoneErrors: (stepIndex: number, name: string) => void;
+    stepErrors: FormStepErrors[];
+    workMilestoneErrors: FormWorkMilestoneErrors[];
 }
 
-const WorkMilestone: FC<WorkMilestoneProps> = ({  }) => {
+const WorkMilestone: FC<WorkMilestoneProps> = ({ formDataWorkMilestone, onInputChange, stepErrors, workMilestoneErrors, onStepErrors, onWorkMilestoneErrors }) => {
+    const [numStep, setNumStep] = useState<number[]>([]);
+
+    // ------------------------ Cập nhật mốc công việc + khởi tạo steps ------------------//
+    const handleInputChangeWorkMilestone = (index: number, name: string, value: any) => {
+        const validName = name as keyof FormDataWorkMilestone;
+        if(validName === 'step'){
+            const valueNum = Number(value);
+            if(!isNaN(valueNum) && valueNum > 0){
+                setNumStep(Array.from({ length: valueNum }, (_, i) => i + 1))
+                const newSteps = Array.from({ length: valueNum }, () => ({
+                    name: '',
+                    proccess: 'pending'
+                }));
+                onInputChange(index, "steps", newSteps)
+            }else{
+                setNumStep([]);
+                onInputChange(index, "steps", [])
+            }
+        }
+
+        onInputChange(index, name, value)
+        // Xóa lỗi tại ô đang nhập
+
+        onWorkMilestoneErrors(index, name);
+    }
+
+    const handleInputStepChange = (milestoneIndex: number, stepIndex: number, name: string, value: any) => {
+        const milestone = formDataWorkMilestone[milestoneIndex];
+        const steps = [ ...(milestone.steps ?? [])];
+
+        steps[stepIndex] = {
+            ...steps[stepIndex],
+            [name]: value
+        }     
+        onInputChange(milestoneIndex, "steps", steps);
+
+        onStepErrors(stepIndex, name)
+    }
 
     return(
-        <Box mx={2} py={1}>
-          
+        <Box>
+            {formDataWorkMilestone.map((mile, index) => {
+                const errors = workMilestoneErrors[index] || {};
+                return(
+                    <LabeledStack
+                        sx={{ borderRadius: 3 }}
+                        label={`Công việc mốc ${index + 1}`}
+                        stackProps={{ direction: 'column', my: 2, p: 2 }}
+                    >
+                        <Grid container spacing={2}>
+                            <Grid size={{ xs: 12, md: 6 }}>
+                                <InputText
+                                    label="Tên mốc"
+                                    name="name"
+                                    value={mile.name}
+                                    index={index}
+                                    onInputChange={handleInputChangeWorkMilestone}
+                                    error={!!errors.name}
+                                    helperText={errors.name}
+                                />
+                            </Grid>
+                            <Grid size={{ xs: 12, md: 6 }}>
+                                <InputText
+                                    label="Mốc công việc"
+                                    name="step"
+                                    value={mile.step}
+                                    index={index}
+                                    onInputChange={handleInputChangeWorkMilestone}
+                                    onlyPositiveNumber={true}
+                                    placeholder="Chỉ nhập số"
+                                    error={!!errors.step}
+                                    helperText={errors.step}
+                                />
+                            </Grid>
+                            <Grid size={{ xs: 12 }}>
+                                <InputText
+                                    label="Mục tiêu/ yêu cầu"
+                                    name="target"
+                                    value={mile.target}
+                                    index={index}
+                                    onInputChange={handleInputChangeWorkMilestone}
+                                    error={!!errors.target}
+                                    helperText={errors.target}
+                                />
+                            </Grid>
+                        </Grid>
+                        {mile.step !== null && numStep.length > 0 && (
+                            (mile.steps ?? []).map((step, idx) => (
+                                <Step
+                                    index={idx}
+                                    key={idx}
+                                    onInputChange={(i, name, value) => handleInputStepChange(index, i, name, value)}
+                                    formData={step}
+                                    errors={stepErrors[idx] || {}}
+                                />
+                            ))
+                        )}
+                    </LabeledStack>
+                )
+            })}
         </Box>
     )
 }

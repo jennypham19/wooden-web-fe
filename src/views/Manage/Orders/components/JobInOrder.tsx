@@ -1,6 +1,6 @@
-import { getDetailOrder } from "@/services/order-service";
-import { FormDataWorkMilestone, FormWorkMilestoneErrors, IOrder } from "@/types/order";
-import { Box, Button, Divider, Paper, Stack, Typography } from "@mui/material"
+import { getDetailOrder, saveOrderWork } from "@/services/order-service";
+import { FormDataWorkMilestone, FormStepErrors, FormWorkMilestoneErrors, IOrder, WorkOderPayload } from "@/types/order";
+import { Avatar, Box, Button, Divider, Paper, Stack, Tooltip, Typography } from "@mui/material"
 import { useEffect, useState } from "react";
 import CardDetailDataOrder from "./CardDetailDataOrder";
 import NavigateBack from "../../components/NavigateBack";
@@ -19,6 +19,9 @@ import WorkMilestone from "./WorkMilestone";
 import DialogChooseWorkers from "./DialogChooseWorkers";
 import { getProductsByOrderId } from "@/services/product-service";
 import { IProduct } from "@/types/product";
+import { useFetchData } from "@/hooks/useFetchData";
+import { getListCapenter } from "@/services/user-service";
+import Backdrop from "@/components/Backdrop";
 
 interface JobInOrderProps{
     data: IOrder,
@@ -60,20 +63,23 @@ const JobInOrder = (props: JobInOrderProps) => {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [openDialogChooseWorkers, setOpenDialogChooseWorkers] = useState(false);
-    const [openWorkMilestone, setOpenWorkMilestone] = useState(false);
 
     const [order, setOrder] = useState<IOrder | null>(null);
     const [products, setProducts] = useState<IProduct[]>([]);
     const [workMileStone, setWorkMilestone] = useState<string>('');
     const [errorWorkMileStone, setErrorWorkMilestone] = useState<string>('');
-    const [carpenters, setCarpenters] = useState<IUser[]>([]);
     const [numberWorkMilestone, setNumberWorkMilestone] = useState<number[]>([]);
     const [formDataWorkMilestone, setFormDataWorkMilestone] = useState<FormDataWorkMilestone[]>([]);
-    const [dataWorkMilestonePayload, setDataWorkMilestonePayload] = useState<FormDataWorkMilestone[]>([]);
     const [product, setProduct] = useState<IProduct | null>(null);
     const [productSelected, setProductSelected] = useState<any>(null);
     const [errorProductSelected, setErrorProductSelected] = useState<string>('');
+    const [workMilestoneErrors, setWorkMilestoneErrors] = useState<FormWorkMilestoneErrors[]>([])
+    const [stepErrors, setStepErrors] = useState<FormStepErrors[]>([])
+    const [carpentersId, setCarpentersId] = useState<{ carpenterId: string }[]>([]);
+    const [assignedWorkerIds, setAssignedWorkerIds] = useState<string[]>([]);
+    const [carpenterIdsError, setCarpenterIdsError] = useState<string>('')
 
+    const { listData } = useFetchData<IUser>(getListCapenter, 99)
     
     useEffect(() => {
         if(data){
@@ -94,18 +100,32 @@ const JobInOrder = (props: JobInOrderProps) => {
         }
     }, [data])
 
+    const reset = () => {
+        setWorkMilestone('');
+        setErrorWorkMilestone('');
+        setProducts([]);
+        setNumberWorkMilestone([]) ;
+        setFormDataWorkMilestone([]);
+        setProduct(null); 
+        setProductSelected(null);
+        setErrorProductSelected('');
+        setWorkMilestoneErrors([]);
+        setStepErrors([]);
+        setCarpentersId([]);
+        setAssignedWorkerIds([]);
+        setCarpenterIdsError('')
+    }
+
     const handleClose = () => {
         onClose();
-        setWorkMilestone('');
-        setCarpenters([]);
-        setErrorWorkMilestone('')
+        reset();
     }
 
     const handleOpenDialogChooseWorkers = () => {
         setOpenDialogChooseWorkers(true)
     }
 
-    const handleSelectInput = (index: number, productId: string, name: string, value: any) => {
+    const handleSelectInput = (name: string, value: any) => {
         const number = value.split('_')[0];
         const newNumber = getNumber(number);
         if(newNumber > 0){
@@ -120,7 +140,6 @@ const JobInOrder = (props: JobInOrderProps) => {
                     steps: []
                 }))
             )
-            setOpenWorkMilestone(true)
         }else{
             setWorkMilestone('')
             setNumberWorkMilestone([])
@@ -136,6 +155,21 @@ const JobInOrder = (props: JobInOrderProps) => {
         })
     }
 
+    const handleStepErrors = (stepIndex: number, name: string) => {
+        setStepErrors((prev) => {
+            const updated = [...prev];
+            updated[stepIndex] = { ...updated[stepIndex], [name]: undefined };
+            return updated;
+        });
+    }
+    const handleWorkMilestoneErrors = (index: number, name: string) => {
+        setWorkMilestoneErrors((prev) => {
+            const updated = [...prev];
+            updated[index] = { ...updated[index], [name]: undefined };
+            return updated;
+        });   
+    }
+
     const validateSubmit = (): boolean => {
         if(!workMileStone){
             setErrorWorkMilestone('Mốc công việc không được để trống.')
@@ -143,21 +177,75 @@ const JobInOrder = (props: JobInOrderProps) => {
         if(!productSelected){
             setErrorProductSelected('Sản phẩm để tạo công việc không được để trống. ')
         }
-        return !!workMileStone && !!productSelected;
+        if(carpentersId.length === 0){
+            setCarpenterIdsError("Phân công nhân lực không được để trống .")
+        }
+
+        // Bắt lỗi mốc công việc
+        const newWorkMilestoneErrors: FormWorkMilestoneErrors[] = [];
+        formDataWorkMilestone.forEach((mile, idx) => {
+            const mError: FormWorkMilestoneErrors = {};
+            if (!mile.name) mError.name = `Mốc công việc ${idx + 1}: Vui lòng nhập tên mốc công việc`;
+            if (!mile.step) mError.step = `Mốc công việc ${idx + 1}: Vui lòng nhập mốc công việc`;
+            if (!mile.target) mError.target = `Mốc công việc ${idx + 1}: Vui lòng nhập mục tiêu/ yêu cầu`;
+            newWorkMilestoneErrors.push(mError);
+        });
+
+        const hasWorkMilestoneError = newWorkMilestoneErrors.some((e) => Object.keys(e).length > 0);
+        setWorkMilestoneErrors(newWorkMilestoneErrors)
+
+        // Bắt lỗi của Bước
+        const newStepErrors: FormStepErrors[] = [];
+        formDataWorkMilestone.forEach((mile) => {
+            (mile.steps ?? []).forEach((step, idx) => {
+                const pError: FormStepErrors = {};
+                if (!step.name) pError.name = `Bước ${idx + 1}: Vui lòng nhập tên bước`;
+                if (!step.proccess) pError.proccess = `Bước ${idx + 1}: Vui lòng chọn tiến độ`;
+                newStepErrors.push(pError);
+            })
+        });
+
+        const hasStepError = newStepErrors.some((e) => Object.keys(e).length > 0);
+        setStepErrors(newStepErrors)
+
+        return !!workMileStone && !!productSelected && !hasStepError && !hasWorkMilestoneError && carpentersId.length > 0;
     }
 
-    const handleSaveMilestone = (data: FormDataWorkMilestone[]) => {
-        setDataWorkMilestonePayload(data);
-        setOpenWorkMilestone(false)
-    } 
-    
+    const handleSaveWorkers = (ids: string[]) => {
+        setAssignedWorkerIds((prev) => {
+            const merged = [...prev, ...ids];
+            return Array.from(new Set(merged));
+        })
+        const payloadIds: { carpenterId: string }[] = ids.map((id) => ({
+            carpenterId: id
+        }));
+        setCarpentersId((prev) => [...prev, ...payloadIds])
+        setCarpenterIdsError('');
+        setOpenDialogChooseWorkers(false)
+    }
+ 
     const handleSave = async() => {
         if(!validateSubmit()){
             return;
         }
+        const payload: WorkOderPayload = {
+            managerId: profile ? profile.id : null,
+            productId: product ? product.id : null,
+            workMilestone: workMileStone,
+            workers: carpentersId.length > 0 ? carpentersId : [],
+            workMilestones: formDataWorkMilestone.length > 0 ? formDataWorkMilestone : []
+
+        }
+        console.log("payload: ", payload);
+
         setIsSubmitting(true)
         try {
-            
+            const res = await saveOrderWork(payload);
+            notify({
+                message: res.message,
+                severity: 'success'
+            });
+            reset()            
         } catch (error: any) {
             notify({
                 message: error.message,
@@ -174,6 +262,7 @@ const JobInOrder = (props: JobInOrderProps) => {
         newProduct && setProduct(newProduct)
         setErrorProductSelected('')
     }
+    
     return(
         <Box>
             <NavigateBack
@@ -241,7 +330,24 @@ const JobInOrder = (props: JobInOrderProps) => {
                                     <Typography fontSize='15px'>{profile?.fullName}</Typography>
                                 </Stack>
                                 <Stack direction='row' display='flex' justifyContent='space-between'>
-                                    <Typography fontSize='15px' fontWeight={600}>Phân công nhân lực:</Typography>
+                                    <Stack direction='row'>
+                                        <Typography fontSize='15px' fontWeight={600}>Phân công nhân lực:</Typography>
+                                        {carpenterIdsError && (<Typography fontSize='15px' fontWeight={600} color="error">{carpenterIdsError}</Typography>)}
+                                        {carpentersId.length > 0 && (
+                                            carpentersId.map((id, idx) => {
+                                                const selectedWorker = listData.find(el => el.id === id.carpenterId);
+                                                if (!selectedWorker) return null;
+                                                return(
+                                                    <Tooltip key={idx} title={selectedWorker?.fullName}>
+                                                        <Avatar
+                                                            src={selectedWorker?.avatarUrl || ''}
+                                                            sx={{ borderRadius: '50%'}}
+                                                        />
+                                                    </Tooltip>
+                                                )
+                                            })
+                                        )}
+                                    </Stack>
                                     <IconButton
                                         tooltip="Mở dialog chọn nhân lực"
                                         handleFunt={handleOpenDialogChooseWorkers}
@@ -258,7 +364,7 @@ const JobInOrder = (props: JobInOrderProps) => {
                                         label=""
                                         value={workMileStone}
                                         options={DATA_WORK_MILESTONE}
-                                        onChange={(name, value) => {}}
+                                        onChange={handleSelectInput}
                                         placeholder="Chọn mốc công việc"
                                         error={!!errorWorkMileStone}
                                         helperText={errorWorkMileStone}
@@ -268,6 +374,18 @@ const JobInOrder = (props: JobInOrderProps) => {
                         </Grid>
                     )}
                 </Grid>
+                {workMileStone !== null && numberWorkMilestone.length > 0 && (
+                    <WorkMilestone
+                        formDataWorkMilestone={formDataWorkMilestone}
+                        onInputChange={handleInputChangeWorkMilestone}
+                        onBack={handleClose}
+                        onSave={handleSave}
+                        onStepErrors={handleStepErrors}
+                        onWorkMilestoneErrors={handleWorkMilestoneErrors}
+                        stepErrors={stepErrors}
+                        workMilestoneErrors={workMilestoneErrors}
+                    />
+                )}
                 <Box mt={2} display='flex' justifyContent='center'>
                     <Button
                         variant="outlined"
@@ -291,8 +409,11 @@ const JobInOrder = (props: JobInOrderProps) => {
                     onClose={() => {
                         setOpenDialogChooseWorkers(false)
                     }}
+                    onSave={handleSaveWorkers}
+                    excludedIds={assignedWorkerIds}
                 />
             )}
+            {isSubmitting && (<Backdrop open={isSubmitting}/>)}
         </Box>
     )
 }

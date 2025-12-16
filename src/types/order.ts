@@ -60,10 +60,10 @@ export interface OrderPayloadRequest{
 }
 
 export interface WorkOderPayload{
-    managerId: string,
-    productId: string,
+    managerId: string | null,
+    productId: string | null,
     workMilestone: string,
-    workers: {carpenterId: string}[],
+    workers: { carpenterId : string} [],
     workMilestones: FormDataWorkMilestone[]
 }
 

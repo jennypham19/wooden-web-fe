@@ -1,7 +1,7 @@
 import { HttpResponse } from "@/types/common";
 import HttpClient from "@/utils/HttpClient";
 import { GetParams, PaginatedResponse } from "./base-service";
-import { IOrder, OrderPayloadRequest } from "@/types/order";
+import { IOrder, OrderPayloadRequest, WorkOderPayload } from "@/types/order";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'; 
 const prefix = `${API_BASE_URL}/api/orders`;
 
@@ -38,4 +38,9 @@ export const getOrders = async(getParams: GetParams): Promise<HttpResponse<Pagin
 // Lấy chi tiết đơn hàng
 export const getDetailOrder = (id: string) => {
     return HttpClient.get<HttpResponse<IOrder>>(`${prefix}/detail-order/${id}`)
+}
+
+// Lưu tạo mới công việc
+export const saveOrderWork = (payload: WorkOderPayload) => {
+    return HttpClient.post(`${prefix}/save-work-order`, payload)
 }
