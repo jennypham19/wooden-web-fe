@@ -40,7 +40,7 @@ interface InputSelectProps {
   title?: string,
   loadingTitle?: string,
   renderChips?: boolean, // hiển thị selected dưới dạng Chip
-  margin?: any
+  margin?: any,
 }
 
 const InputSelect: React.FC<InputSelectProps> = ({

@@ -4,7 +4,7 @@ import Grid from "@mui/material/Grid2"
 import InputSelect from "./InputSelect";
 import { v4 as uuidv4} from "uuid"
 
-const DATA_PROCCESS: { id: string, label: string, value: string}[] = [
+export const DATA_PROCCESS: { id: string, label: string, value: string}[] = [
     {
         id: uuidv4(),
         label: 'Chưa hoạt động',
@@ -19,6 +19,39 @@ const DATA_PROCCESS: { id: string, label: string, value: string}[] = [
         id: uuidv4(),
         label: 'Hoàn thành',
         value: 'completed'
+    }
+]
+
+export const DATA_PROGRESS: { id: string, label: string, value: string}[] = [
+    {
+        id: uuidv4(),
+        label: '0%',
+        value: '0%'
+    },
+    {
+        id: uuidv4(),
+        label: '20%',
+        value: '20%'
+    },
+    {
+        id: uuidv4(),
+        label: '40%',
+        value: '40%'
+    },
+    {
+        id: uuidv4(),
+        label: '60%',
+        value: '60%'
+    },
+    {
+        id: uuidv4(),
+        label: '80%',
+        value: '80%'
+    },
+    {
+        id: uuidv4(),
+        label: '100%',
+        value: '100%'
     }
 ]
 
@@ -87,7 +120,7 @@ const Step = (props: StepProps) => {
 
     return(
         <Grid container spacing={2}>
-            <Grid size={{ xs: 12, md: 6 }}>
+            <Grid size={{ xs: 12, md: 4 }}>
                 <InputText
                     index={index} // Giữ nguyên index
                     label={`Bước ${index + 1}`}
@@ -98,7 +131,19 @@ const Step = (props: StepProps) => {
                     helperText={errors.name}
                 />
             </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
+            <Grid size={{ xs: 12, md: 4 }}>
+                <InputSelect
+                    index={index} // Giữ nguyên index, không cần -1
+                    name="progress"
+                    value={formData.progress}
+                    label=""
+                    options={DATA_PROGRESS}
+                    onChange={onInputChange}
+                    placeholder="Chọn tiến độ"
+                    disabled
+                />
+            </Grid>
+            <Grid size={{ xs: 12, md: 4 }}>
                 <InputSelect
                     index={index} // Giữ nguyên index, không cần -1
                     name="proccess"
@@ -106,7 +151,7 @@ const Step = (props: StepProps) => {
                     label=""
                     options={DATA_PROCCESS}
                     onChange={onInputChange}
-                    placeholder="Chọn tiến độ"
+                    placeholder="Chọn quá trình"
                     disabled
                 />
             </Grid>

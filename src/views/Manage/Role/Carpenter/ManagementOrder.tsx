@@ -1,10 +1,10 @@
 import { Box } from "@mui/material"
-import AllListOrders from "../../Orders/components/AllListOrders";
+import AllListOrdersByCarpenter from "../../Orders/components/AllListOrdersByCarpenter";
 
 const ManagementOrderCarpenter = () => {
     return(
         <Box>
-            <AllListOrders/>
+            <AllListOrdersByCarpenter/>
         </Box>
     )
 }

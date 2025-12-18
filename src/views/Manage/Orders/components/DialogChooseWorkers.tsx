@@ -64,7 +64,7 @@ const DialogChooseWorkers = (props: DialogChooseWorkersProps) => {
           <>
             <Grid container spacing={2}>
               {listData.length === 0 && (
-                <Box width='100%' p={1} bgcolor='red'>
+                <Box width='100%' p={1} bgcolor='#20ac4aff'>
                   <Typography variant="subtitle2">Không tồn tại bản ghi.</Typography>
                 </Box>
               )}
@@ -122,6 +122,7 @@ const DialogChooseWorkers = (props: DialogChooseWorkersProps) => {
                 <Button
                     sx={{ bgcolor: COLORS.BUTTON, mr: 1}}  
                     onClick={handleSave}     
+                    disabled={filteredList.length === 0}
                 >
                     Hoàn thành
                 </Button>

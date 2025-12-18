@@ -1,21 +1,28 @@
-import useAuth from "@/hooks/useAuth";
 import { useFetchData } from "@/hooks/useFetchData";
 import { getOrders, getOrdersByCarpenter } from "@/services/order-service";
 import { IOrder } from "@/types/order";
-import { AllInbox, Autorenew, CheckCircle } from "@mui/icons-material";
 import { Alert, Box, Button, Typography } from "@mui/material";
 import React, { useState } from "react";
-import SearchBox from "../components/SearchBox";
+import SearchBox from "../../components/SearchBox";
+import { COLORS } from "@/constants/colors";
+import { Add, AllInbox, Autorenew, CheckCircle,  Schedule } from "@mui/icons-material";
+import NavigateBack from "../../components/NavigateBack";
 import Backdrop from "@/components/Backdrop";
-import Grid from "@mui/material/Grid2"
-import Tabs from "../components/Tabs";
-import CardDataOrder from "../Orders/components/CardDataOrder";
+import Grid from "@mui/material/Grid2";
+import DialogAddOrder from "./DialogAddOrder";
+import DetailOrder from "./DetailOrder";
+import useAuth from "@/hooks/useAuth";
+import CardDataOrder from "./CardDataOrder";
+import { ROLE } from "@/constants/roles";
 import CustomPagination from "@/components/Pagination/CustomPagination";
-import Page from "@/components/Page";
-import UpdateOrder from "./components/UpdateOrder";
+import JobInOrder from "./JobInOrder";
+import Tabs from "../../components/Tabs";
+import ViewOrderByCarpenter from "./ViewOrderByCapenter";
 
 
-
+interface AllListOrdersByCarpenterProps{
+    onBack?: () => void;
+}
 
 const DataStatus: {id: number, value: string, label: string, icon: React.ReactNode}[] = [
     {
@@ -39,7 +46,8 @@ const DataStatus: {id: number, value: string, label: string, icon: React.ReactNo
     }
 ]
 
-const ManagementJob = () => {
+const AllListOrdersByCarpenter: React.FC<AllListOrdersByCarpenterProps> = (props) => {
+    const { onBack } = props;
     const { profile } = useAuth();
     const [viewMode, setViewMode] = useState<'all' | 'in_progress' | 'completed'>('all')
     const [openOrder, setOpenOrder] = useState<{ open: boolean, type: string}>({
@@ -61,7 +69,7 @@ const ManagementJob = () => {
     }
 
     return(
-        <Page title="Quản lý công việc">
+        <Box>
             {!openOrder.open && (
                 <>
                     <SearchBox
@@ -69,6 +77,12 @@ const ManagementJob = () => {
                         onSearch={handleSearch}
                         placeholder="Tìm kiếm theo tên, mã đơn hàng..."
                     />
+                    {(profile?.role === ROLE.EMPLOYEE || profile?.role === ROLE.FACTORY_MANAGER) && onBack && (
+                        <NavigateBack
+                            title="Danh sách đơn hàng"
+                            onBack={onBack}
+                        />
+                    )}
                     <Box m={2}>
                         <Tabs data={DataStatus} viewMode={viewMode} onChange={setViewMode} />
                     </Box>
@@ -106,13 +120,13 @@ const ManagementJob = () => {
                 </>
             )}
             {openOrder.open && openOrder.type === 'view' && order && (
-                <UpdateOrder
+                <ViewOrderByCarpenter
                     data={order}
                     onBack={handleCloseViewOrder}
                 />
             )}
-        </Page>
+        </Box>
     )
 }
 
-export default ManagementJob;
+export default AllListOrdersByCarpenter;

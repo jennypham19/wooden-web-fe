@@ -17,5 +17,6 @@ export interface IProduct{
     proccess: ProccessOrder | null,
     status: StatusOrder | null,
     createdAt: string,
-    updatedAt: string
+    updatedAt: string,
+    isCreated: boolean,
 }

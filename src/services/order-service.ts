@@ -44,3 +44,29 @@ export const getDetailOrder = (id: string) => {
 export const saveOrderWork = (payload: WorkOderPayload) => {
     return HttpClient.post(`${prefix}/save-work-order`, payload)
 }
+
+// Lấy danh sách đơn hàng theo id carpenter
+export const getOrdersByCarpenter = async(getParams: GetParams): Promise<HttpResponse<PaginatedResponse<IOrder>>> => {
+    const url = `${prefix}/list-orders-by-carpenter`;
+    const params: Record<string, any> = {
+        page: getParams.page,
+        limit: getParams.limit,
+        id: getParams.id
+    }
+    if(getParams.searchTerm && getParams.searchTerm.trim()){
+        params.searchTerm = getParams.searchTerm
+    }
+    if(getParams.status !== 'all'){
+        params.status = getParams.status
+    };
+    const response = await HttpClient.get<{
+        success: boolean,
+        message: string,
+        data: PaginatedResponse<IOrder>
+    }>(url, { params });
+    if(response.data && response.success && response.data){
+        return response;
+    }else{
+        throw new Error(response.message || 'Failed to fetch list orders')
+    }
+}

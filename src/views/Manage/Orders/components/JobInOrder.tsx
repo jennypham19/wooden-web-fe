@@ -17,7 +17,7 @@ import useNotification from "@/hooks/useNotification";
 import { COLORS } from "@/constants/colors";
 import WorkMilestone from "./WorkMilestone";
 import DialogChooseWorkers from "./DialogChooseWorkers";
-import { getProductsByOrderId } from "@/services/product-service";
+import { getProductsByOrderId, getProductsByOrderIdAndStatus } from "@/services/product-service";
 import { IProduct } from "@/types/product";
 import { useFetchData } from "@/hooks/useFetchData";
 import { getListCapenter } from "@/services/user-service";
@@ -80,7 +80,12 @@ const JobInOrder = (props: JobInOrderProps) => {
     const [carpenterIdsError, setCarpenterIdsError] = useState<string>('')
 
     const { listData } = useFetchData<IUser>(getListCapenter, 99)
-    
+
+    const getProductByOrder = async(id: string) => {
+        const res = await getProductsByOrderIdAndStatus(id);
+        const newProducts = res.data as any as IProduct[];
+        setProducts(newProducts)
+    }
     useEffect(() => {
         if(data){
             const getOrder = async() => {
@@ -88,22 +93,14 @@ const JobInOrder = (props: JobInOrderProps) => {
                 const newOrder = res.data as any as IOrder;
                 setOrder(newOrder)
             };
-
-            const getProductByOrder = async() => {
-                const res = await getProductsByOrderId(data.id);
-                const newProducts = res.data as any as IProduct[];
-                setProducts(newProducts)
-            }
-
             getOrder();
-            getProductByOrder()
+            getProductByOrder(data.id)
         }
     }, [data])
 
     const reset = () => {
         setWorkMilestone('');
         setErrorWorkMilestone('');
-        setProducts([]);
         setNumberWorkMilestone([]) ;
         setFormDataWorkMilestone([]);
         setProduct(null); 
@@ -113,7 +110,8 @@ const JobInOrder = (props: JobInOrderProps) => {
         setStepErrors([]);
         setCarpentersId([]);
         setAssignedWorkerIds([]);
-        setCarpenterIdsError('')
+        setCarpenterIdsError('');
+        getProductByOrder(data.id)
     }
 
     const handleClose = () => {
@@ -177,7 +175,7 @@ const JobInOrder = (props: JobInOrderProps) => {
         if(!productSelected){
             setErrorProductSelected('Sản phẩm để tạo công việc không được để trống. ')
         }
-        if(carpentersId.length === 0){
+        if(carpentersId.length === 0 ){
             setCarpenterIdsError("Phân công nhân lực không được để trống .")
         }
 
@@ -200,7 +198,8 @@ const JobInOrder = (props: JobInOrderProps) => {
             (mile.steps ?? []).forEach((step, idx) => {
                 const pError: FormStepErrors = {};
                 if (!step.name) pError.name = `Bước ${idx + 1}: Vui lòng nhập tên bước`;
-                if (!step.proccess) pError.proccess = `Bước ${idx + 1}: Vui lòng chọn tiến độ`;
+                if (!step.progress) pError.progress = `Bước ${idx + 1}: Vui lòng chọn tiến độ`;
+                if (!step.proccess) pError.proccess = `Bước ${idx + 1}: Vui lòng chọn quá trình`;
                 newStepErrors.push(pError);
             })
         });
@@ -229,6 +228,7 @@ const JobInOrder = (props: JobInOrderProps) => {
             return;
         }
         const payload: WorkOderPayload = {
+            orderId: order ? order.id : null,
             managerId: profile ? profile.id : null,
             productId: product ? product.id : null,
             workMilestone: workMileStone,
@@ -236,8 +236,6 @@ const JobInOrder = (props: JobInOrderProps) => {
             workMilestones: formDataWorkMilestone.length > 0 ? formDataWorkMilestone : []
 
         }
-        console.log("payload: ", payload);
-
         setIsSubmitting(true)
         try {
             const res = await saveOrderWork(payload);
@@ -293,6 +291,7 @@ const JobInOrder = (props: JobInOrderProps) => {
                                     label: item.name
                                 }))
                             }
+                            title='Không tồn tại bản ghi nào'
                             error={!!errorProductSelected}
                             helperText={errorProductSelected}
                         />                                

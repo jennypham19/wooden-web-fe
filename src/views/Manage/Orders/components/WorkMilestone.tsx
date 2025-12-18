@@ -104,6 +104,7 @@ const WorkMilestone: FC<WorkMilestoneProps> = ({ formDataWorkMilestone, onInputC
                 setNumStep(Array.from({ length: valueNum }, (_, i) => i + 1))
                 const newSteps = Array.from({ length: valueNum }, () => ({
                     name: '',
+                    progress: '0%',
                     proccess: 'pending'
                 }));
                 onInputChange(index, "steps", newSteps)

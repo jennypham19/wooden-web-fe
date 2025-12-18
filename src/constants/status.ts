@@ -179,3 +179,38 @@ export const STATUS_PRODUCT_LABELS: { [key in StatusProduct]: string } = {
     [StatusProduct.IN_PROGRESS]: 'Đang hoạt động',
     [StatusProduct.COMPLETED]: 'Đã hoàn thành',
 }
+
+// WorkOrder
+export const ProgressWorkOrder = {
+    NOT_START_0: '0%',
+    IN_PROGRESS_20: '20%',
+    IN_PROGRESS_40: '40%',
+    IN_PROGRESS_60: '60%',
+    IN_PROGRESS_80: '80%',
+    COMPLETED_100: '100%'
+}
+
+export type ProgressWorkOrder = typeof ProgressWorkOrder[keyof typeof ProgressWorkOrder];
+
+export const PROGRESS_WORK_ORDER_LABELS: { [key in ProgressWorkOrder]: string } = {
+    [ProgressWorkOrder.NOT_START_0]: '0%',
+    [ProgressWorkOrder.IN_PROGRESS_20]: '20%',
+    [ProgressWorkOrder.IN_PROGRESS_40]: '40%',
+    [ProgressWorkOrder.IN_PROGRESS_60]: '60%',
+    [ProgressWorkOrder.IN_PROGRESS_80]: '80%',
+    [ProgressWorkOrder.COMPLETED_100]: '100%',
+}
+
+export const ProccessWorkOrder = {
+    PENDING: 'pending',
+    IN_PROGRESS: 'in_progress',
+    COMPLETED: 'completed',
+}
+
+export type ProccessWorkOrder = typeof ProccessWorkOrder[keyof typeof ProccessWorkOrder];
+
+export const PROCCESS_WORK_ORDER_LABELS: { [key in ProccessWorkOrder]: string } = {
+    [StatusProduct.PENDING]: 'Chưa hoạt động',
+    [StatusProduct.IN_PROGRESS]: 'Đang hoạt động',
+    [StatusProduct.COMPLETED]: 'Đã hoàn thành',
+}

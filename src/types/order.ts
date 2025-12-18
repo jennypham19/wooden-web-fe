@@ -1,4 +1,4 @@
-import { ProccessOrder, StatusOrder } from "@/constants/status";
+import { ProccessOrder, ProccessWorkOrder, ProgressWorkOrder, StatusOrder } from "@/constants/status";
 import { Dayjs } from "dayjs";
 import { FormDataProducts, IProduct } from "./product";
 import { IInputFile, IReferenceLink } from "./file";
@@ -33,6 +33,7 @@ export interface FormDataImageStep{
 export interface FormDataStep{
     name: string,
     proccess: string,
+    progress: string,
     images?: FormDataImageStep[]
 }
 
@@ -60,6 +61,7 @@ export interface OrderPayloadRequest{
 }
 
 export interface WorkOderPayload{
+    orderId: string | null,
     managerId: string | null,
     productId: string | null,
     workMilestone: string,
@@ -85,9 +87,43 @@ export interface IOrder{
     requiredNote: string,
     createdAt: string,
     updatedAt: string,
+    isCreatedWork: boolean,
     products: IProduct[],
     inputFiles: IInputFile[],
     referenceLinks: IReferenceLink[]
+}
+
+export interface IWorkOrder{
+    id: string,
+    workMilestone: string,
+    manager: {
+        id: string,
+        fullName: string,
+        avatarUrl: string
+    },
+    createdAt: string,
+    updatedAt: string,
+    workers: { 
+        id: string,
+        fullName: string,
+        avatarUrl: string
+    }[];
+    workMilestones: {
+        id: string,
+        name: string,
+        step: string,
+        target: string,
+        createdAt: string,
+        updatedAt: string,
+        steps: {
+            id: string,
+            name: string,
+            proccess: ProccessWorkOrder | null,
+            progress: ProgressWorkOrder | null,
+            createdAt: string,
+            updatedAt: string,
+        }[]
+    }[]
 }
 
 //error
