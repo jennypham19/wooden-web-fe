@@ -72,15 +72,14 @@ const ProgressProduct = (props: ProgressProductProps) => {
         return !isStepCanUpdate(milestoneIndex, stepIndex)
     }
 
-    const isShowButtonAddStep = (milestoneIndex: number) => {
+    const canAddStep = (milestoneIndex: number) => {
         if(!workOrder) return false;
 
         // 1. Kiểm tra các mốc đã hoàn thành chưa để hiện thị thêm b
-        for(let i = 0; i < milestoneIndex; i++){
-            const milestone = workOrder.workMilestones[i];
-            const allStepsDone = milestone.steps.every(s => s.proccess === 'completed');
-            if(!allStepsDone) return false;
-        }
+        const milestone = workOrder.workMilestones[milestoneIndex];
+
+        // Tất cả step đã hoàn thành
+        return milestone.steps.every(step => step.proccess === 'completed')
     }
 
     const handleOpenUpdateStep = () => {
@@ -207,8 +206,23 @@ const ProgressProduct = (props: ProgressProductProps) => {
                                                     <>
                                                         <Grid size={{ xs: 12, md: 9 }}>
                                                             <Stack direction='row'>
-                                                                <Typography sx={{ whiteSpace: 'nowrap' }} fontSize='14px'>Bước {idx + 1}: </Typography>
-                                                                <Typography sx={{ whiteSpace: { xs: 'none', md: 'nowrap'} }} fontSize='14px'>{step.name} </Typography>
+                                                                <Typography 
+                                                                    sx={{ 
+                                                                        whiteSpace: 'nowrap',
+                                                                        color: isStepLocked(index, idx) ? '#979595ff' : '#000' 
+                                                                    }} fontSize='14px'
+                                                                >
+                                                                    Bước {idx + 1}: 
+                                                                </Typography>
+                                                                <Typography 
+                                                                    sx={{ 
+                                                                        whiteSpace: { xs: 'none', md: 'nowrap'},
+                                                                        color: isStepLocked(index, idx) ? '#979595ff' : '#000'
+                                                                    }} 
+                                                                    fontSize='14px' 
+                                                                >
+                                                                    {step.name} 
+                                                                </Typography>
                                                             </Stack>
                                                         </Grid>
                                                         <Grid size={{ xs: 12, md: 3 }}>
@@ -310,7 +324,17 @@ const ProgressProduct = (props: ProgressProductProps) => {
                                                                     </Box>
                                                                 </Paper>
                                                             </Grid>
-                                                        )}                                                                            
+                                                        )} 
+                                                        {canAddStep(index) && (
+                                                            <Box mt={1.5} display='flex' justifyContent='flex-end'>
+                                                                <Button
+                                                                    variant="outlined"
+                                                                    sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
+                                                                >
+                                                                    Thêm bước
+                                                                </Button>
+                                                            </Box>
+                                                        )}                                                                           
                                                     </>
                                                 )
                                             })}
