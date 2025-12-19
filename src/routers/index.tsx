@@ -41,7 +41,7 @@ const routes: RouteObject[] = [
 
   // --- NHÁNH 2: CÁC TRANG XÁC THỰC (CHỈ DÀNH CHO NGƯỜI CHƯA ĐĂNG NHẬP) ---
   {
-    path: 'auth',
+    path: '/auth',
     element: <PublicRoute/>,
     children: [
       {
@@ -58,11 +58,7 @@ const routes: RouteObject[] = [
   },
   {
     path: '*',
-    element: <Outlet />,
-    children: [
-      { index: true, element: <NotFound /> },
-      { path: '*', element: <NotFound /> },
-    ],
+    element: <NotFound />,
   },
   {
     path: '/403',
