@@ -69,6 +69,19 @@ export interface WorkOderPayload{
     workMilestones: FormDataWorkMilestone[]
 }
 
+export interface StepsPayload{
+    proccess: string,
+    progress: string,
+    images: { name: string, url: string }[]
+}
+
+export interface StepPayload{
+    workMilestoneId: string,
+    name: string,
+    proccess: string,
+    progress: string,
+}
+
 
 // đầu ra
 export interface IOrder{
@@ -93,6 +106,34 @@ export interface IOrder{
     referenceLinks: IReferenceLink[]
 }
 
+interface IImage{
+    id: string,
+    name: string,
+    url: string,
+    createdAt: string,
+    updatedAt: string,
+}
+
+export interface IStep{
+    id: string,
+    name: string,
+    proccess: ProccessWorkOrder | null,
+    progress: ProgressWorkOrder | null,
+    createdAt: string,
+    updatedAt: string,
+    images: IImage[]
+}
+
+export interface IWorkMilestone{
+    id: string,
+    name: string,
+    step: string,
+    target: string,
+    createdAt: string,
+    updatedAt: string,
+    steps: IStep[]
+}
+
 export interface IWorkOrder{
     id: string,
     workMilestone: string,
@@ -108,22 +149,7 @@ export interface IWorkOrder{
         fullName: string,
         avatarUrl: string
     }[];
-    workMilestones: {
-        id: string,
-        name: string,
-        step: string,
-        target: string,
-        createdAt: string,
-        updatedAt: string,
-        steps: {
-            id: string,
-            name: string,
-            proccess: ProccessWorkOrder | null,
-            progress: ProgressWorkOrder | null,
-            createdAt: string,
-            updatedAt: string,
-        }[]
-    }[]
+    workMilestones: IWorkMilestone[]
 }
 
 //error

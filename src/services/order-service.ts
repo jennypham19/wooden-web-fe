@@ -1,7 +1,7 @@
 import { HttpResponse } from "@/types/common";
 import HttpClient from "@/utils/HttpClient";
 import { GetParams, PaginatedResponse } from "./base-service";
-import { IOrder, OrderPayloadRequest, WorkOderPayload } from "@/types/order";
+import { IOrder, OrderPayloadRequest, StepPayload, StepsPayload, WorkOderPayload } from "@/types/order";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'; 
 const prefix = `${API_BASE_URL}/api/orders`;
 
@@ -69,4 +69,19 @@ export const getOrdersByCarpenter = async(getParams: GetParams): Promise<HttpRes
     }else{
         throw new Error(response.message || 'Failed to fetch list orders')
     }
+}
+
+// update tiến độ và trạng thái của step
+export const updateStep = async(id: string, payload: StepsPayload) => {
+    return HttpClient.put(`${prefix}/step-updated/${id}`, payload as any)
+}
+
+// thêm mới step
+export const createStep = async(payload: StepPayload) => {
+    return HttpClient.post(`${prefix}/step-created`, payload)
+}
+
+// update đơn hàng
+export const updateProccessOder = async(id: string, payload: { proccess: string }) => {
+    return HttpClient.patch(`${prefix}/proccess-order-updated/${id}`, payload as any)
 }

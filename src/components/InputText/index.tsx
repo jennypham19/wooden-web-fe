@@ -247,6 +247,12 @@ const InputText: React.FC<CustomInputProps> = ({
             },
             startAdornment: startAdornment,
         }}
+        InputLabelProps={{
+          sx: {
+            fontSize: "14px",
+            color: '#aaa'
+          }
+        }}
         sx={{
           ...sx,
         }}

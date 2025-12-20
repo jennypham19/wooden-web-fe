@@ -1,6 +1,6 @@
 import { HttpResponse } from "@/types/common";
 import { IWorkOrder } from "@/types/order";
-import { IProduct } from "@/types/product";
+import { FormUpdateProduct, IProduct } from "@/types/product";
 import HttpClient from "@/utils/HttpClient";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'; 
@@ -19,4 +19,9 @@ export const getProductsByOrderIdAndStatus = (id: string) => {
 // Lấy chi tiết mốc công việc theo sản phẩm
 export const getDetailWorkOrderByProduct = (id: string) => {
     return HttpClient.get<any, HttpResponse<IWorkOrder>>(`${prefix}/detail-work-order-by-product/${id}`)
+}
+
+// Update hình ảnh và trạng thái của sản phẩm
+export const updateImageAndStatusProduct = (id: string, payload: FormUpdateProduct) => {
+    return HttpClient.put(`${prefix}/image-and-status-product-updated/${id}`, payload)
 }

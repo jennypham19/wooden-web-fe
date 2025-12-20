@@ -1,42 +1,98 @@
-import { Avatar, Box, Button, Chip, Paper, Stack, Tooltip, Typography } from "@mui/material";
+import { Avatar, Box, Button, Chip, IconButton, Paper, Stack, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import NavigateBack from "../../components/NavigateBack";
-import { IProduct } from "@/types/product";
-import { useEffect, useRef, useState } from "react";
-import { IWorkOrder } from "@/types/order";
-import { getDetailWorkOrderByProduct } from "@/services/product-service";
+import { FormUpdateProduct, IProduct } from "@/types/product";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { IWorkMilestone, IWorkOrder, StepPayload, StepsPayload } from "@/types/order";
+import { getDetailWorkOrderByProduct, updateImageAndStatusProduct } from "@/services/product-service";
 import Grid from "@mui/material/Grid2"
-import { getNumber, getProccessProductLabel, getProccessWorkOrderColor, getProccessWorkOrderLabel, getProgressWorkOrderLabel, getStatusProductColor, getStatusProductLabel } from "@/utils/labelEntoVni";
+import { getNumber, getProccessWorkOrderColor, getProccessWorkOrderLabel, getProgressWorkOrderLabel, getStatusProductLabel } from "@/utils/labelEntoVni";
 import { COLORS } from "@/constants/colors";
-import { Camera, CloudUpload, Lock } from "@mui/icons-material";
+import { CameraAlt, Delete, Lock } from "@mui/icons-material";
 import InputSelect from "@/components/InputSelect";
 import { DATA_PROCCESS, DATA_PROGRESS } from "../../Orders/components/Step";
+import { resizeImage } from "@/utils/common";
+import useNotification from "@/hooks/useNotification";
+import { uploadImage, uploadImages } from "@/services/upload-service";
+import { createStep, updateStep } from "@/services/order-service";
+import Backdrop from "@/components/Backdrop";
+import CommonImage from "@/components/Image/index";
+import InputText from "@/components/InputText";
 
 interface ProgressProductProps{
     onBack: () => void;
     data: IProduct
 }
 
+interface FormDataProgress{
+    proccess: string,
+    progress: string
+}
+
+type ProgressErrors = {
+    [K in keyof FormDataProgress]?: string
+} 
+
 const ProgressProduct = (props: ProgressProductProps) => {
     const { onBack, data } = props;
+    const theme = useTheme();
+    const notify = useNotification();
     const [workOrder, setWorkOrder] = useState<IWorkOrder | null>(null);
     const [workOrderError, setWorkOrderError] = useState<string>('');
+
+    const [errorProductImageFile, setProductErrorImageFile] = useState('');
+    const fileProductImageRef = useRef<HTMLInputElement | null>(null);
+    const [imageProductFile, setImageProductFile] = useState<File | null>(null);
+    const [imageProductUrl, setImageProductUrl] = useState<string>('');
+
+    const [errorImageFiles, setErrorImageFiles] = useState('');
+    const fileInputImageRef = useRef<HTMLInputElement | null>(null);
+    const [imageFiles, setImageFiles] = useState<File[]>([]);
+    const [imagesUrl, setImagesUrl] = useState<string[]>([]);
+
+    const [formDataProgress, setFormDataProgress] = useState<FormDataProgress>({
+        proccess: '',
+        progress: ''
+    })
+    const [progressErrors, setProgressErrors] = useState<ProgressErrors>({});
+    const [milestoneIndex, setMilestoneIndex] = useState<number | null>(null);
+    const [nameStep, setNameStep] = useState('');
+    const [nameStepError, setNameStepError] = useState('');
+    
     const [openUpdateStep, setOpenUpdateStep] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [openAddStep, setOpenAddStep] = useState(false);
+
+    const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
+    
+    const getWorkOrderByIdProduct = async(id: string) => {
+        try {
+            const res = await getDetailWorkOrderByProduct(id);
+            const data = res.data as any as IWorkOrder;
+            setWorkOrder(data);
+            setWorkOrderError('');            
+        } catch (error: any) {
+            setWorkOrderError(error.message)
+        }
+    }
 
     useEffect(() => {
-        const getWorkOrderByIdProduct = async(id: string) => {
-            try {
-                const res = await getDetailWorkOrderByProduct(id);
-                const data = res.data as any as IWorkOrder;
-                setWorkOrder(data);
-                setWorkOrderError('');            
-            } catch (error: any) {
-                setWorkOrderError(error.message)
-            }
-        }
-
         getWorkOrderByIdProduct(data.id)
     }, [data]);
+
+    const reset = () => {
+        setWorkOrderError('');
+        setImageFiles([]);
+        setFormDataProgress({ proccess: '', progress: '' });
+        setProgressErrors({});
+        setErrorImageFiles('');
+        setMilestoneIndex(null);
+        setNameStep('');
+        setNameStepError('');
+        setImagesUrl([]);
+        setImageProductFile(null);
+        setImageProductUrl('');
+        setProductErrorImageFile('')
+    }
 
     const isStepCanUpdate = (milestoneIndex: number, stepIndex: number) => {
         if(!workOrder) return false;
@@ -72,33 +128,236 @@ const ProgressProduct = (props: ProgressProductProps) => {
         return !isStepCanUpdate(milestoneIndex, stepIndex)
     }
 
-    const canAddStep = (milestoneIndex: number) => {
+    const canAddStep = (milestoneIndex: number, stepIndex: number) => { 
         if(!workOrder) return false;
 
         // 1. Kiểm tra các mốc đã hoàn thành chưa để hiện thị thêm b
         const milestone = workOrder.workMilestones[milestoneIndex];
 
         // Tất cả step đã hoàn thành
-        return milestone.steps.every(step => step.proccess === 'completed')
+        if(milestone.steps.length - 1 === stepIndex){
+            return milestone.steps.every(step => step.proccess === 'completed')
+        }
+    }
+
+    const showButtonFinishedProduct = () => {
+        if(workOrder === null) return;
+        const data: IWorkMilestone[] = workOrder && workOrder.workMilestones;
+        for(let i = 0; i < data.length; i ++){
+            const milestone = data[i];
+            const allStepsDone = milestone.steps.every(s => s.proccess === 'completed');
+            if(!allStepsDone) return false;
+        }
+
+        return true;
+        
     }
 
     const handleOpenUpdateStep = () => {
         setOpenUpdateStep(true);
     }
 
-    const handleCloseUpdateStep = () => {
-        setOpenUpdateStep(true);
-    }
-
+    {/* upload ảnh tiến độ */}
     const handleBoxClick = () => {
-        fileInputRef.current?.click();
+        fileInputImageRef.current?.click();
     };
     
+    const handleChangeImages = async(event: ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+        if(!files) return;
+        const resized = await Promise.all(
+            Array.from(files).map(async(file) => {
+                return resizeImage(file, 800)
+            })
+        )
+
+        const resizedFiles = resized.map((r) => new File([r.blob], r.name!, { type: "image/*" })) 
+        setImageFiles(prev => [...prev, ...resizedFiles]);
+        const urls = resized.map((file) => file.previewUrl);
+        setImagesUrl(urls);
+        setErrorImageFiles('')
+        // reset input để có thể chọn lại cùng 1 file
+        event.target.value = "";
+    }
+
+    const handleRemove = (index: number) => {
+        setImagesUrl((prev) => prev.filter((_, i) => i !== index));
+        setImageFiles((prev) => prev.filter((_, i) => i !== index));
+    }
+
+    {/* upload ảnh sản phẩm */}
+    const handleBoxClickProduct = () => {
+        fileInputImageRef.current?.click();
+    };
+    
+    const handleChangeProductImage = async(event: ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if(!file) return;
+        const { blob, previewUrl } = await resizeImage(file, 800);
+        const newFile = new File([blob], file.name, { type: "image/jpeg" });
+        setImageProductFile(newFile);
+        setImageProductUrl(previewUrl)
+        setProductErrorImageFile('')
+        // reset input để có thể chọn lại cùng 1 file
+        event.target.value = "";
+    }
+
+    const handleRemoveProduct = () => {
+        setImageProductFile(null);
+        setImageProductUrl('');
+        if(fileProductImageRef.current){
+            fileProductImageRef.current.value = "";
+        }
+    }
+
+    const handleInputChange = (name: string, value: any) => {
+        const validName = name as keyof FormDataProgress;
+        if(validName === 'progress'){
+            if(value === '20%' || value === '40%' || value === '60%' || value === '80%'){
+                setFormDataProgress((prev) => ({ ...prev, 'proccess': 'in_progress', 'progress': value}))
+                setProgressErrors(prev => ({ ...prev, 'proccess': '' }))
+            }else{
+                setFormDataProgress((prev) => ({ ...prev, 'proccess': 'completed', 'progress': value }))
+                setProgressErrors(prev => ({ ...prev, 'proccess': '' }))
+            }
+        }
+
+        if(validName === 'proccess') {
+            if(value === 'completed'){
+                setFormDataProgress((prev) => ({ ...prev, 'progress': '100%', 'proccess': value }))
+            }else{
+                setFormDataProgress((prev) => ({ ...prev, 'progress': '', 'proccess': value }))
+            }
+        }
+
+        setFormDataProgress((prev) => ({ ...prev, [name]: value }));
+
+        if(progressErrors[name as keyof typeof progressErrors]) {
+            setProgressErrors(prev => ({ ...prev, [name]: undefined}))
+        }
+    }
+
+    const validateForm = (): boolean => {
+        const newErrors: ProgressErrors = {};
+        if(!formDataProgress.proccess) newErrors.proccess = "Vui lòng chọn trạng thái";
+        if(!formDataProgress.progress) newErrors.progress = "Vui lòng chọn tiến độ";
+        if(imageFiles.length === 0){
+            setErrorImageFiles('Vui lòng chọn ảnh')
+        }
+        setProgressErrors(newErrors);
+        return Object.keys(newErrors).length === 0 && imageFiles.length > 0;
+    }
+
+    const handleSave = async(id: string) => {
+        if(!validateForm()) {
+            return;
+        }
+        setIsSubmitting(true);
+        try {
+            let uploadResponses: any;
+            uploadResponses = await uploadImages(imageFiles!, 'order/product/work-order/milestones/steps');
+            if(!uploadResponses.success || !uploadResponses.data.files){
+                throw new Error('Upload ảnh thất bại hoặc không nhận được URL ảnh'); 
+            }
+            const payloadImages = uploadResponses.data.files.map((img: any) => ({
+                name: img.originalname,
+                url: img.url
+            }))
+            const payload: StepsPayload = {
+                ...formDataProgress,
+                images: payloadImages
+            }
+            const res = await updateStep(id, payload);
+            notify({
+                message: res.message,
+                severity: 'success'
+            })
+            getWorkOrderByIdProduct(data.id);
+            setOpenUpdateStep(false);
+            reset()
+        } catch (error: any) {
+            notify({
+                message: error.message,
+                severity: 'error'
+            })
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
+    
+
+    const handleSaveStep = async(id: string) => {
+        if(nameStep === ''){
+            setNameStepError('Vui lòng nhập tên bước')
+            return
+        }
+
+        try {
+            const payload: StepPayload = {
+                workMilestoneId: id,
+                name: nameStep,
+                proccess: 'pending',
+                progress: '0%'
+            }
+            const res = await createStep(payload);
+            notify({
+                message: res.message,
+                severity: 'success'
+            });
+            getWorkOrderByIdProduct(data.id);
+            setOpenAddStep(false);
+            reset()
+        } catch (error: any) {
+            notify({
+                message: error.message,
+                severity: 'error'
+            })
+        }
+
+    }
+    
+    const handleFinish = async(id: string) => {
+        if(imageProductFile === null) {
+            setProductErrorImageFile('Vui lòng chọn ảnh')
+            return;
+        }
+        setIsSubmitting(true);
+        try {
+            let uploadResponse: any;
+            uploadResponse = await uploadImage(imageProductFile!, 'order/products');
+            if(!uploadResponse.success || !uploadResponse.data.file){
+                throw new Error('Upload ảnh thất bại hoặc không nhận được URL ảnh'); 
+            }
+
+            const payload: FormUpdateProduct = {
+                status: 'completed',
+                nameImage: uploadResponse.data.file.originalname,
+                urlImage: uploadResponse.data.file.imageUrl
+            }
+            const res = await updateImageAndStatusProduct(data.id, payload);
+            notify({
+                message: res.message,
+                severity: 'success'
+            })
+            reset(),
+            onBack()
+        } catch (error: any) {
+            notify({
+                message: error.message,
+                severity: 'error'
+            })
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
     return(
         <Box>
             <NavigateBack
                 title="Tiến độ sản phẩm"
-                onBack={onBack}
+                onBack={() => {
+                    reset(),
+                    onBack()
+                }}
             />
             <Paper elevation={2} sx={{ borderRadius: 3, p: 2, mx: 1.5, mb: 1.5 }}>
                 <Typography mb={1} fontSize='16px' fontWeight={600}>Thông tin công việc</Typography>
@@ -201,6 +460,7 @@ const ProgressProduct = (props: ProgressProductProps) => {
                                             <Typography fontWeight={600} fontSize='14px'>{workMilestone.name}</Typography>
                                         </Stack>
                                         <Grid container spacing={2}>
+                                            {/* Các bước trong mốc */}
                                             {workMilestone.steps.map((step, idx) => {
                                                 return(
                                                     <>
@@ -254,7 +514,60 @@ const ProgressProduct = (props: ProgressProductProps) => {
                                                                 </Box>
                                                             </Box>
                                                         </Grid>
-                                                        
+
+                                                        {/* Hình ảnh của bước trong mốc */}
+                                                        {step.images.length > 0 && (
+                                                            <Grid size={{ xs: 12}}>
+                                                                <Grid container spacing={1}>
+                                                                    {step.images.map((img, imgIndex) => (
+                                                                        <Grid key={imgIndex} size={{ xs: 12, md: 3}}>
+                                                                            <CommonImage
+                                                                                src={img.url}
+                                                                                alt={img.name}
+                                                                                sx={{ height: 180, width: '100%' }}
+                                                                            />
+                                                                        </Grid>
+                                                                    ))}                                                                
+                                                                </Grid>
+                                                            </Grid>
+                                                        )}
+
+                                                        {/* Hiển thị ảnh khi cập nhật */}
+                                                        {isStepCanUpdate(index, idx) && (
+                                                            <Grid size={{ xs: 12}}>
+                                                                <Grid container spacing={1}>
+                                                                    {imagesUrl.map((img, imgIndex) => (
+                                                                        <Box
+                                                                            sx={{
+                                                                                position: "relative",
+                                                                                overflow: "hidden"
+                                                                            }}
+                                                                        >  
+                                                                            <img
+                                                                                src={img}
+                                                                                alt={`upload-${imgIndex}`}
+                                                                                style={{ width: "100%", height: 200, objectFit: "fill" }}
+                                                                            />
+                                                                            <IconButton
+                                                                                onClick={() => handleRemove(imgIndex)}
+                                                                                sx={{
+                                                                                    position: 'absolute',
+                                                                                    top: 4,
+                                                                                    right: 4,
+                                                                                    bgcolor: 'rgba(0,0,0,0.5)',
+                                                                                    color: 'white',
+                                                                                    "&:hover": { bgcolor: "rgba(0,0,0,0.7)" },
+                                                                                }}
+                                                                                size="small"
+                                                                            >
+                                                                                <Delete fontSize="small"/>
+                                                                            </IconButton>
+                                                                        </Box>
+                                                                    ))}                                                                
+                                                                </Grid>
+                                                            </Grid>
+                                                        )}
+                                                        {/* Cập nhập tiến độ */}
                                                         {openUpdateStep && isStepCanUpdate(index, idx) && (
                                                             <Grid size={{ xs: 12 }}>
                                                                 <Paper elevation={2} sx={{ borderRadius: 2, border: '1px solid #bebabaff', p: 1.5 }}>
@@ -263,38 +576,43 @@ const ProgressProduct = (props: ProgressProductProps) => {
                                                                             <Typography mb={1} fontSize='14px' fontWeight={500}>Tiến độ</Typography>
                                                                             <InputSelect
                                                                                 label=""
-                                                                                value={''}
-                                                                                options={DATA_PROGRESS}
-                                                                                name=""
-                                                                                onChange={() => {}}
+                                                                                value={formDataProgress.progress}
+                                                                                options={DATA_PROGRESS.slice(1,6)}
+                                                                                name="progress"
+                                                                                onChange={handleInputChange}
                                                                                 placeholder="Chọn tiến độ"
                                                                                 sx={{ mb: 1}}
+                                                                                error={!!progressErrors.progress}
+                                                                                helperText={progressErrors.progress}
                                                                                 
                                                                             />
                                                                             <Typography mb={1} fontSize='14px' fontWeight={500}>Trạng thái</Typography>
                                                                             <InputSelect
                                                                                 label=""
-                                                                                value={''}
-                                                                                options={DATA_PROCCESS}
-                                                                                name=""
-                                                                                onChange={() => {}}
+                                                                                value={formDataProgress.proccess}
+                                                                                options={DATA_PROCCESS.slice(1,3)}
+                                                                                name="proccess"
+                                                                                onChange={handleInputChange}
                                                                                 placeholder="Chọn trạng thái"
-                                                                                />
+                                                                                error={!!progressErrors.proccess}
+                                                                                helperText={progressErrors.proccess}
+                                                                            />
                                                                         </Grid>
                                                                         <Grid size={{ xs: 12, md: 6}}>
                                                                             <Box>
                                                                                 <input
                                                                                     type="file"
-                                                                                    accept="image/"
+                                                                                    accept="image/*"
                                                                                     capture="environment"
                                                                                     hidden
-                                                                                    ref={fileInputRef}
-                                                                                    onChange={() => {}}
+                                                                                    ref={fileInputImageRef}
+                                                                                    onChange={handleChangeImages}
+                                                                                    multiple
                                                                                 />
                                                                                 <Box
                                                                                     onClick={handleBoxClick}
                                                                                     sx={{
-                                                                                        border: '2px dashed #ccc',
+                                                                                        border: errorImageFiles ? '2px dashed red' : '2px dashed #ccc',
                                                                                         borderRadius: 2,
                                                                                         p: 3,
                                                                                         textAlign: 'center',
@@ -307,17 +625,21 @@ const ProgressProduct = (props: ProgressProductProps) => {
                                                                                     }}
                                                                                 >
                                                                                     <Box sx={{ margin: 'auto 0'}}>
-                                                                                        <Camera sx={{ fontSize: 48, color: 'text.secondary' }} />
-                                                                                        <Typography fontSize='14px'>Tải lên hình ảnh trực tiếp.</Typography>
-                                                                                        <Typography fontSize='14px'>Chụp ảnh từ camera của bạn.</Typography>
+                                                                                        <CameraAlt sx={{ fontSize: 48, color: 'text.secondary' }} />
+                                                                                        <Typography fontSize='14px'>{isSmall ? 'Tải lên hình ảnh trực tiếp.' : 'Tải lên dữ liệu files ảnh trong thư viện.'}</Typography>
+                                                                                        <Typography fontSize='14px'>{isSmall ? 'Chụp ảnh từ camera của bạn.' : 'JPG, JPEG, PNG, MOV,...'}</Typography>
                                                                                     </Box>
                                                                                 </Box>
                                                                             </Box>
+                                                                            {errorImageFiles && (
+                                                                                <Typography align="center" fontSize='14px' mt={1} color="error">{errorImageFiles}</Typography>
+                                                                            )}
                                                                         </Grid>
                                                                     </Grid>
                                                                     <Box mt={2} display='flex' justifyContent='center'>
                                                                         <Button
                                                                             sx={{ bgcolor: COLORS.BUTTON, width: 150 }}
+                                                                            onClick={() => step && handleSave(step.id)}
                                                                         >
                                                                             Lưu
                                                                         </Button>
@@ -325,20 +647,97 @@ const ProgressProduct = (props: ProgressProductProps) => {
                                                                 </Paper>
                                                             </Grid>
                                                         )} 
-                                                        {canAddStep(index) && (
-                                                            <Box mt={1.5} display='flex' justifyContent='flex-end'>
-                                                                <Button
-                                                                    variant="outlined"
-                                                                    sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
-                                                                >
-                                                                    Thêm bước
-                                                                </Button>
-                                                            </Box>
-                                                        )}                                                                           
+
+                                                        {/* Thêm bước nếu cần */}
+                                                        {canAddStep(index, idx) && (
+                                                            <Grid size={{ xs: 12 }}>
+                                                                <Box mt={1.5} display='flex' justifyContent='flex-end'>
+                                                                    <Button
+                                                                        variant="outlined"
+                                                                        sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
+                                                                        onClick={() => {
+                                                                            setOpenAddStep(true)
+                                                                            setMilestoneIndex(index)
+                                                                        }}
+                                                                    >
+                                                                        Thêm bước ở mốc {index + 1}
+                                                                    </Button>
+                                                                </Box>
+                                                            </Grid>
+                                                        )} 
+
+                                                        {/* Thêm bước */}
+                                                        <Grid size={{ xs: 12 }}>
+                                                            {openAddStep && canAddStep(index, idx) && (milestoneIndex === index) && (
+                                                                <Paper elevation={2} sx={{ borderRadius: 2, border: '1px solid #bebabaff', p: 1.5 }}>
+                                                                    <Grid container spacing={2}>
+                                                                        <Grid size={{ xs: 12, md: 4 }}>
+                                                                            <Typography fontSize='14px' fontWeight={600}>Tên</Typography>
+                                                                            <InputText
+                                                                                label=""
+                                                                                name="name"
+                                                                                type="text"
+                                                                                value={nameStep}
+                                                                                onChange={(name: string, value: any) => {
+                                                                                    setNameStep(value);
+                                                                                    setNameStepError('')
+                                                                                }}
+                                                                                error={!!nameStepError}
+                                                                                helperText={nameStepError}
+                                                                            />
+                                                                        </Grid>
+                                                                        <Grid size={{ xs: 12, md: 4 }}>
+                                                                            <Typography fontSize='14px' fontWeight={600}>Tiến độ</Typography>
+                                                                            <InputSelect
+                                                                                label=""
+                                                                                value={'0%'}
+                                                                                options={DATA_PROGRESS}
+                                                                                name="progress"
+                                                                                onChange={() => {}}
+                                                                                placeholder="Chọn tiến độ"
+                                                                                sx={{ mb: 1}}
+                                                                                disabled
+                                                                            />
+                                                                        </Grid>
+                                                                        <Grid size={{ xs: 12, md: 4 }}>
+                                                                            <Typography fontSize='14px' fontWeight={600}>Trạng thái</Typography>
+                                                                            <InputSelect
+                                                                                label=""
+                                                                                value={'pending'}
+                                                                                options={DATA_PROCCESS}
+                                                                                name="proccess"
+                                                                                onChange={() => {}}
+                                                                                placeholder="Chọn trạng thái"
+                                                                                sx={{ mb: 1}}
+                                                                                disabled
+                                                                            />
+                                                                        </Grid>
+                                                                        <Grid sx={{ display: 'flex', justifyContent: 'center' }} size={{ xs: 12 }}>
+                                                                            <Button
+                                                                                sx={{ bgcolor: COLORS.BUTTON, width: 150, mr: 2 }}
+                                                                                onClick={() => workMilestone && handleSaveStep(workMilestone.id)}
+                                                                            >
+                                                                                Lưu
+                                                                            </Button>
+                                                                            <Button
+                                                                                variant="outlined"
+                                                                                sx={{ color: COLORS.BUTTON, width: 150, border: `1px solid ${COLORS.BUTTON}` }}
+                                                                                onClick={() => {
+                                                                                    setOpenAddStep(false);
+                                                                                    setNameStepError('')
+                                                                                    setNameStep('')
+                                                                                }}
+                                                                            >
+                                                                                Đóng
+                                                                            </Button>
+                                                                        </Grid>
+                                                                    </Grid>
+                                                                </Paper>
+                                                            )}                                                             
+                                                        </Grid>
                                                     </>
                                                 )
                                             })}
-
                                         </Grid>
                                     </Grid>
                                 )
@@ -346,13 +745,86 @@ const ProgressProduct = (props: ProgressProductProps) => {
                         </Grid>      
                     </>
                 )}
-                <Button
-                    fullWidth
-                    sx={{ bgcolor: COLORS.BUTTON, mt: 2, borderRadius: 3 }}
-                >
-                    Hoàn thành đơn hàng
-                </Button>
+                {showButtonFinishedProduct() && (
+                    <>
+                        <Typography fontSize='15px'>Hình ảnh sản phẩm</Typography>
+                        {imageProductUrl ? (
+                            <Box
+                                sx={{
+                                    position: "relative",
+                                    overflow: "hidden"
+                                }}
+                            >  
+                                <img
+                                    src={imageProductUrl}
+                                    alt={`upload-product`}
+                                    style={{ width: "100%", height: 200, objectFit: "fill" }}
+                                />
+                                <IconButton
+                                    onClick={handleRemoveProduct}
+                                    sx={{
+                                        position: 'absolute',
+                                        top: 4,
+                                        right: 4,
+                                        bgcolor: 'rgba(0,0,0,0.5)',
+                                        color: 'white',
+                                        "&:hover": { bgcolor: "rgba(0,0,0,0.7)" },
+                                    }}
+                                    size="small"
+                                >
+                                    <Delete fontSize="small"/>
+                                </IconButton>
+                            </Box>                            
+                        ) : (
+                            <Box>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    capture="environment"
+                                    hidden
+                                    ref={fileInputImageRef}
+                                    onChange={handleChangeProductImage}
+                                />
+                                <Box
+                                    onClick={handleBoxClickProduct}
+                                    sx={{
+                                        border: errorProductImageFile ? '2px dashed red' : '2px dashed #ccc',
+                                        borderRadius: 2,
+                                        p: 3,
+                                        textAlign: 'center',
+                                        cursor: 'pointer',
+                                        '&:hover': { borderColor: 'primary.main' },
+                                        height: '100%',
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
+                                    }}
+                                >
+                                    <Box sx={{ margin: 'auto 0'}}>
+                                        <CameraAlt sx={{ fontSize: 48, color: 'text.secondary' }} />
+                                        <Typography fontSize='14px'>{isSmall ? 'Tải lên hình ảnh trực tiếp.' : 'Tải lên dữ liệu files ảnh trong thư viện.'}</Typography>
+                                        <Typography fontSize='14px'>{isSmall ? 'Chụp ảnh từ camera của bạn.' : 'JPG, JPEG, PNG, MOV,...'}</Typography>
+                                    </Box>
+                                </Box>
+                            </Box>
+                        )}
+                        {errorProductImageFile && (
+                            <Typography align="center" fontSize='14px' mt={1} color="error">{errorProductImageFile}</Typography>
+                        )}
+                        <Button
+                            fullWidth
+                            sx={{ bgcolor: COLORS.BUTTON, mt: 2, borderRadius: 3 }}
+                            onClick={ () => data && handleFinish(data.id)}
+                        >
+                            Hoàn thành đơn hàng
+                        </Button>  
+                    </>                  
+                )}
+
             </Paper>
+            {isSubmitting && (
+                <Backdrop open={isSubmitting}/>
+            )}
         </Box>
     )
 }

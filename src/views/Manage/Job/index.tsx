@@ -57,7 +57,8 @@ const ManagementJob = () => {
 
     const handleCloseViewOrder = () => {
         setOrder(null);
-        setOpenOrder({ open: false, type: 'view'})
+        setOpenOrder({ open: false, type: 'view'});
+        fetchData(page, rowsPerPage, '', viewMode, profile?.id)
     }
 
     return(

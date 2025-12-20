@@ -1,5 +1,6 @@
 import { ProccessOrder, StatusOrder } from "@/constants/status";
 
+// Đầu vào
 export interface FormDataProducts{
     name: string,
     description: string,
@@ -8,6 +9,15 @@ export interface FormDataProducts{
     status: string,
     managerId: string,
 }
+
+// Body
+export interface FormUpdateProduct{
+    status: string,
+    nameImage: string,
+    urlImage: string
+}
+
+// Đầu ra
 export interface IProduct{
     id: string,
     manager: string,
@@ -19,4 +29,6 @@ export interface IProduct{
     createdAt: string,
     updatedAt: string,
     isCreated: boolean,
+    nameImage: string,
+    urlImage: string
 }
