@@ -8,7 +8,7 @@ const CheckedOrder = (props: CheckedOrderProps) => {
     const { } = props;
     return(
         <Box>
-            Kiểm soát đơn hàng
+            Kiểm soát đơn hàng ở role quản lý
         </Box>
     )
 }
