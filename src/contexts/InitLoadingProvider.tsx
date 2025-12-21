@@ -8,6 +8,7 @@ import { FCC } from '@/types/react';
 import { getAccessToken, removeAccessToken } from '@/utils/AuthHelper';
 import Logger from '@/utils/Logger';
 import { getCurrentUser } from '@/services/auth-service';
+import { IUser } from '@/types/user';
 
 const InitLoadingProvider: FCC = ({ children }) => {
   const { isInitialized } = useAppSelector((state) => state.auth);
@@ -18,7 +19,7 @@ const InitLoadingProvider: FCC = ({ children }) => {
       const token = getAccessToken();
       if (token) {
         const resp = await getCurrentUser();
-        const userProfile = resp.data;
+        const userProfile = resp.data as any as IUser;
         if (userProfile) {
           dispatch(setProfile(userProfile));
           dispatch(setIsAuth(true));

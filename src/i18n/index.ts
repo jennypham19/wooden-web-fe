@@ -11,15 +11,30 @@ const initI18n = (): I18nInstance => {
     return i18nInstance;
   }
 
-  const userCache = localStorage.getItem('i18nConfig');
-  const langCode = userCache ? JSON.parse(userCache) : navigator.language.split('-')[0];
+  const getInitialLang = () => {
+    if (typeof window === 'undefined') {
+      return 'en';
+    }
+
+    try {
+      const userCache = localStorage.getItem('i18nConfig');
+      if (userCache) {
+        return JSON.parse(userCache);
+      }
+    } catch {}
+
+    return navigator.language?.split('-')[0] || 'en';
+  };
+
+  // const userCache = localStorage.getItem('i18nConfig');
+  // const langCode = userCache ? JSON.parse(userCache) : navigator.language.split('-')[0];
 
   i18nInstance = i18next.createInstance();
   i18nInstance
     .use(HttpBackend)
     .use(initReactI18next)
     .init({
-      lng: langCode,
+      lng: getInitialLang(),
       fallbackLng: 'en',
       ns: NS,
       defaultNS: 'common',
