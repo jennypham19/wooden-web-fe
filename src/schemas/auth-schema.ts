@@ -26,7 +26,7 @@ export const loginSchema = object().shape({
 
 export const registrationSchema = object()
   .shape({
-    username: usernameValidateSchema,
+    email: usernameValidateSchema,
   })
   .concat(passwordSchema('password'));
 
