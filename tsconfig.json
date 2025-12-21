@@ -2,16 +2,15 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     },
     "typeRoots": ["./node_modules/@types", "./src/types"],
-    "types": ["webpack-env"]
+    "skipLibCheck": true
   },
   "files": [],
   "references": [
-    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.app.json" }, 
     { "path": "./tsconfig.node.json" }
-  ]
+  ],
+  "exclude": ["node_modules", "dist", "build"]
 }
