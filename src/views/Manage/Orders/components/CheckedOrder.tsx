@@ -30,12 +30,14 @@ const CheckedOrder = (props: CheckedOrderProps) => {
             <Button
               variant='outlined'
               sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, mr: 2, width: 150 }}
+              onClick={() => {}}
             >
               Xem chi tiết
             </Button>
             <Button
               variant='outlined'
               sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, width: 150 }}
+              onClick={() => {}}
             >
               Chỉnh sửa
             </Button>
