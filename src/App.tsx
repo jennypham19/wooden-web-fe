@@ -11,6 +11,7 @@ import DialogProvider from './contexts/Dialog';
 import InitLoadingProvider from './contexts/InitLoadingProvider';
 import { NotificationProvider } from './contexts/Notification';
 import { SettingsProvider } from './contexts/Settings';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import './i18n';
 

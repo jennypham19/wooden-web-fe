@@ -47,7 +47,7 @@ const routes: RouteObject[] = [
       {
         element: <AuthLayout/>,
         children: [
-          { index: true, element: <Navigate to={'login'} replace /> },
+          { index: true, element: <Navigate to='login' replace /> },
           { path: 'login', element: <Login /> },
           { path: 'registration', element: <Registration /> },
           { path: 'forgot-password', element: <ForgotPassword /> },

@@ -17,6 +17,7 @@ import { ROLE } from "@/constants/roles";
 import CustomPagination from "@/components/Pagination/CustomPagination";
 import JobInOrder from "./JobInOrder";
 import Tabs from "../../components/Tabs";
+import CheckedOrder from "./CheckedOrder";
 
 
 interface AllListOrdersProps{
@@ -95,6 +96,17 @@ const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
         setOpenOrder({ open: false, type: 'job-order' });
     }
 
+    {/* Checked order */}
+    const handleOpenCheckedOrder = (order: IOrder) => {
+        setOrder(order);
+        setOpenOrder({ open: true, type: 'checked-order'})
+    }
+
+    const handleCloseCheckedOrder = () => {
+        setOrder(null);
+        setOpenOrder({ open: false, type: 'checked-order' });
+    };
+
     return(
         <Box>
             {!openOrder.open && (
@@ -141,17 +153,30 @@ const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
                                                         onViewOrder={handleOpenViewOrder}
                                                     >
                                                         {profile?.role === ROLE.FACTORY_MANAGER && (
-                                                            <Button
-                                                                fullWidth
-                                                                variant="outlined"
-                                                                sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation()
-                                                                    order && handleOpenJobOrder(order)
-                                                                }}
-                                                            >
-                                                                Thêm công việc
-                                                            </Button>
+                                                            <Box display='flex' justifyContent='space-between'>
+                                                                <Button
+                                                                    fullWidth
+                                                                    variant="outlined"
+                                                                    sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, mr: 2 }}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation()
+                                                                        order && handleOpenJobOrder(order)
+                                                                    }}
+                                                                >
+                                                                    Thêm công việc
+                                                                </Button>
+                                                                <Button
+                                                                    fullWidth
+                                                                    variant="outlined"
+                                                                    sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation()
+                                                                        order && handleOpenCheckedOrder(order)
+                                                                    }}
+                                                                >
+                                                                    Kiểm soát đơn hàng
+                                                                </Button>
+                                                            </Box>
                                                         )}
                                                     </CardDataOrder>
                                                 </Grid>                                    
@@ -188,6 +213,12 @@ const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
                 <JobInOrder
                     data={order}
                     onClose={handleCloseJobOrder}
+                />
+            )}
+            {openOrder.open && openOrder.type === 'checked-order' && order && (
+                <CheckedOrder
+                    data={order}
+                    onClose={handleCloseCheckedOrder}
                 />
             )}
         </Box>
