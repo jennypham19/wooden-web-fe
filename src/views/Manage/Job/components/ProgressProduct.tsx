@@ -1,22 +1,29 @@
-import { Avatar, Box, Button, Chip, IconButton, Paper, Stack, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
-import NavigateBack from "../../components/NavigateBack";
-import { FormUpdateProduct, IProduct } from "@/types/product";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
-import { IWorkMilestone, IWorkOrder, StepPayload, StepsPayload } from "@/types/order";
-import { getDetailWorkOrderByProduct, updateImageAndStatusProduct } from "@/services/product-service";
-import Grid from "@mui/material/Grid2"
-import { getNumber, getProccessWorkOrderColor, getProccessWorkOrderLabel, getProgressWorkOrderLabel, getStatusProductLabel } from "@/utils/labelEntoVni";
-import { COLORS } from "@/constants/colors";
+
+
+
 import { CameraAlt, Delete, Lock } from "@mui/icons-material";
-import InputSelect from "@/components/InputSelect";
+import { Avatar, Box, Button, Chip, IconButton, Paper, Stack, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
+import Grid from "@mui/material/Grid2";
+import NavigateBack from "../../components/NavigateBack";
 import { DATA_PROCCESS, DATA_PROGRESS } from "../../Orders/components/Step";
-import { resizeImage } from "@/utils/common";
-import useNotification from "@/hooks/useNotification";
-import { uploadImage, uploadImages } from "@/services/upload-service";
-import { createStep, updateStep } from "@/services/order-service";
 import Backdrop from "@/components/Backdrop";
 import CommonImage from "@/components/Image/index";
+import InputSelect from "@/components/InputSelect";
 import InputText from "@/components/InputText";
+
+
+
+import { COLORS } from "@/constants/colors";
+import useNotification from "@/hooks/useNotification";
+import { createStep, updateStep } from "@/services/order-service";
+import { getDetailWorkOrderByProduct, updateImageAndStatusProduct } from "@/services/product-service";
+import { uploadImage, uploadImages } from "@/services/upload-service";
+import { IWorkMilestone, IWorkOrder, StepPayload, StepsPayload } from "@/types/order";
+import { FormUpdateProduct, IProduct } from "@/types/product";
+import { resizeImage } from "@/utils/common";
+import { getNumber, getProccessWorkOrderColor, getProccessWorkOrderLabel, getProgressWorkOrderLabel, getStatusProductLabel } from "@/utils/labelEntoVni";
+
 
 interface ProgressProductProps{
     onBack: () => void;
@@ -174,7 +181,7 @@ const ProgressProduct = (props: ProgressProductProps) => {
         const resizedFiles = resized.map((r) => new File([r.blob], r.name!, { type: "image/*" })) 
         setImageFiles(prev => [...prev, ...resizedFiles]);
         const urls = resized.map((file) => file.previewUrl);
-        setImagesUrl(urls);
+        setImagesUrl((prev) => [...prev, ...urls]);
         setErrorImageFiles('')
         // reset input để có thể chọn lại cùng 1 file
         event.target.value = "";
@@ -316,7 +323,7 @@ const ProgressProduct = (props: ProgressProductProps) => {
 
     }
     
-    const handleFinish = async(id: string) => {
+    const handleFinish = async() => {
         if(imageProductFile === null) {
             setProductErrorImageFile('Vui lòng chọn ảnh')
             return;
@@ -814,7 +821,7 @@ const ProgressProduct = (props: ProgressProductProps) => {
                         <Button
                             fullWidth
                             sx={{ bgcolor: COLORS.BUTTON, mt: 2, borderRadius: 3 }}
-                            onClick={ () => data && handleFinish(data.id)}
+                            onClick={handleFinish}
                         >
                             Hoàn thành đơn hàng
                         </Button>  
