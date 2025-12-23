@@ -18,6 +18,9 @@ import CustomPagination from "@/components/Pagination/CustomPagination";
 import JobInOrder from "./JobInOrder";
 import Tabs from "../../components/Tabs";
 import CheckedOrder from "./CheckedOrder";
+import { ProccessOrder } from "@/constants/status";
+import { IUser } from "@/types/user";
+import ViewProductsInOrder from "./ViewProductsInOrder";
 
 
 interface AllListOrdersProps{
@@ -52,6 +55,7 @@ const DataStatus: {id: number, value: string, label: string, icon: React.ReactNo
 
     }
 ]
+
 
 const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
     const { onBack } = props;
@@ -107,6 +111,95 @@ const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
         setOpenOrder({ open: false, type: 'checked-order' });
     };
 
+    {/* View order */}
+    const handleOpenViewProduct = (order: IOrder) => {
+        setOrder(order);
+        setOpenOrder({ open: true, type: 'view-product' })
+    }
+
+    const handleCloseViewProduct = () => {
+        setOrder(null);
+        setOpenOrder({ open: false, type: 'view-product' })
+    }
+
+    const renderActionButton = (order: IOrder) => {
+        if(profile && profile.role !== ROLE.FACTORY_MANAGER) return null;
+        switch (order.proccess) {
+            case ProccessOrder.NOT_START_0:
+                return (
+                    <Button
+                        fullWidth
+                        variant="outlined"
+                        sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            order && handleOpenJobOrder(order)
+                        }}
+                    >
+                        Thêm công việc
+                    </Button> 
+                )
+            case ProccessOrder.IN_PROGRESS_25:
+                return (
+                    <Button
+                        fullWidth
+                        variant="outlined"
+                        sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            order && handleOpenCheckedOrder(order)
+                        }}
+                    >
+                        Kiểm soát đơn hàng
+                    </Button>
+                )
+            case ProccessOrder.IN_PROGRESS_50:
+                return (
+                    <Button
+                        fullWidth
+                        variant="outlined"
+                        sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            order && handleOpenCheckedOrder(order)
+                        }}
+                    >
+                        Kiểm soát đơn hàng
+                    </Button>
+                )
+            case ProccessOrder.IN_PROGRESS_75:
+                return (
+                    <Button
+                        fullWidth
+                        variant="outlined"
+                        sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            order && handleOpenViewProduct(order)
+                        }}
+                    >
+                        Xem chi tiết
+                    </Button>
+                )
+            case ProccessOrder.COMPLETED_100:
+                return (
+                    <Button
+                        fullWidth
+                        variant="outlined"
+                        sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            order && handleOpenViewProduct(order)
+                        }}
+                    >
+                        Xem chi tiết
+                    </Button>
+                )
+            default:
+                return null;
+        }
+    }
+
     return(
         <Box>
             {!openOrder.open && (
@@ -152,32 +245,7 @@ const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
                                                         order={order}
                                                         onViewOrder={handleOpenViewOrder}
                                                     >
-                                                        {profile?.role === ROLE.FACTORY_MANAGER && (
-                                                            <Box display='flex' justifyContent='space-between'>
-                                                                <Button
-                                                                    fullWidth
-                                                                    variant="outlined"
-                                                                    sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, mr: 2 }}
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation()
-                                                                        order && handleOpenJobOrder(order)
-                                                                    }}
-                                                                >
-                                                                    Thêm công việc
-                                                                </Button>
-                                                                <Button
-                                                                    fullWidth
-                                                                    variant="outlined"
-                                                                    sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation()
-                                                                        order && handleOpenCheckedOrder(order)
-                                                                    }}
-                                                                >
-                                                                    Kiểm soát đơn hàng
-                                                                </Button>
-                                                            </Box>
-                                                        )}
+                                                        {renderActionButton(order)}
                                                     </CardDataOrder>
                                                 </Grid>                                    
                                             ))
@@ -219,6 +287,12 @@ const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
                 <CheckedOrder
                     data={order}
                     onClose={handleCloseCheckedOrder}
+                />
+            )}
+            {openOrder.open && openOrder.type === 'view-product' && order && (
+                <ViewProductsInOrder
+                    data={order}
+                    onBack={handleCloseViewProduct}
                 />
             )}
         </Box>

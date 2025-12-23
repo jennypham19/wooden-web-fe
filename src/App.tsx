@@ -19,8 +19,6 @@ import Routers from './routers';
 import store from './store';
 import i18n from './i18n';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

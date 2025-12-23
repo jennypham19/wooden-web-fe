@@ -12,6 +12,7 @@ import { COLORS } from "@/constants/colors";
 import ProgressProduct from "./ProgressProduct";
 import useNotification from "@/hooks/useNotification";
 import { updateProccessOder } from "@/services/order-service";
+import { ProccessOrder } from "@/constants/status";
 
 interface UpdateOrderProps{
     onBack: () => void;
@@ -125,7 +126,7 @@ const UpdateOrder: React.FC<UpdateOrderProps> = ({ onBack, data }) => {
                             )
                         })}
                     </Grid>
-                    {showButtonFinishedOrder() && (
+                    {showButtonFinishedOrder() &&  (
                         <Box display='flex' justifyContent='center'>
                             <Button
                                 sx={{ bgcolor: COLORS.BUTTON, mt: 2, borderRadius: 3, width: 200 }}
