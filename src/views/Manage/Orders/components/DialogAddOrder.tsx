@@ -24,6 +24,7 @@ import LabeledStack from "@/components/LabeledStack";
 import FilesUpload from "../../components/FilesUpload";
 import { uploadFiles } from "@/services/upload-service";
 import Backdrop from "@/components/Backdrop";
+import useAuth from "@/hooks/useAuth";
 
 interface DialogAddOrderProps{
     open: boolean,
@@ -41,9 +42,9 @@ export type FormProductErrors = {
 const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
     const { open, onClose } = props;
     const notify = useNotification();
+    const { profile } = useAuth();
     const [ formData, setFormData ] = useState<FormDataOrders>({
-        customerId: '', name: '', dateOfReceipt: dayjs(), dateOfPayment: null, proccess: 'not_started_0%', status: 'pending', amount: null, requiredNote: '', products: []
-    });
+        customerId: '', name: '', dateOfReceipt: dayjs(), dateOfPayment: null, proccess: 'not_started_0%', status: 'pending', amount: null, requiredNote: '', products: []})
     const [errors, setErrors] = useState<FormErrors>({});
     const [customers, setCustomers] = useState<ICustomer[]>([]);
     const [users, setUsers] = useState<IUser[]>([]);
@@ -65,7 +66,7 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
                 setCustomers(data)
             }
             const fetchManagers = async() => {
-                const res = await getAccounts({ page: 1, limit: 99, role: 'production_supervisor'});
+                const res = await getAccounts({ page: 1, limit: 99, role: 'factory_manager'});
                 const data = res.data?.data as any as IUser[];
                 setUsers(data)
             }
@@ -223,7 +224,7 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
                 })),
                 inputFiles: files.length > 0 ? payloadInputFiles : [],
                 referenceLinks: referenceLinkSlots[0] === null ? [] : payloadReferenceLink,
-
+                createdBy: profile ? profile.id : null
             };
             const res = await createOrder(payload);
             notify({
@@ -232,8 +233,6 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
             })
             handleClose()
         } catch (error: any) {
-            console.log("error: ", error);
-            
             notify({
                 message: error.message,
                 severity: 'error'

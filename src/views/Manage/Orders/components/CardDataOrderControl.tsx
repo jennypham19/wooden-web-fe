@@ -4,18 +4,22 @@ import React from "react";
 import avatar from "@/assets/images/users/default-avatar.jpg";
 import { getProccessOrderLabel, getStatusOrderColor, getStatusOrderLabel } from "@/utils/labelEntoVni";
 import DateTime from "@/utils/DateTime";
-import { StatusProduct } from "@/constants/status";
+import { StatusOrder, StatusProduct } from "@/constants/status";
 import IconButton from "@/components/IconButton/IconButton";
 import { Visibility } from "@mui/icons-material";
+import ProductOrder from "./ProductOrder";
+import useAuth from "@/hooks/useAuth";
+import { ROLE } from "@/constants/roles";
+import ProductStatusStepper from "./ProductStatusStepper";
 
 
-interface CardDataOrderProps{
+interface CardDataOrderControlProps{
     order: IOrder
     onViewOrder: (data: IOrder) => void;
     children?: React.ReactNode;
 }
 
-const CardDataOrder = (props: CardDataOrderProps) => {
+const CardDataOrderControl = (props: CardDataOrderControlProps) => {
     const { order, onViewOrder, children } = props;
     return(
         <Card
@@ -38,6 +42,7 @@ const CardDataOrder = (props: CardDataOrderProps) => {
                         <Chip label={getStatusOrderLabel(order.status)} color={getStatusOrderColor(order.status).color}/>
                     </Box>
                 </Box>
+                <ProductStatusStepper products={order.products} />
                 <Stack mt={1} display='flex' justifyContent='space-between'>
                     <Typography fontSize='15px'><b>Đơn hàng:</b> {order.name}</Typography>
                     <Typography fontSize='15px'><b>ID đơn:</b> {order.codeOrder}</Typography>
@@ -67,4 +72,4 @@ const CardDataOrder = (props: CardDataOrderProps) => {
     )
 }
 
-export default CardDataOrder;
+export default CardDataOrderControl;

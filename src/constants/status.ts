@@ -66,6 +66,7 @@ export const RENDER_LABELS: { [key in RenderUser]: string } = {
 
 }
 
+/* Order */
 export const ProccessOrder = {
     NOT_START_0: 'not_started_0%',
     IN_PROGRESS_25: 'in_progress_25%',
@@ -95,9 +96,11 @@ export type StatusOrder = typeof StatusOrder[keyof typeof StatusOrder];
 export const STATUS_ORDER_LABELS: { [key in StatusOrder]: string } = {
     [StatusOrder.PENDING]: 'Chưa hoạt động',
     [StatusOrder.IN_PROGRESS]: 'Đang hoạt động',
-    [StatusOrder.COMPLETED]: 'Đã hoàn thành',
+    [StatusOrder.COMPLETED]: 'Hoàn thành',
 }
 
+
+/* Machine */
 export const StatusMachine = {
     OPERATING: 'operating',
     PAUSED: 'paused',
@@ -118,6 +121,7 @@ export const STATUS_MACHINE_LABELS: { [key in StatusMachine]: string } = {
     [StatusMachine.FAULTY]: 'Gặp sự cố',
 }
 
+/* Design Request */
 export const PriorityDesignRequest = {
     LOW: 'low',
     MEDIUM: 'medium',
@@ -177,7 +181,7 @@ export type StatusProduct = typeof StatusProduct[keyof typeof StatusProduct];
 export const STATUS_PRODUCT_LABELS: { [key in StatusProduct]: string } = {
     [StatusProduct.PENDING]: 'Chưa hoạt động',
     [StatusProduct.IN_PROGRESS]: 'Đang hoạt động',
-    [StatusProduct.COMPLETED]: 'Đã hoàn thành',
+    [StatusProduct.COMPLETED]: 'Hoàn thành',
 }
 
 // WorkOrder
@@ -212,5 +216,36 @@ export type ProccessWorkOrder = typeof ProccessWorkOrder[keyof typeof ProccessWo
 export const PROCCESS_WORK_ORDER_LABELS: { [key in ProccessWorkOrder]: string } = {
     [StatusProduct.PENDING]: 'Chưa hoạt động',
     [StatusProduct.IN_PROGRESS]: 'Đang hoạt động',
-    [StatusProduct.COMPLETED]: 'Đã hoàn thành',
+    [StatusProduct.COMPLETED]: 'Hoàn thành',
+}
+
+export const EvaluatedStatusWorkOrder = {
+    PENDING: 'pending',
+    REWORK: 'rework',
+    APPROVED: 'approve',
+}
+
+export type EvaluatedStatusWorkOrder = typeof EvaluatedStatusWorkOrder[keyof typeof EvaluatedStatusWorkOrder];
+
+export const EVALUATED_STATUS_WORK_ORDER_LABELS: { [key in EvaluatedStatusWorkOrder]: string } = {
+    [EvaluatedStatusWorkOrder.PENDING]: 'Chờ đánh giá',
+    [EvaluatedStatusWorkOrder.REWORK]: 'Cần làm lại',
+    [EvaluatedStatusWorkOrder.APPROVED]: 'Đạt',
+}
+
+/* Work Milestone */
+export const EvaluatedStatusWorkMilestone = {
+    PENDING: 'pending',
+    REWORK: 'rework',
+    APPROVED: 'approve',
+    OVERDUE: 'overdue'
+}
+
+export type EvaluatedStatusWorkMilestone = typeof EvaluatedStatusWorkMilestone[keyof typeof EvaluatedStatusWorkMilestone];
+
+export const EVALUATED_STATUS_WORK_MILESTONE_LABELS: { [key in EvaluatedStatusWorkMilestone]: string } = {
+    [EvaluatedStatusWorkMilestone.PENDING]: 'Chờ đánh giá',
+    [EvaluatedStatusWorkMilestone.REWORK]: 'Cần làm lại',
+    [EvaluatedStatusWorkMilestone.APPROVED]: 'Đạt',
+    [EvaluatedStatusWorkMilestone.OVERDUE]: 'Quá hạn',
 }

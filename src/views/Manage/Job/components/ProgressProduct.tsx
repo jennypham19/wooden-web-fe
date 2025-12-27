@@ -22,7 +22,7 @@ import { uploadImage, uploadImages } from "@/services/upload-service";
 import { IWorkMilestone, IWorkOrder, StepPayload, StepsPayload } from "@/types/order";
 import { FormUpdateProduct, IProduct } from "@/types/product";
 import { resizeImage } from "@/utils/common";
-import { getNumber, getProccessWorkOrderColor, getProccessWorkOrderLabel, getProgressWorkOrderLabel, getStatusProductLabel } from "@/utils/labelEntoVni";
+import { getEvaluatedStatusWorkMilestoneColor, getEvaluatedStatusWorkMilestoneLabel, getNumber, getProccessWorkOrderColor, getProccessWorkOrderLabel, getProgressWorkOrderLabel, getStatusProductLabel } from "@/utils/labelEntoVni";
 
 
 interface ProgressProductProps{
@@ -104,10 +104,10 @@ const ProgressProduct = (props: ProgressProductProps) => {
     const isStepCanUpdate = (milestoneIndex: number, stepIndex: number) => {
         if(!workOrder) return false;
 
-        // 1. Kiểm tra các mốc trước đã hoàn thành chưa
+        // 1. Kiểm tra các mốc trước đã hoàn thành và được đánh giá là đạt chưa
         for(let i = 0; i < milestoneIndex; i++){
             const milestone = workOrder.workMilestones[i];
-            const allStepsDone = milestone.steps.every(s => s.proccess === 'completed');
+            const allStepsDone = milestone.steps.every(s => s.proccess === 'completed') && milestone.evaluatedStatus === 'approved';
             if(!allStepsDone) return false;
         }
 
@@ -145,6 +145,14 @@ const ProgressProduct = (props: ProgressProductProps) => {
         if(milestone.steps.length - 1 === stepIndex){
             return milestone.steps.every(step => step.proccess === 'completed')
         }
+    }
+
+    const showEvaluatedStatusMilestone = (milestoneIndex: number) => {
+        if(!workOrder) return false;
+
+        // Kiểm tra các step đã hoàn thành chưa
+        const milestone = workOrder.workMilestones[milestoneIndex];
+        return milestone.steps.every(s => s.proccess === 'completed');
     }
 
     const showButtonFinishedProduct = () => {
@@ -461,6 +469,13 @@ const ProgressProduct = (props: ProgressProductProps) => {
                                         <Stack direction='row'>
                                             <Typography fontWeight={600} fontSize='15px'>Mốc {index + 1 }: </Typography>
                                             <Typography fontWeight={600} fontSize='15px'>{workMilestone.name}</Typography>
+                                            {showEvaluatedStatusMilestone(index) && (
+                                                <Chip
+                                                    label={getEvaluatedStatusWorkMilestoneLabel(workMilestone.evaluatedStatus)}
+                                                    color={getEvaluatedStatusWorkMilestoneColor(workMilestone.evaluatedStatus).color}
+                                                />                                                
+                                            )}
+
                                         </Stack>
                                         <Stack my={1.5} direction='row'>
                                             <Typography fontSize='14px'>Tên mốc {index + 1 }: </Typography>
@@ -514,7 +529,7 @@ const ProgressProduct = (props: ProgressProductProps) => {
                                                                     )}
                                                                     {/* Hiển thị icon khóa */}
                                                                     {isStepLocked(index, idx) && (
-                                                                        <Tooltip title="Cần hoàn thành các bước trước">
+                                                                        <Tooltip title="Cần hoàn thành các bước trước và chờ đánh giá">
                                                                             <Lock sx={{ color: 'gray'}}/>
                                                                         </Tooltip>
                                                                     )}

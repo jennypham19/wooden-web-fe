@@ -1,5 +1,5 @@
 import { useFetchData } from "@/hooks/useFetchData";
-import { getOrders } from "@/services/order-service";
+import { getOrdersByIdManager } from "@/services/order-service";
 import { IOrder } from "@/types/order";
 import { Alert, Box, Button, Typography } from "@mui/material";
 import React, { useState } from "react";
@@ -19,11 +19,10 @@ import JobInOrder from "./JobInOrder";
 import Tabs from "../../components/Tabs";
 import CheckedOrder from "./CheckedOrder";
 import { ProccessOrder } from "@/constants/status";
-import { IUser } from "@/types/user";
 import ViewProductsInOrder from "./ViewProductsInOrder";
 
 
-interface AllListOrdersProps{
+interface AllListOrdersByManagerProps{
     onBack?: () => void;
 }
 
@@ -57,7 +56,7 @@ const DataStatus: {id: number, value: string, label: string, icon: React.ReactNo
 ]
 
 
-const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
+const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) => {
     const { onBack } = props;
     const { profile } = useAuth();
     const [viewMode, setViewMode] = useState<'all' | 'pending' | 'in_progress' | 'completed'>('all')
@@ -68,7 +67,7 @@ const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
     const [viewOrder, setViewOrder] = useState(false);
     const [order, setOrder] = useState<IOrder | null>(null);
     
-    const { error, fetchData, handlePageChange, handleSearch, listData, loading, page, rowsPerPage, searchTerm, total } = useFetchData<IOrder>(getOrders, 8, viewMode);
+    const { error, fetchData, handlePageChange, handleSearch, listData, loading, page, rowsPerPage, searchTerm, total } = useFetchData<IOrder>(getOrdersByIdManager, 8, viewMode, profile?.id);
 
     const handleOpenAddOrder = () => {
         setOpenOrder({ open: true, type: 'add' })
@@ -98,6 +97,7 @@ const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
     const handleCloseJobOrder = () => {
         setOrder(null);
         setOpenOrder({ open: false, type: 'job-order' });
+        fetchData(page, rowsPerPage, '', viewMode, profile?.id)
     }
 
     {/* Checked order */}
@@ -109,6 +109,7 @@ const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
     const handleCloseCheckedOrder = () => {
         setOrder(null);
         setOpenOrder({ open: false, type: 'checked-order' });
+        fetchData(page, rowsPerPage, '', viewMode, profile?.id)
     };
 
     {/* View order */}
@@ -304,4 +305,4 @@ const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
     )
 }
 
-export default AllListOrders;
+export default AllListOrdersByManager;

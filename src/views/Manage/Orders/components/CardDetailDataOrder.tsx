@@ -83,7 +83,7 @@ const CardDetailDataOrder = (props: CardDetailDataOrderProps) => {
             <Typography mt={1} fontSize='15px'>
               <b>Yêu cầu:</b> {order.requiredNote}
             </Typography>
-            {profile?.role !== ROLE.FACTORY_MANAGER && (
+            {/* {profile?.role !== ROLE.FACTORY_MANAGER && ( */}
               <>
                 <Typography mt={1} fontSize='15px' fontWeight={700}>
                   Danh sách sản phẩm kèm theo:
@@ -175,7 +175,7 @@ const CardDetailDataOrder = (props: CardDetailDataOrderProps) => {
                   </>
                 )}
               </>
-            )}
+            {/* )} */}
           </>
         )}
       </>

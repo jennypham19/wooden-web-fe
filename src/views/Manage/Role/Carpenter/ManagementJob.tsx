@@ -1,24 +1,18 @@
+import useAuth from "@/hooks/useAuth";
 import { useFetchData } from "@/hooks/useFetchData";
 import { getOrdersByCarpenter } from "@/services/order-service";
 import { IOrder } from "@/types/order";
+import { AllInbox, Autorenew, CheckCircle } from "@mui/icons-material";
 import { Alert, Box, Typography } from "@mui/material";
 import React, { useState } from "react";
-import SearchBox from "../../components/SearchBox";
-import { AllInbox, Autorenew, CheckCircle } from "@mui/icons-material";
-import NavigateBack from "../../components/NavigateBack";
 import Backdrop from "@/components/Backdrop";
-import Grid from "@mui/material/Grid2";
-import useAuth from "@/hooks/useAuth";
-import CardDataOrder from "./CardDataOrder";
-import { ROLE } from "@/constants/roles";
+import Grid from "@mui/material/Grid2"
 import CustomPagination from "@/components/Pagination/CustomPagination";
+import SearchBox from "../../components/SearchBox";
 import Tabs from "../../components/Tabs";
-import ViewOrderByCarpenter from "./ViewOrderByCapenter";
+import CardDataOrder from "../../Orders/components/CardDataOrder";
+import UpdateOrder from "../../Job/components/UpdateOrder";
 
-
-interface AllListOrdersByCarpenterProps{
-    onBack?: () => void;
-}
 
 const DataStatus: {id: number, value: string, label: string, icon: React.ReactNode}[] = [
     {
@@ -42,8 +36,7 @@ const DataStatus: {id: number, value: string, label: string, icon: React.ReactNo
     }
 ]
 
-const AllListOrdersByCarpenter: React.FC<AllListOrdersByCarpenterProps> = (props) => {
-    const { onBack } = props;
+const ManagementJobCarpenter = () => {
     const { profile } = useAuth();
     const [viewMode, setViewMode] = useState<'all' | 'in_progress' | 'completed'>('all')
     const [openOrder, setOpenOrder] = useState<{ open: boolean, type: string}>({
@@ -61,7 +54,8 @@ const AllListOrdersByCarpenter: React.FC<AllListOrdersByCarpenterProps> = (props
 
     const handleCloseViewOrder = () => {
         setOrder(null);
-        setOpenOrder({ open: false, type: 'view'})
+        setOpenOrder({ open: false, type: 'view'});
+        fetchData(page, rowsPerPage, '', viewMode, profile?.id)
     }
 
     return(
@@ -73,12 +67,6 @@ const AllListOrdersByCarpenter: React.FC<AllListOrdersByCarpenterProps> = (props
                         onSearch={handleSearch}
                         placeholder="Tìm kiếm theo tên, mã đơn hàng..."
                     />
-                    {(profile?.role === ROLE.EMPLOYEE || profile?.role === ROLE.FACTORY_MANAGER) && onBack && (
-                        <NavigateBack
-                            title="Danh sách đơn hàng"
-                            onBack={onBack}
-                        />
-                    )}
                     <Box m={2}>
                         <Tabs data={DataStatus} viewMode={viewMode} onChange={setViewMode} />
                     </Box>
@@ -116,7 +104,7 @@ const AllListOrdersByCarpenter: React.FC<AllListOrdersByCarpenterProps> = (props
                 </>
             )}
             {openOrder.open && openOrder.type === 'view' && order && (
-                <ViewOrderByCarpenter
+                <UpdateOrder
                     data={order}
                     onBack={handleCloseViewOrder}
                 />
@@ -125,4 +113,4 @@ const AllListOrdersByCarpenter: React.FC<AllListOrdersByCarpenterProps> = (props
     )
 }
 
-export default AllListOrdersByCarpenter;
+export default ManagementJobCarpenter;

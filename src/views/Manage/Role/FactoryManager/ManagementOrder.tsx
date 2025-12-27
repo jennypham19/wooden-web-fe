@@ -9,14 +9,16 @@ import AllListOrders from "../../Orders/components/AllListOrders";
 import CardDataOrder from "../../Orders/components/CardDataOrder";
 import DetailOrder from "../../Orders/components/DetailOrder";
 import Backdrop from "@/components/Backdrop";
-import Page from "@/components/Page";
 
 
 
 import useAuth from "@/hooks/useAuth";
 import { useFetchData } from "@/hooks/useFetchData";
-import { getOrders } from "@/services/order-service";
+import { getOrders, getOrdersByIdManager, getOrdersWithProccess } from "@/services/order-service";
 import { IOrder } from "@/types/order";
+import AllListEvaluatedOrders from "../../Orders/components/AllListEvaluatedOrders";
+import { useFetchOrdersWithProccess } from "@/hooks/useFetchOrdersWithProccess";
+import AllListOrdersByManager from "../../Orders/components/AllListOrdersByManager";
 
 
 const ManagementOrderFactoryManager = () => {
@@ -29,7 +31,8 @@ const ManagementOrderFactoryManager = () => {
     const [viewOrder, setViewOrder] = useState(false);
     const [order, setOrder] = useState<IOrder | null>(null);
 
-    const { error, fetchData, listData, loading, page, rowsPerPage} = useFetchData<IOrder>(getOrders);
+    const { error: errorOrders, fetchData: fetchOrders, listData: orders, loading: loadingOrder, page: pageOrders, rowsPerPage: rowsPerPageOrders } = useFetchData<IOrder>(getOrdersByIdManager, 10, '', profile?.id);
+    const { error: errorOrderWithProccess, fetchData: fetchOrdersWithProccess, listData: ordersWithProccess, loading: loadingOrdersWithProccess, page: pageOrdersWithProccess, rowsPerPage: rowsPerPageOrdersWithProccess} = useFetchOrdersWithProccess<IOrder>(getOrdersWithProccess);
 
     {/* Danh sách đơn hàng */}
     const handleOpenShowAllListOrders = () => {
@@ -40,19 +43,7 @@ const ManagementOrderFactoryManager = () => {
     const handleCloseShowAllListOrders = () => {
         setShowAll(false);
         setShowOrders({ open: false, type: 'list-orders'})
-        fetchData(page, rowsPerPage)
-    }
-
-    {/* Kiểm soát đơn hàng */}
-    const handleOpenShowAllCheckedOrders = () => {
-        setShowAll(true);
-        setShowOrders({ open: true, type: 'checked-orders'})
-    }
-
-    const handleCloseShowAllCheckedOrders = () => {
-        setShowAll(false);
-        setShowOrders({ open: false, type: 'checked-orders'})
-        fetchData(page, rowsPerPage)
+        fetchOrders(pageOrders, rowsPerPageOrders, '', '', profile?.id)
     }
 
     {/* Đánh giá đơn hàng */}
@@ -64,7 +55,7 @@ const ManagementOrderFactoryManager = () => {
     const handleCloseShowAllEvalutedOrders = () => {
       setShowAll(false);
       setShowOrders({ open: false, type: 'evaluated-orders' });
-      fetchData(page, rowsPerPage);
+      fetchOrdersWithProccess(pageOrdersWithProccess, rowsPerPageOrdersWithProccess)
     };
 
     // View order
@@ -81,22 +72,28 @@ const ManagementOrderFactoryManager = () => {
       <Box>
         {!showAll && (
           <>
-            {loading && <Backdrop open={loading} />}
-            {error && !loading && (
+            {loadingOrder && <Backdrop open={loadingOrder} />}
+            {loadingOrdersWithProccess && <Backdrop open={loadingOrdersWithProccess} />}
+            {errorOrders && !loadingOrder && (
               <Alert severity='error' sx={{ my: 2 }}>
-                {error}
+                {errorOrders}
               </Alert>
             )}
-            {!loading && !error && (
+            {errorOrderWithProccess && !loadingOrdersWithProccess && (
+              <Alert severity='error' sx={{ my: 2 }}>
+                {errorOrderWithProccess}
+              </Alert>
+            )}
+            {!loadingOrder && !errorOrders && !loadingOrdersWithProccess && !errorOrderWithProccess && (
               <>
                 <OverviewData title='Danh sách đơn hàng' onShowAll={handleOpenShowAllListOrders}>
                   <Grid container spacing={2}>
-                    {listData.length === 0 ? (
+                    {orders.length === 0 ? (
                       <Typography p={2} fontWeight={700}>
                         Không tồn tại bản ghi nào
                       </Typography>
                     ) : (
-                      listData.slice(0, 3).map((order, index) => (
+                      orders.slice(0, 3).map((order, index) => (
                         <Grid key={index} size={{ xs: 12, md: 4 }}>
                           <CardDataOrder order={order} onViewOrder={handleOpenViewOrder} />
                         </Grid>
@@ -108,14 +105,27 @@ const ManagementOrderFactoryManager = () => {
                   title='Đánh giá đơn hàng'
                   onShowAll={handleOpenShowAllEvaluatedOrders}
                 >
-                  <Grid container spacing={2}></Grid>
+                  <Grid container spacing={2}>
+                    {ordersWithProccess.length === 0 ? (
+                      <Typography p={2} fontWeight={700}>Không tồn tại bản ghi nào</Typography>
+                    ) : (
+                      ordersWithProccess.slice(0, 3).map((orderWithProccess, idx) => (
+                        <Grid key={idx} size={{ xs: 12, md: 4 }}>
+                          <CardDataOrder order={orderWithProccess} onViewOrder={handleOpenViewOrder}/>
+                        </Grid>
+                      ))
+                    )}
+                  </Grid>
                 </OverviewData>
               </>
             )}
           </>
         )}
         {showAll && showOrders.open && showOrders.type === 'list-orders' && (
-          <AllListOrders onBack={handleCloseShowAllListOrders} />
+          <AllListOrdersByManager onBack={handleCloseShowAllListOrders} />
+        )}
+        {showAll && showOrders.open && showOrders.type === 'evaluated-orders' && (
+          <AllListEvaluatedOrders onBack={handleCloseShowAllEvalutedOrders}/>
         )}
         {viewOrder && order && (
           <DetailOrder open={viewOrder} data={order} onClose={handleCloseViewOrder} />

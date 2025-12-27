@@ -22,7 +22,7 @@ export interface FormDataOrders{
     status: string,
     amount: number | null,
     requiredNote: string,
-    products: FormDataProducts[]
+    products: FormDataProducts[],
 }
 
 export interface FormDataImageStep{
@@ -57,7 +57,8 @@ export interface OrderPayloadRequest{
     requiredNote: string,
     inputFiles?: FormDataInputFiles[],
     referenceLinks?: FormDataReferenceLinks[] | null[],
-    products: FormDataProducts[]
+    products: FormDataProducts[],
+    createdBy: string | null
 }
 
 export interface WorkOderPayload{
@@ -101,6 +102,8 @@ export interface IOrder{
     createdAt: string,
     updatedAt: string,
     isCreatedWork: boolean,
+    createdBy: string,
+    reason: string,
     products: IProduct[],
     inputFiles: IInputFile[],
     referenceLinks: IReferenceLink[]
@@ -131,6 +134,7 @@ export interface IWorkMilestone{
     target: string,
     createdAt: string,
     updatedAt: string,
+    evaluatedStatus: string,
     steps: IStep[]
 }
 
@@ -144,6 +148,7 @@ export interface IWorkOrder{
     },
     createdAt: string,
     updatedAt: string,
+    evaluatedStatus: string,
     workers: { 
         id: string,
         fullName: string,

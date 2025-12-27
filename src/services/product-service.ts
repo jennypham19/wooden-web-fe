@@ -1,6 +1,6 @@
 import { HttpResponse } from "@/types/common";
 import { IWorkOrder } from "@/types/order";
-import { FormUpdateProduct, IProduct } from "@/types/product";
+import { FormUpdateProduct, IProduct, PayloadRequestMilestone } from "@/types/product";
 import HttpClient from "@/utils/HttpClient";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'; 
@@ -24,4 +24,9 @@ export const getDetailWorkOrderByProduct = (id: string) => {
 // Update hình ảnh và trạng thái của sản phẩm
 export const updateImageAndStatusProduct = (id: string, payload: FormUpdateProduct) => {
     return HttpClient.put(`${prefix}/image-and-status-product-updated/${id}`, payload)
+}
+
+// Send request milestone
+export const sendRequestMilestone = (id: string, payload: PayloadRequestMilestone) => {
+    return HttpClient.put(`${prefix}/request-milestone-sent/${id}`, payload)
 }

@@ -57,7 +57,7 @@ const ProductStatusStepper: React.FC<ProductStatusStepperProps> = ({ products })
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        py: 3,
+        py: 1,
       }}
     >
       <Stepper

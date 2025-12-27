@@ -1,4 +1,5 @@
 import { ProccessOrder, StatusOrder } from "@/constants/status";
+import { Dayjs } from "dayjs";
 
 // Đầu vào
 export interface FormDataProducts{
@@ -10,11 +11,27 @@ export interface FormDataProducts{
     managerId: string,
 }
 
+export interface FormDataRequestMilestone{
+    reworkReason: string | null,
+    reworkDeadline: Dayjs | null,
+    reworkStartedAt: Dayjs | null
+}
+
 // Body
 export interface FormUpdateProduct{
     status: string,
     nameImage: string,
     urlImage: string
+}
+
+export interface PayloadRequestMilestone{
+    evaluatedStatus: string,
+    reworkReason: string | null,
+    reworkDeadline: string | null,
+    reworkStartedAt: string | null,
+    changedBy: string | null,
+    changedRole: string | null,
+    carpenters: { id: string }[]
 }
 
 // Đầu ra

@@ -18,7 +18,8 @@ const OverviewData: React.FC<OverviewDataProps> = ({
         <>
             {lgUp ? (
                 <Box
-                    p={2}
+                    pt={1.5}
+                    px={2}
                     onClick={onShowAll}
                     sx={{ cursor: 'pointer'}}
                     display='flex'
@@ -35,7 +36,8 @@ const OverviewData: React.FC<OverviewDataProps> = ({
                 </Box>
             ) : (
                 <Box
-                    p={2}
+                    pt={1.5}
+                    px={1}
                     onClick={onShowAll}
                     sx={{ cursor: 'pointer'}}
                     display='flex'

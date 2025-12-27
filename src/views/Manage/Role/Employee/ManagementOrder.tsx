@@ -4,13 +4,15 @@ import useAuth from "@/hooks/useAuth";
 import { useFetchData } from "@/hooks/useFetchData";
 import { getOrders } from "@/services/order-service";
 import { IOrder } from "@/types/order";
-import { Alert, Box, Typography } from "@mui/material";
+import { Alert, Box, Button, Typography } from "@mui/material";
 import { useState } from "react";
 import OverviewData from "../../components/OverviewData";
 import Grid from "@mui/material/Grid2";
 import CardDataOrder from "../../Orders/components/CardDataOrder";
 import AllListOrders from "../../Orders/components/AllListOrders";
 import DetailOrder from "../../Orders/components/DetailOrder";
+import CardDataOrderControl from "../../Orders/components/CardDataOrderControl";
+import AllListOrdersControl from "../../Orders/components/AllListOrdersControl";
 
 const ManagementOrderEmployee = () => {
     const { profile } = useAuth();
@@ -90,7 +92,20 @@ const ManagementOrderEmployee = () => {
                                 title="Kiểm soát đơn hàng"
                                 onShowAll={handleOpenShowAllCheckedOrders}
                             >
-                                <Grid container spacing={2}></Grid>
+                                <Grid container spacing={2}>
+                                    {listData.length === 0 ? (
+                                        <Typography p={2} fontWeight={700}>Không tồn tại bản ghi nào</Typography>
+                                    ) : (
+                                        listData.slice(0,3).map((order, index) => (
+                                            <Grid key={index} size={{ xs: 12, md: 4 }}>
+                                                <CardDataOrderControl
+                                                    order={order}
+                                                    onViewOrder={handleOpenViewOrder}
+                                                />
+                                            </Grid>
+                                        ))
+                                    )}
+                                </Grid>
                             </OverviewData>
                         </>
                     )}   
@@ -99,6 +114,11 @@ const ManagementOrderEmployee = () => {
             {showAll && showOrders.open && showOrders.type === 'list-orders' && (
                 <AllListOrders
                     onBack={handleCloseShowAllListOrders}
+                />
+            )}
+            {showAll && showOrders.open && showOrders.type === 'checked-orders' && (
+                <AllListOrdersControl
+                    onBack={handleCloseShowAllCheckedOrders}
                 />
             )}
             {viewOrder && order && (
