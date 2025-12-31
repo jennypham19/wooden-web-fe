@@ -235,6 +235,7 @@ export const EVALUATED_STATUS_WORK_ORDER_LABELS: { [key in EvaluatedStatusWorkOr
 
 /* Work Milestone */
 export const EvaluatedStatusWorkMilestone = {
+    NOT_REVIEWED: 'not_reviewed',
     PENDING: 'pending',
     REWORK: 'rework',
     APPROVED: 'approve',
@@ -244,6 +245,7 @@ export const EvaluatedStatusWorkMilestone = {
 export type EvaluatedStatusWorkMilestone = typeof EvaluatedStatusWorkMilestone[keyof typeof EvaluatedStatusWorkMilestone];
 
 export const EVALUATED_STATUS_WORK_MILESTONE_LABELS: { [key in EvaluatedStatusWorkMilestone]: string } = {
+    [EvaluatedStatusWorkMilestone.NOT_REVIEWED]: 'Chưa đánh giá',
     [EvaluatedStatusWorkMilestone.PENDING]: 'Chờ đánh giá',
     [EvaluatedStatusWorkMilestone.REWORK]: 'Cần làm lại',
     [EvaluatedStatusWorkMilestone.APPROVED]: 'Đạt',

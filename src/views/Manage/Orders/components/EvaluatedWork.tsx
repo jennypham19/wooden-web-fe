@@ -12,6 +12,7 @@ import { ArrowDropDown, ArrowDropUp, Lock } from "@mui/icons-material";
 import CommonImage from "@/components/Image/index";
 import InputText from "@/components/InputText";
 import { COLORS } from "@/constants/colors";
+import LabeledStack from "@/components/LabeledStack";
 
 interface InputTextProps{
     index: number,
@@ -88,6 +89,8 @@ const EvaluatedWork = (props: EvaluatedWorkProps) => {
     })
     const [errorsRequestMilestone, setErrorsRequestMilestone] = useState<ErrorsRequestMilestone>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errorNoti, setErrorNoti] = useState<string | null>(null);
+    const [openRequestMilestone, setOpenRequestMilestone] = useState(false);
 
     const getWorkOrderByIdProduct = async(id: string) => {
         try {
@@ -126,18 +129,9 @@ const EvaluatedWork = (props: EvaluatedWorkProps) => {
     const isMilestoneEvaluated = (milestoneIndex: number) => {
         if(!workOrder) return false;
 
-        // 1. Kiểm tra các mốc trước đã đạt hoặc cần làm lại chưa
-        for(let i = 0; i < milestoneIndex; i++){
-            const milestone = workOrder.workMilestones[i];
-            const evaluatedStatus = milestone.evaluatedStatus === 'approved' && milestone.steps.every(s => s.proccess === 'completed');
-            if(!evaluatedStatus) return false;
-        }
-
-        // 2. Kiểm tra các bước trước trong cùng mốc
-        const currentMilestone = workOrder.workMilestones[milestoneIndex];
-
-        // 3. Step hiện tại chưa hoàn thành
-        return currentMilestone.evaluatedStatus === 'pending';
+        // Kiểm tra các step đã hoàn thành chưa
+        const milestone = workOrder.workMilestones[milestoneIndex];
+        return milestone.steps.every(s => s.proccess === 'completed') && milestone.evaluatedStatus !== 'approved';
     }
     
     const isEvaluatedLocked = (milestoneIndex: number) => {
@@ -150,6 +144,54 @@ const EvaluatedWork = (props: EvaluatedWorkProps) => {
 
         // Không được cập nhật thì là bị khóa
         return !isMilestoneEvaluated(milestoneIndex)
+    }
+
+    const showNotiWarning = (milestoneIndex: number) => {
+        if(!workOrder) return false;
+
+        const milestones = workOrder.workMilestones;
+        if (!milestones.length) return false;
+
+        const firstMilestone = milestones[0];
+        const isFirstMilestoneCompleted = firstMilestone.steps.length > 0 && firstMilestone.steps.every(step => step.proccess === 'completed');
+        const isFirstMilestoneRework = firstMilestone.evaluatedStatus === 'rework';
+        const isFirstMilestoneApproved = firstMilestone.evaluatedStatus === 'approved';
+
+        // ======== CASE 1: Mốc 1 chưa thực hiện ========
+        if(!isFirstMilestoneCompleted){
+            if (milestoneIndex === 0) {
+                if(isFirstMilestoneRework){
+                    return(`Mốc 1 bị khóa do bị yêu cầu làm lại`);
+                }
+                return('Mốc 1 bị khóa do chưa thực hiện');
+            } else {
+                if(isFirstMilestoneRework) {
+                    return (`Mốc ${milestoneIndex + 1} bị khóa do mốc 1 bị yêu cầu làm lại.`)
+                }
+                return(`Mốc ${milestoneIndex + 1} bị khóa do mốc 1 chưa thực hiện.`)
+            }
+        }
+
+        // ======== CASE 2: Mốc 1 completed nhưng chưa đạt
+        if(isFirstMilestoneCompleted && !isFirstMilestoneApproved) {
+            if(milestoneIndex > 0){
+                const milestoneNext = milestoneIndex + 1;
+                return(`Mốc ${milestoneIndex + 1} bị khóa do mốc ${milestoneNext - 1 } chưa đạt.`);
+            }
+        }
+
+        // ===== CASE 3: Cho phép thao tác =====
+        return false;
+    }
+
+    /* ----------------- Yêu cầu làm lại -------------------- */
+    const handleOpenRequestMilestone = () => {
+        setOpenRequestMilestone(true);
+    }
+
+    const handleCloseRequestMilestone = () => {
+        setOpenRequestMilestone(false);
+        getWorkOrderByIdProduct(data.id)
     }
 
     const handleChangeInputRequestMilestone = (name: string, value: any) => {
@@ -169,13 +211,27 @@ const EvaluatedWork = (props: EvaluatedWorkProps) => {
         return Object.keys(newErrors).length === 0;
     }
 
-    const handleSendRequestMilestone = async() => {
+    const handleSendRequestMilestone = async(id: string) => {
         if(!validateSubmit()) {
             return;
         }
         setIsSubmitting(true)
         try {
-
+            const payload: PayloadRequestMilestone = {
+                evaluatedStatus: 'rework',
+                reworkReason: formDataRequestMilestone.reworkReason ? formDataRequestMilestone.reworkReason : null,
+                reworkStartedAt: formDataRequestMilestone.reworkStartedAt ? formDataRequestMilestone.reworkStartedAt.toISOString() : null,
+                reworkDeadline: formDataRequestMilestone.reworkDeadline ? formDataRequestMilestone.reworkDeadline.toISOString() : null,
+                changedBy: profile ? profile.id : null,
+                changedRole: profile ? profile.role : null,
+                carpenters: workOrder?.workers ? workOrder.workers : []
+            }
+            const res = await sendRequestMilestone(id, payload);
+            notify({
+                message: res.message,
+                severity: 'success'
+            })
+            handleCloseRequestMilestone()
         } catch (error: any) {
             notify({
                 message: error.message,
@@ -185,6 +241,8 @@ const EvaluatedWork = (props: EvaluatedWorkProps) => {
             setIsSubmitting(false)
         }
     }
+
+    /* ----------------- Yêu cầu làm lại -------------------- */
     return(
         <Box>
             <NavigateBack
@@ -344,34 +402,32 @@ const EvaluatedWork = (props: EvaluatedWorkProps) => {
                                                     <Typography fontSize='14px'>Tên mốc {index + 1 }: </Typography>
                                                     <Typography fontWeight={600} fontSize='14px'>{workMilestone.name}</Typography>
                                                 </Stack>
-                                                <Grid sx={{ mb: 1 }} container spacing={2}>
+                                                <Grid sx={{ mb: 1 }} container spacing={3}>
                                                     {/* Các bước trong mốc */}
                                                     {workMilestone.steps.map((step, idx) => {
                                                         return(
                                                             <>
-                                                                <Grid size={{ xs: 12, md: 9 }}>
-                                                                    <Stack direction='row'>
-                                                                        <Typography
-                                                                            sx={{ 
-                                                                                whiteSpace: 'nowrap',
-                                                                                color: '#000' 
-                                                                            }} fontSize='14px'   
-                                                                        >
-                                                                            Bước {idx + 1}:
-                                                                        </Typography>
-                                                                        <Typography 
-                                                                            sx={{ 
-                                                                                whiteSpace: { xs: 'none', md: 'nowrap'},
-                                                                                color: '#000'
-                                                                            }} 
-                                                                            fontSize='14px' 
-                                                                        >
-                                                                            {step.name} 
-                                                                        </Typography>
-                                                                    </Stack>
-                                                                </Grid>
-                                                                <Grid size={{ xs: 12, md: 3 }}>
+                                                                <Grid size={{ xs: 12, md: 6 }}>
                                                                     <Box flexDirection='row' display='flex' justifyContent='space-between'>
+                                                                        <Stack direction='row'>
+                                                                            <Typography
+                                                                                sx={{ 
+                                                                                    whiteSpace: 'nowrap',
+                                                                                    color: '#000' 
+                                                                                }} fontSize='14px'   
+                                                                            >
+                                                                                Bước {idx + 1}:
+                                                                            </Typography>
+                                                                            <Typography 
+                                                                                sx={{ 
+                                                                                    whiteSpace: { xs: 'none', md: 'nowrap'},
+                                                                                    color: '#000'
+                                                                                }} 
+                                                                                fontSize='14px' 
+                                                                            >
+                                                                                {step.name} 
+                                                                            </Typography>
+                                                                        </Stack>
                                                                         <Stack direction='row'>
                                                                             <Typography fontSize='14px'>Tiến độ: </Typography>
                                                                             <Typography fontSize='14px'>{getProgressWorkOrderLabel(step.progress)}</Typography>
@@ -381,32 +437,33 @@ const EvaluatedWork = (props: EvaluatedWorkProps) => {
                                                                             color={getProccessWorkOrderColor(step.proccess).color}
                                                                         />
                                                                     </Box>
-                                                                </Grid>
-                                                                {/* Hình ảnh của bước trong mốc */}
-                                                                {step.images.length > 0 && (
-                                                                    <Grid size={{ xs: 12}}>
-                                                                        <Grid container spacing={1}>
-                                                                            {step.images.map((img, imgIndex) => (
-                                                                                <Grid key={imgIndex} size={{ xs: 12, md: 3}}>
-                                                                                    <CommonImage
-                                                                                        src={img.url}
-                                                                                        alt={img.name}
-                                                                                        sx={{ height: 180, width: '100%' }}
-                                                                                    />
-                                                                                </Grid>
-                                                                            ))}                                                                
+                                                                    {/* Hình ảnh của bước trong mốc */}
+                                                                    {step.images.length > 0 && (
+                                                                        <Grid sx={{ mt: 1 }} size={{ xs: 12}}>
+                                                                            <Grid container spacing={1}>
+                                                                                {step.images.map((img, imgIndex) => (
+                                                                                    <Grid key={imgIndex} size={{ xs: 12, md: 3}}>
+                                                                                        <CommonImage
+                                                                                            src={img.url}
+                                                                                            alt={img.name}
+                                                                                            sx={{ height: 180, width: '100%' }}
+                                                                                        />
+                                                                                    </Grid>
+                                                                                ))}                                                                
+                                                                            </Grid>
                                                                         </Grid>
-                                                                    </Grid>
-                                                                )}
+                                                                    )}                                                                    
+                                                                </Grid>
+
                                                             </>
                                                         )
                                                     })}
                                                 </Grid>
                                             </>
                                         )}
-                                        {isEvaluatedLocked(index) && (
+                                        {showNotiWarning(index) &&  (
                                             <Alert severity="warning" sx={{ mb: 1 }}>
-                                                Mốc này bị khóa do mốc trước đang chờ đánh giá
+                                                {showNotiWarning(index)}
                                             </Alert>
                                         )}
                                         <InputTextStep
@@ -421,16 +478,89 @@ const EvaluatedWork = (props: EvaluatedWorkProps) => {
                                             <Box mt={1.5} display='flex' justifyContent='center'>
                                                 <Button
                                                     sx={{ bgcolor: COLORS.BUTTON, width: 120, mr: 2 }}
+                                                    disabled={!!openRequestMilestone}
                                                 >
                                                     Gửi đánh giá
                                                 </Button>
                                                 <Button
                                                     sx={{ bgcolor: COLORS.BUTTON, width: 120 }}
+                                                    onClick={handleOpenRequestMilestone}
                                                 >
                                                     Yêu cầu làm lại
                                                 </Button>
                                             </Box>
                                         )}
+
+                                        {/* Form data yêu cầu làm lại */}
+                                        <Box>
+                                            {isMilestoneEvaluated(index) && openRequestMilestone && (
+                                                <LabeledStack label="Thông tin yêu cầu làm lại" stackProps={{ direction: "column", my: 2, p: 2 }}>
+                                                    <Grid container spacing={2}>
+                                                        <Grid size={{ xs: 12, md: 6 }}>
+                                                            <Typography fontSize='15px' fontWeight={600}>Lý do yêu cầu làm lại</Typography>
+                                                            <InputText
+                                                                label=""
+                                                                value={formDataRequestMilestone.reworkReason}
+                                                                name="reworkReason"
+                                                                type="text"
+                                                                onChange={handleChangeInputRequestMilestone}
+                                                                multiline
+                                                                rows={errorsRequestMilestone.reworkReason ? 6 : 5}
+                                                                margin="dense"
+                                                                error={!!errorsRequestMilestone.reworkReason}
+                                                                helperText={errorsRequestMilestone.reworkReason}
+                                                            />
+                                                        </Grid>
+                                                        <Grid size={{ xs: 12, md: 6 }}>
+                                                            <Grid container spacing={2}>
+                                                                <Grid size={{ xs: 12 }}>
+                                                                    <Typography fontSize='15px' fontWeight={600}>Ngày bắt đầu làm</Typography>
+                                                                    <InputText
+                                                                        label=""
+                                                                        name="reworkStartedAt"
+                                                                        value={formDataRequestMilestone.reworkStartedAt}
+                                                                        type="date"
+                                                                        onChange={handleChangeInputRequestMilestone}
+                                                                        error={!!errorsRequestMilestone.reworkStartedAt}
+                                                                        helperText={errorsRequestMilestone.reworkStartedAt}
+                                                                        margin="dense"
+                                                                    />
+                                                                </Grid>
+                                                                <Grid size={{ xs: 12 }}>
+                                                                    <Typography fontSize='15px' fontWeight={600}>Ngày hoàn thành deadline</Typography>
+                                                                    <InputText
+                                                                        label=""
+                                                                        name="reworkDeadline"
+                                                                        value={formDataRequestMilestone.reworkDeadline}
+                                                                        type="date"
+                                                                        onChange={handleChangeInputRequestMilestone}
+                                                                        error={!!errorsRequestMilestone.reworkDeadline}
+                                                                        helperText={errorsRequestMilestone.reworkDeadline}
+                                                                        margin="dense"
+                                                                    />
+                                                                </Grid>
+                                                            </Grid>
+                                                        </Grid>
+                                                        <Grid sx={{ display: 'flex', justifyContent: 'center'}} size={{ xs: 12 }}>
+                                                            <Button
+                                                                variant="outlined"
+                                                                sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, width: 120, mr: 2 }}
+                                                                onClick={() => workMilestone && handleSendRequestMilestone(workMilestone.id)}
+                                                            >
+                                                                Gửi
+                                                            </Button>
+                                                            <Button
+                                                                variant="outlined"
+                                                                sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, width: 120 }}
+                                                                onClick={handleCloseRequestMilestone}
+                                                            >
+                                                                Đóng
+                                                            </Button>
+                                                        </Grid>
+                                                    </Grid>
+                                                </LabeledStack>
+                                            )}
+                                        </Box>
                                     </Grid>
                                 )
                             })}

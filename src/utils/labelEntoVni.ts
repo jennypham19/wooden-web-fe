@@ -123,8 +123,10 @@ export const getEvaluatedStatusWorkMilestoneColor = (evaluatedStatus: string | n
     case 'overdue':
       return { color: 'info' as const };
     case 'pending':
-    default:
       return { color: 'warning' as const };
+    case 'not_reviewed':
+    default:
+      return { color: 'default' as const };
   }
 };
 // End Work Milestone

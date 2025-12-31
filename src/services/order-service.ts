@@ -90,6 +90,11 @@ export const createStep = async(payload: StepPayload) => {
     return HttpClient.post(`${prefix}/step-created`, payload)
 }
 
+// xóa step vừa thêm
+export const deletedStepAdded = async(id: string) => {
+    return HttpClient.delete(`${prefix}/step-added-deleted/${id}`)
+}
+
 // update proccess đơn hàng
 export const updateProccessOder = async(id: string, payload: { proccess: string }) => {
     return HttpClient.patch(`${prefix}/proccess-order-updated/${id}`, payload as any)

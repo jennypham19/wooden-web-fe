@@ -71,6 +71,7 @@ export interface WorkOderPayload{
 }
 
 export interface StepsPayload{
+    workMilestoneId: string
     proccess: string,
     progress: string,
     images: { name: string, url: string }[]
@@ -135,6 +136,10 @@ export interface IWorkMilestone{
     createdAt: string,
     updatedAt: string,
     evaluatedStatus: string,
+    reworkReason: string,
+    reworkStartedAt: string,
+    reworkDeadline: string,
+    version: number,
     steps: IStep[]
 }
 

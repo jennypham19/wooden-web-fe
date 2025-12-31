@@ -2,7 +2,7 @@ import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 
 
-import { CameraAlt, Delete, Lock } from "@mui/icons-material";
+import { CameraAlt, Delete, Edit, Lock } from "@mui/icons-material";
 import { Avatar, Box, Button, Chip, IconButton, Paper, Stack, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import NavigateBack from "../../components/NavigateBack";
@@ -16,13 +16,14 @@ import InputText from "@/components/InputText";
 
 import { COLORS } from "@/constants/colors";
 import useNotification from "@/hooks/useNotification";
-import { createStep, updateStep } from "@/services/order-service";
+import { createStep, deletedStepAdded, updateStep } from "@/services/order-service";
 import { getDetailWorkOrderByProduct, updateImageAndStatusProduct } from "@/services/product-service";
 import { uploadImage, uploadImages } from "@/services/upload-service";
 import { IWorkMilestone, IWorkOrder, StepPayload, StepsPayload } from "@/types/order";
 import { FormUpdateProduct, IProduct } from "@/types/product";
 import { resizeImage } from "@/utils/common";
 import { getEvaluatedStatusWorkMilestoneColor, getEvaluatedStatusWorkMilestoneLabel, getNumber, getProccessWorkOrderColor, getProccessWorkOrderLabel, getProgressWorkOrderLabel, getStatusProductLabel } from "@/utils/labelEntoVni";
+import { EvaluatedStatusWorkMilestone } from "@/constants/status";
 
 
 interface ProgressProductProps{
@@ -147,12 +148,12 @@ const ProgressProduct = (props: ProgressProductProps) => {
         }
     }
 
-    const showEvaluatedStatusMilestone = (milestoneIndex: number) => {
+    const deleteStepAdded = (milestoneIndex: number, stepIndex: number) => {
         if(!workOrder) return false;
-
-        // Kiểm tra các step đã hoàn thành chưa
         const milestone = workOrder.workMilestones[milestoneIndex];
-        return milestone.steps.every(s => s.proccess === 'completed');
+        if(milestone.steps.length - 1 === stepIndex){
+            return milestone.steps.some(step => step.proccess === 'completed') && milestone.evaluatedStatus === 'not_reviewed'
+        }
     }
 
     const showButtonFinishedProduct = () => {
@@ -263,7 +264,7 @@ const ProgressProduct = (props: ProgressProductProps) => {
         return Object.keys(newErrors).length === 0 && imageFiles.length > 0;
     }
 
-    const handleSave = async(id: string) => {
+    const handleSave = async(id: string, workMilestoneId: string) => {
         if(!validateForm()) {
             return;
         }
@@ -280,6 +281,7 @@ const ProgressProduct = (props: ProgressProductProps) => {
             }))
             const payload: StepsPayload = {
                 ...formDataProgress,
+                workMilestoneId: workMilestoneId,
                 images: payloadImages
             }
             const res = await updateStep(id, payload);
@@ -363,6 +365,22 @@ const ProgressProduct = (props: ProgressProductProps) => {
             })
         } finally {
             setIsSubmitting(false)
+        }
+    }
+
+    const handleDeleteStepAdded = async(stepId: string) => {
+        try {
+            const res = await deletedStepAdded(stepId);
+            notify({
+                message: res.message,
+                severity: 'success'
+            });
+            getWorkOrderByIdProduct(data.id);
+        } catch (error: any) {
+            notify({
+                message: error.message,
+                severity: 'error'
+            })
         }
     }
     return(
@@ -469,13 +487,13 @@ const ProgressProduct = (props: ProgressProductProps) => {
                                         <Stack direction='row'>
                                             <Typography fontWeight={600} fontSize='15px'>Mốc {index + 1 }: </Typography>
                                             <Typography fontWeight={600} fontSize='15px'>{workMilestone.name}</Typography>
-                                            {showEvaluatedStatusMilestone(index) && (
-                                                <Chip
-                                                    label={getEvaluatedStatusWorkMilestoneLabel(workMilestone.evaluatedStatus)}
-                                                    color={getEvaluatedStatusWorkMilestoneColor(workMilestone.evaluatedStatus).color}
-                                                />                                                
+                                            {workMilestone.evaluatedStatus === EvaluatedStatusWorkMilestone.REWORK && workMilestone.reworkReason !== null && (
+                                                <Typography fontSize='15px'>{`( Lý do phải làm lại: ${workMilestone.reworkReason})`}</Typography>
                                             )}
-
+                                            <Chip
+                                                label={getEvaluatedStatusWorkMilestoneLabel(workMilestone.evaluatedStatus)}
+                                                color={getEvaluatedStatusWorkMilestoneColor(workMilestone.evaluatedStatus).color}
+                                            />
                                         </Stack>
                                         <Stack my={1.5} direction='row'>
                                             <Typography fontSize='14px'>Tên mốc {index + 1 }: </Typography>
@@ -517,15 +535,28 @@ const ProgressProduct = (props: ProgressProductProps) => {
                                                                     label={getProccessWorkOrderLabel(step.proccess)}
                                                                     color={getProccessWorkOrderColor(step.proccess).color}
                                                                 />
-                                                                <Box flexDirection='row' display='flex' alignItems='center' gap={1}>
+                                                                <Box flexDirection='row' display='flex' alignItems='center' gap={2}>
                                                                     {/* Hiển thị nút cập nhật */}
                                                                     {isStepCanUpdate(index, idx) && (
-                                                                        <Button
-                                                                            sx={{ bgcolor: COLORS.BUTTON }}
+                                                                        <Tooltip
+                                                                            title='Cập nhật'
                                                                             onClick={handleOpenUpdateStep}
                                                                         >
-                                                                            Cập nhật
-                                                                        </Button>
+                                                                            <Edit sx={{ color: COLORS.BUTTON }}/>
+                                                                        </Tooltip>
+                                                                    )}
+                                                                    {/* Xóa bước vừa thêm */}
+                                                                    {deleteStepAdded(index, idx) && (
+                                                                        <Tooltip
+                                                                            title='Xóa'
+                                                                            onClick={() => {
+                                                                                if(workMilestone.steps.length - 1 === idx){
+                                                                                    handleDeleteStepAdded(step.id)
+                                                                                }
+                                                                            }}
+                                                                        >
+                                                                            <Delete color="error"/>
+                                                                        </Tooltip>
                                                                     )}
                                                                     {/* Hiển thị icon khóa */}
                                                                     {isStepLocked(index, idx) && (
@@ -661,7 +692,7 @@ const ProgressProduct = (props: ProgressProductProps) => {
                                                                     <Box mt={2} display='flex' justifyContent='center'>
                                                                         <Button
                                                                             sx={{ bgcolor: COLORS.BUTTON, width: 150 }}
-                                                                            onClick={() => step && handleSave(step.id)}
+                                                                            onClick={() => step && handleSave(step.id, workMilestone.id)}
                                                                         >
                                                                             Lưu
                                                                         </Button>
