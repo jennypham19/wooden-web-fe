@@ -14,6 +14,7 @@ import { COLORS } from "@/constants/colors";
 import CustomPagination from "@/components/Pagination/CustomPagination";
 import DetailOrder from "../../Orders/components/DetailOrder";
 import EvaluatedProductsInOrder from "../../Orders/components/EvaluatedProductsInOrder";
+import DialogListImageProduct from "../../Orders/components/DialogListImageProduct";
 
 const DataEvaluated: {id: number, value: string, label: string, icon: React.ReactNode}[] = [
     {
@@ -47,6 +48,7 @@ const ManagementJobManager = () => {
     const { profile } = useAuth()
     const [viewMode, setViewMode] = useState<'all' | 'pending' | 'rework' | 'approved'>('all');
     const [viewOrder, setViewOrder] = useState(false);
+    const [viewImageProducts, setViewImageProducts] = useState(false);
     const [viewProductsInOrder, setViewProductsInOrder] = useState(false);
     const [order, setOrder] = useState<IOrder | null>(null);
     
@@ -71,6 +73,21 @@ const ManagementJobManager = () => {
     const handleCloseViewProductsInOrder = () => {
         setOrder(null);
         setViewProductsInOrder(false);
+        fetchData(page, rowsPerPage, '', viewMode, profile?.id)
+    }
+
+    // view image products
+    const handleOpenViewImageProducts = (order: IOrder) => {
+      setOrder(order);
+      setViewImageProducts(true)
+    }
+
+    const handleCloseViewImageProducts = () => {
+      setOrder(null);
+      setViewImageProducts(false)
+    }
+
+    const handleLoadData = () => {
         fetchData(page, rowsPerPage, '', viewMode, profile?.id)
     }
 
@@ -101,6 +118,7 @@ const ManagementJobManager = () => {
                                             <CardDataOrder
                                                 order={order}
                                                 onViewOrder={handleOpenViewOrder}
+                                                onViewImageProducts={handleOpenViewImageProducts}
                                             >
                                                 <Button
                                                     fullWidth
@@ -141,6 +159,14 @@ const ManagementJobManager = () => {
                     data={order}
                     onBack={handleCloseViewProductsInOrder}
                     from='job'
+                    onLoadData={handleLoadData}
+                />
+            )}
+            {viewImageProducts && order && (
+                <DialogListImageProduct
+                    order={order}
+                    onClose={handleCloseViewImageProducts}
+                    open={viewImageProducts}
                 />
             )}
         </Box>

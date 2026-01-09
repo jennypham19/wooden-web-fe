@@ -13,6 +13,7 @@ import AllListOrders from "../../Orders/components/AllListOrders";
 import DetailOrder from "../../Orders/components/DetailOrder";
 import CardDataOrderControl from "../../Orders/components/CardDataOrderControl";
 import AllListOrdersControl from "../../Orders/components/AllListOrdersControl";
+import DialogListImageProduct from "../../Orders/components/DialogListImageProduct";
 
 const ManagementOrderEmployee = () => {
     const { profile } = useAuth();
@@ -22,6 +23,7 @@ const ManagementOrderEmployee = () => {
         type: ''
     });
     const [viewOrder, setViewOrder] = useState(false);
+    const [viewImageProducts, setViewImageProducts] = useState(false);
     const [order, setOrder] = useState<IOrder | null>(null);
 
     const { error, fetchData, listData, loading, page, rowsPerPage} = useFetchData<IOrder>(getOrders);
@@ -58,6 +60,17 @@ const ManagementOrderEmployee = () => {
         setOrder(null);
         setViewOrder(false)
     }
+
+    // view image products
+    const handleOpenViewImageProducts = (order: IOrder) => {
+      setOrder(order);
+      setViewImageProducts(true)
+    }
+
+    const handleCloseViewImageProducts = () => {
+      setOrder(null);
+      setViewImageProducts(false)
+    }
     return(
         <Box>
             {!showAll && (
@@ -81,6 +94,7 @@ const ManagementOrderEmployee = () => {
                                                 <CardDataOrder
                                                     order={order}
                                                     onViewOrder={handleOpenViewOrder}
+                                                    onViewImageProducts={handleOpenViewImageProducts}
                                                 />
                                             </Grid>                                    
                                         ))
@@ -101,6 +115,7 @@ const ManagementOrderEmployee = () => {
                                                 <CardDataOrderControl
                                                     order={order}
                                                     onViewOrder={handleOpenViewOrder}
+                                                    onViewImageProducts={handleOpenViewImageProducts}
                                                 />
                                             </Grid>
                                         ))
@@ -126,6 +141,13 @@ const ManagementOrderEmployee = () => {
                     open={viewOrder}
                     data={order}
                     onClose={handleCloseViewOrder}
+                />
+            )}
+            {viewImageProducts && order && (
+                <DialogListImageProduct
+                    order={order}
+                    onClose={handleCloseViewImageProducts}
+                    open={viewImageProducts}
                 />
             )}
         </Box>

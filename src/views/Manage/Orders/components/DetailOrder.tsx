@@ -4,6 +4,7 @@ import { COLORS } from "@/constants/colors";
 import { useEffect, useState } from "react";
 import { getDetailOrder } from "@/services/order-service";
 import CardDetailDataOrder from "./CardDetailDataOrder";
+import DialogListImageProduct from "./DialogListImageProduct";
 
 interface DetailOrderProps{
     open: boolean,
@@ -14,6 +15,7 @@ interface DetailOrderProps{
 const DetailOrder = (props: DetailOrderProps) => {
     const { open, data, onClose} = props;
     const [order, setOrder] = useState<IOrder | null>(null);
+    const [viewImageProducts, setViewImageProducts] = useState(false);
     useEffect(() => {
         if(open && data){
             const getOrder = async() => {
@@ -25,6 +27,17 @@ const DetailOrder = (props: DetailOrderProps) => {
             getOrder()
         }
     }, [open, data])
+
+    // view image products
+    const handleOpenViewImageProducts = (order: IOrder) => {
+      setOrder(order);
+      setViewImageProducts(true)
+    }
+
+    const handleCloseViewImageProducts = () => {
+      setOrder(null);
+      setViewImageProducts(false)
+    }
     
     return(
         <Drawer
@@ -40,6 +53,7 @@ const DetailOrder = (props: DetailOrderProps) => {
         >
             <CardDetailDataOrder
                 order={order}
+                onViewImageProducts={handleOpenViewImageProducts}
             />
             <Box mt={2} display='flex' justifyContent='center'>
                 <Button
@@ -50,6 +64,13 @@ const DetailOrder = (props: DetailOrderProps) => {
                     Đóng
                 </Button>
             </Box>
+            {viewImageProducts && order && (
+                <DialogListImageProduct
+                    order={order}
+                    onClose={handleCloseViewImageProducts}
+                    open={viewImageProducts}
+                />
+            )}
         </Drawer>
     )
 }

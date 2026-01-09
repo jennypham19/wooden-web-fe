@@ -29,7 +29,7 @@ export const iconMap: Record<string, SvgIconComponent> = {
     Analytics,
     SupportAgent,
     Notifications,
-    MenuBook
+    MenuBook,
 }
 
 export const mapMenuToSectionItems = (menus: IMenu[]): SectionItem[] => {

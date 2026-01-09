@@ -222,7 +222,7 @@ export const PROCCESS_WORK_ORDER_LABELS: { [key in ProccessWorkOrder]: string } 
 export const EvaluatedStatusWorkOrder = {
     PENDING: 'pending',
     REWORK: 'rework',
-    APPROVED: 'approve',
+    APPROVED: 'approved',
 }
 
 export type EvaluatedStatusWorkOrder = typeof EvaluatedStatusWorkOrder[keyof typeof EvaluatedStatusWorkOrder];
@@ -238,7 +238,7 @@ export const EvaluatedStatusWorkMilestone = {
     NOT_REVIEWED: 'not_reviewed',
     PENDING: 'pending',
     REWORK: 'rework',
-    APPROVED: 'approve',
+    APPROVED: 'approved',
     OVERDUE: 'overdue'
 }
 

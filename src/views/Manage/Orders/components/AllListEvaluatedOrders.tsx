@@ -14,6 +14,7 @@ import CustomPagination from "@/components/Pagination/CustomPagination";
 import { COLORS } from "@/constants/colors";
 import DetailOrder from "./DetailOrder";
 import EvaluatedProductsInOrder from "./EvaluatedProductsInOrder";
+import DialogListImageProduct from "./DialogListImageProduct";
 
 interface AllListEvaluatedOrdersProps{
     onBack: () => void;
@@ -45,6 +46,7 @@ const AllListEvaluatedOrders: React.FC<AllListEvaluatedOrdersProps> = (props) =>
     const { onBack } = props;
     const [viewMode, setViewMode] = useState<'all' | true | false>('all');
     const [viewOrder, setViewOrder] = useState(false);
+    const [viewImageProducts, setViewImageProducts] = useState(false);
     const [viewProductsInOrder, setViewProductsInOrder] = useState(false);
     const [order, setOrder] = useState<IOrder | null>(null);
     const {
@@ -81,6 +83,21 @@ const AllListEvaluatedOrders: React.FC<AllListEvaluatedOrdersProps> = (props) =>
         setViewProductsInOrder(false);
         fetchData(page, rowsPerPage)
     }
+
+    // view image products
+    const handleOpenViewImageProducts = (order: IOrder) => {
+      setOrder(order);
+      setViewImageProducts(true)
+    }
+
+    const handleCloseViewImageProducts = () => {
+      setOrder(null);
+      setViewImageProducts(false)
+    }
+    
+    const handleLoadData = () => {
+        fetchData(page, rowsPerPage)
+    }
     
     return(
         <Box>
@@ -113,6 +130,7 @@ const AllListEvaluatedOrders: React.FC<AllListEvaluatedOrdersProps> = (props) =>
                                             <CardDataOrder
                                                 order={orderWithProccess}
                                                 onViewOrder={handleOpenViewOrder}
+                                                onViewImageProducts={handleOpenViewImageProducts}
                                             >
                                                 <Button
                                                     fullWidth
@@ -155,6 +173,14 @@ const AllListEvaluatedOrders: React.FC<AllListEvaluatedOrdersProps> = (props) =>
                     data={order}
                     onBack={handleCloseViewProductsInOrder}
                     from='order'
+                    onLoadData={handleLoadData}
+                />
+            )}
+            {viewImageProducts && order && (
+                <DialogListImageProduct
+                    order={order}
+                    onClose={handleCloseViewImageProducts}
+                    open={viewImageProducts}
                 />
             )}
         </Box>

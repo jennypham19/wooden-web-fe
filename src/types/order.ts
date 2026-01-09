@@ -136,6 +136,7 @@ export interface IWorkMilestone{
     createdAt: string,
     updatedAt: string,
     evaluatedStatus: string,
+    evaluationDescription: string,
     reworkReason: string,
     reworkStartedAt: string,
     reworkDeadline: string,
@@ -154,6 +155,7 @@ export interface IWorkOrder{
     createdAt: string,
     updatedAt: string,
     evaluatedStatus: string,
+    evaluationDescriptionWorkOrder: string,
     workers: { 
         id: string,
         fullName: string,

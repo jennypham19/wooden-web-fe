@@ -236,8 +236,8 @@ const ViewProgressProduct = (props: ViewProgressProductProps) => {
                                 return(
                                     <Grid key={index} size={{ xs: 12 }}>
                                         <Stack direction='row'>
-                                            <Typography fontWeight={600} fontSize='15px'>Mốc {index + 1 }: </Typography>
-                                            <Typography fontWeight={600} fontSize='15px'>{workMilestone.name}</Typography>
+                                            <Typography fontWeight={600} fontSize='16px'>Mốc {index + 1 }: </Typography>
+                                            <Typography fontWeight={600} fontSize='16px'>{workMilestone.name}</Typography>
                                         </Stack>
                                         <Stack my={1.5} direction='row'>
                                             <Typography fontSize='14px'>Tên mốc {index + 1 }: </Typography>
@@ -248,26 +248,29 @@ const ViewProgressProduct = (props: ViewProgressProductProps) => {
                                             {workMilestone.steps.map((step, idx) => {
                                                 return(
                                                     <>
-                                                        <Grid size={{ xs: 12, md: 9 }}>
-                                                            <Stack direction='row'>
-                                                                <Typography
-                                                                    sx={{ 
-                                                                        whiteSpace: 'nowrap',
-                                                                        color: '#000' 
-                                                                    }} fontSize='14px'   
-                                                                >
-                                                                    Bước {idx + 1}:
-                                                                </Typography>
-                                                                <Typography 
-                                                                    sx={{ 
-                                                                        whiteSpace: { xs: 'none', md: 'nowrap'},
-                                                                        color: '#000'
-                                                                    }} 
-                                                                    fontSize='14px' 
-                                                                >
-                                                                    {step.name} 
-                                                                </Typography>
-                                                            </Stack>
+                                                        <Grid key={idx} size={{ xs: 12, md: 9 }}>
+                                                            <Box flexDirection='row' display='flex' justifyContent='space-between'>
+                                                                <Stack direction='row'>
+                                                                    <Typography
+                                                                        sx={{ 
+                                                                            whiteSpace: 'nowrap',
+                                                                            color: '#000' 
+                                                                        }} fontSize='14px'   
+                                                                    >
+                                                                        Bước {idx + 1}:
+                                                                    </Typography>
+                                                                    <Typography 
+                                                                        sx={{ 
+                                                                            whiteSpace: { xs: 'none', md: 'nowrap'},
+                                                                            color: '#000'
+                                                                        }} 
+                                                                        fontSize='14px' 
+                                                                    >
+                                                                        {step.name} 
+                                                                    </Typography>
+                                                                </Stack>                                                                
+                                                            </Box>
+
                                                         </Grid>
                                                         <Grid size={{ xs: 12, md: 3 }}>
                                                             <Box flexDirection='row' display='flex' justifyContent='space-between'>

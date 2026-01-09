@@ -100,6 +100,9 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
                         proccess: "not_started_0%",
                         status: "pending",
                         managerId: "",
+                        lenghtProduct: null,
+                        widthProduct: null,
+                        heightProduct: null
                     }))
                 );
             }else{
@@ -164,6 +167,9 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
             const pError: FormProductErrors = {};
             if (!product.name) pError.name = `Sản phẩm ${idx + 1}: Vui lòng nhập tên sản phẩm`;
             if (!product.description) pError.description = `Sản phẩm ${idx + 1}: Vui lòng nhập mô tả`;
+            if (!product.lenghtProduct) pError.lenghtProduct = `Sản phẩm ${idx + 1}: Vui lòng nhập chiều dài`;
+            if (!product.widthProduct) pError.widthProduct = `Sản phẩm ${idx + 1}: Vui lòng nhập chiều rộng`;
+            if (!product.heightProduct) pError.heightProduct = `Sản phẩm ${idx + 1}: Vui lòng nhập chiều cao`;
             if (!product.target) pError.target = `Sản phẩm ${idx + 1}: Vui lòng nhập mục tiêu sản xuất`;
             if (!product.managerId) pError.managerId = `Sản phẩm ${idx + 1}: Vui lòng chọn người phụ trách`;
             newProductErrors.push(pError);
@@ -220,7 +226,10 @@ const DialogAddOrder: React.FC<DialogAddOrderProps> = (props) => {
                     target: p.target,
                     proccess: p.proccess,
                     status: p.status,
-                    managerId: p.managerId
+                    managerId: p.managerId,
+                    lenghtProduct: p.lenghtProduct,
+                    widthProduct: p.widthProduct,
+                    heightProduct: p.heightProduct
                 })),
                 inputFiles: files.length > 0 ? payloadInputFiles : [],
                 referenceLinks: referenceLinkSlots[0] === null ? [] : payloadReferenceLink,

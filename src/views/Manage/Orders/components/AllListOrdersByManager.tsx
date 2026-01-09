@@ -20,6 +20,7 @@ import Tabs from "../../components/Tabs";
 import CheckedOrder from "./CheckedOrder";
 import { ProccessOrder } from "@/constants/status";
 import ViewProductsInOrder from "./ViewProductsInOrder";
+import DialogListImageProduct from "./DialogListImageProduct";
 
 
 interface AllListOrdersByManagerProps{
@@ -65,6 +66,7 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
         type: ''
     });
     const [viewOrder, setViewOrder] = useState(false);
+    const [viewImageProducts, setViewImageProducts] = useState(false);
     const [order, setOrder] = useState<IOrder | null>(null);
     
     const { error, fetchData, handlePageChange, handleSearch, listData, loading, page, rowsPerPage, searchTerm, total } = useFetchData<IOrder>(getOrdersByIdManager, 8, viewMode, profile?.id);
@@ -121,6 +123,17 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
     const handleCloseViewProduct = () => {
         setOrder(null);
         setOpenOrder({ open: false, type: 'view-product' })
+    }
+
+    // view image products
+    const handleOpenViewImageProducts = (order: IOrder) => {
+      setOrder(order);
+      setViewImageProducts(true)
+    }
+
+    const handleCloseViewImageProducts = () => {
+      setOrder(null);
+      setViewImageProducts(false)
     }
 
     const renderActionButton = (order: IOrder) => {
@@ -249,6 +262,7 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
                                                     <CardDataOrder
                                                         order={order}
                                                         onViewOrder={handleOpenViewOrder}
+                                                        onViewImageProducts={handleOpenViewImageProducts}
                                                     >
                                                         {renderActionButton(order)}
                                                     </CardDataOrder>
@@ -299,6 +313,13 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
                 <ViewProductsInOrder
                     data={order}
                     onBack={handleCloseViewProduct}
+                />
+            )}
+            {viewImageProducts && order && (
+                <DialogListImageProduct
+                    order={order}
+                    onClose={handleCloseViewImageProducts}
+                    open={viewImageProducts}
                 />
             )}
         </Box>

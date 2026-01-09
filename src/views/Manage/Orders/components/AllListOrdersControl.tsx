@@ -16,6 +16,8 @@ import DetailOrder from "./DetailOrder";
 import { COLORS } from "@/constants/colors";
 import ViewProductsInOrder from "./ViewProductsInOrder";
 import UpdatePaymentDate from "./UpdatePaymentDate";
+import { StatusOrder } from "@/constants/status";
+import DialogListImageProduct from "./DialogListImageProduct";
 
 interface AllListOrdersControlProps{
     onBack: () => void;
@@ -60,6 +62,7 @@ const AllListOrdersControl = (props: AllListOrdersControlProps) => {
     });
     const [viewOrder, setViewOrder] = useState(false);
     const [order, setOrder] = useState<IOrder | null>(null);
+    const [viewImageProducts, setViewImageProducts] = useState(false);
     const { error, fetchData, handlePageChange, handleSearch, listData, loading, page, rowsPerPage, searchTerm, total } = useFetchData<IOrder>(getOrders, 8, viewMode);
 
     const handleOpenViewOrder = (order: IOrder) => {
@@ -95,6 +98,17 @@ const AllListOrdersControl = (props: AllListOrdersControlProps) => {
         fetchData(page, rowsPerPage)
     }
 
+    // view image products
+    const handleOpenViewImageProducts = (order: IOrder) => {
+      setOrder(order);
+      setViewImageProducts(true)
+    }
+
+    const handleCloseViewImageProducts = () => {
+      setOrder(null);
+      setViewImageProducts(false)
+    }
+
     return(
         <Box>
             {!openOrder.open && (
@@ -126,12 +140,13 @@ const AllListOrdersControl = (props: AllListOrdersControlProps) => {
                                             <CardDataOrderControl
                                                 order={order}
                                                 onViewOrder={handleOpenViewOrder}
+                                                onViewImageProducts={handleOpenViewImageProducts}
                                             >
-                                                <Box display='flex' justifyContent='center'>
+                                                {order.status === StatusOrder.COMPLETED ? (
                                                     <Button
                                                         fullWidth
                                                         variant="outlined"
-                                                        sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, mr: 2, borderRadius: 3 }}
+                                                        sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, borderRadius: 3 }}
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             order && handleOpenViewProductsInOrder(order)
@@ -139,18 +154,32 @@ const AllListOrdersControl = (props: AllListOrdersControlProps) => {
                                                     >
                                                         Xem chi tiết
                                                     </Button>
-                                                    <Button
-                                                        fullWidth
-                                                        variant="outlined"
-                                                        sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, borderRadius: 3 }}
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            order && handleOpenUpdateOrder(order)
-                                                        }}
-                                                    >
-                                                        Chỉnh sửa
-                                                    </Button>
-                                                </Box>
+                                                ) : (
+                                                    <Box display='flex' justifyContent='center'>
+                                                        <Button
+                                                            fullWidth
+                                                            variant="outlined"
+                                                            sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, mr: 2, borderRadius: 3 }}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                order && handleOpenViewProductsInOrder(order)
+                                                            }}
+                                                        >
+                                                            Xem chi tiết
+                                                        </Button>
+                                                        <Button
+                                                            fullWidth
+                                                            variant="outlined"
+                                                            sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, borderRadius: 3 }}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                order && handleOpenUpdateOrder(order)
+                                                            }}
+                                                        >
+                                                            Chỉnh sửa
+                                                        </Button>
+                                                    </Box>
+                                                )}
                                             </CardDataOrderControl>
                                         </Grid>
                                     ))
@@ -185,6 +214,13 @@ const AllListOrdersControl = (props: AllListOrdersControlProps) => {
                     open={viewOrder}
                     data={order}
                     onClose={handleCloseViewOrder}
+                />
+            )}
+            {viewImageProducts && order && (
+                <DialogListImageProduct
+                    order={order}
+                    onClose={handleCloseViewImageProducts}
+                    open={viewImageProducts}
                 />
             )}
         </Box>

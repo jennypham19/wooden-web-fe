@@ -12,6 +12,7 @@ import SearchBox from "../../components/SearchBox";
 import Tabs from "../../components/Tabs";
 import CardDataOrder from "../../Orders/components/CardDataOrder";
 import UpdateOrder from "../../Job/components/UpdateOrder";
+import DialogListImageProduct from "../../Orders/components/DialogListImageProduct";
 
 
 const DataStatus: {id: number, value: string, label: string, icon: React.ReactNode}[] = [
@@ -44,6 +45,7 @@ const ManagementJobCarpenter = () => {
         type: ''
     });
     const [order, setOrder] = useState<IOrder | null>(null);
+    const [viewImageProducts, setViewImageProducts] = useState(false);
     
     const { error, fetchData, handlePageChange, handleSearch, listData, loading, page, rowsPerPage, searchTerm, total } = useFetchData<IOrder>(getOrdersByCarpenter, 8, viewMode, profile?.id);
 
@@ -56,6 +58,17 @@ const ManagementJobCarpenter = () => {
         setOrder(null);
         setOpenOrder({ open: false, type: 'view'});
         fetchData(page, rowsPerPage, '', viewMode, profile?.id)
+    }
+
+    // view image products
+    const handleOpenViewImageProducts = (order: IOrder) => {
+      setOrder(order);
+      setViewImageProducts(true)
+    }
+
+    const handleCloseViewImageProducts = () => {
+      setOrder(null);
+      setViewImageProducts(false)
     }
 
     return(
@@ -85,6 +98,7 @@ const ManagementJobCarpenter = () => {
                                                     <CardDataOrder
                                                         order={order}
                                                         onViewOrder={handleOpenViewOrder}
+                                                        onViewImageProducts={handleOpenViewImageProducts}
                                                     />
                                                 </Grid>                                    
                                             ))
@@ -107,6 +121,13 @@ const ManagementJobCarpenter = () => {
                 <UpdateOrder
                     data={order}
                     onBack={handleCloseViewOrder}
+                />
+            )}
+            {viewImageProducts && order && (
+                <DialogListImageProduct
+                    order={order}
+                    onClose={handleCloseViewImageProducts}
+                    open={viewImageProducts}
                 />
             )}
         </Box>

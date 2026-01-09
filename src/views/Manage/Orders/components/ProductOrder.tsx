@@ -1,7 +1,7 @@
 import { FormDataProducts } from "@/types/product";
 import { IUser } from "@/types/user";
 import { getProccessOrderLabel, getStatusOrderLabel } from "@/utils/labelEntoVni";
-import { Box, TextField, Typography } from "@mui/material";
+import { Box, InputAdornment, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { FormProductErrors } from "./DialogAddOrder";
 import InputSelect from "./InputSelect";
@@ -10,15 +10,16 @@ interface InputTextProps{
     index: number,
     onInputChange: (index: number, name: string, value: any) => void;
     name: string,
-    value: string;
+    value: any;
     error?: boolean,
     helperText?: string;
     label: string;
-    disabled?: boolean
+    disabled?: boolean;
+    inputLabel?: string
 }
 
 const InputText = (props: InputTextProps) => {
-    const { onInputChange, index, name, value, error, helperText, label, disabled } = props;
+    const { onInputChange, index, name, value, error, helperText, label, disabled, inputLabel } = props;
     return (
         <TextField
             placeholder="Nhập thông tin"
@@ -44,7 +45,13 @@ const InputText = (props: InputTextProps) => {
                     },
                     color: 'black'
                 },
-            }} 
+            }}
+            slotProps={{
+                input: {
+                    endAdornment: <InputAdornment position="end">{inputLabel}</InputAdornment>,
+                    
+                }
+            }}
         />
     )
 }
@@ -88,6 +95,45 @@ const ProductOrder = (props: ProductOrderProps) => {
                             onInputChange={onInputChange}
                             error={!!errors.description}
                             helperText={errors.description}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                        <Typography fontWeight={700} fontSize='15px'>Chiều dài</Typography>
+                        <InputText
+                            label=""
+                            name="lenghtProduct"
+                            index={index}
+                            value={formData.lenghtProduct}
+                            onInputChange={onInputChange}
+                            error={!!errors.lenghtProduct}
+                            helperText={errors.lenghtProduct}
+                            inputLabel='cm'
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                        <Typography fontWeight={700} fontSize='15px'>Chiều rộng</Typography>
+                        <InputText
+                            label=""
+                            name="widthProduct"
+                            index={index}
+                            value={formData.widthProduct}
+                            onInputChange={onInputChange}
+                            error={!!errors.widthProduct}
+                            helperText={errors.widthProduct}
+                            inputLabel='cm'
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                        <Typography fontWeight={700} fontSize='15px'>Chiều cao</Typography>
+                        <InputText
+                            label=""
+                            name="heightProduct"
+                            index={index}
+                            value={formData.heightProduct}
+                            onInputChange={onInputChange}
+                            error={!!errors.heightProduct}
+                            helperText={errors.heightProduct}
+                            inputLabel='cm'
                         />
                     </Grid>
                     <Grid size={{ xs: 12 }}>

@@ -139,12 +139,12 @@ const ProgressProduct = (props: ProgressProductProps) => {
     const canAddStep = (milestoneIndex: number, stepIndex: number) => { 
         if(!workOrder) return false;
 
-        // 1. Kiểm tra các mốc đã hoàn thành chưa để hiện thị thêm b
+        // 1. Kiểm tra các mốc đã hoàn thành chưa để hiện thị thêm button
         const milestone = workOrder.workMilestones[milestoneIndex];
 
         // Tất cả step đã hoàn thành
         if(milestone.steps.length - 1 === stepIndex){
-            return milestone.steps.every(step => step.proccess === 'completed')
+            return milestone.steps.every(step => step.proccess === 'completed') && milestone.evaluatedStatus !== 'approved'
         }
     }
 
@@ -154,19 +154,6 @@ const ProgressProduct = (props: ProgressProductProps) => {
         if(milestone.steps.length - 1 === stepIndex){
             return milestone.steps.some(step => step.proccess === 'completed') && milestone.evaluatedStatus === 'not_reviewed'
         }
-    }
-
-    const showButtonFinishedProduct = () => {
-        if(workOrder === null) return;
-        const data: IWorkMilestone[] = workOrder && workOrder.workMilestones;
-        for(let i = 0; i < data.length; i ++){
-            const milestone = data[i];
-            const allStepsDone = milestone.steps.every(s => s.proccess === 'completed');
-            if(!allStepsDone) return false;
-        }
-
-        return true;
-        
     }
 
     const handleOpenUpdateStep = () => {
@@ -798,7 +785,7 @@ const ProgressProduct = (props: ProgressProductProps) => {
                         </Grid>      
                     </>
                 )}
-                {showButtonFinishedProduct() && (
+                {workOrder?.evaluatedStatus === 'approved' && (
                     <>
                         <Typography fontSize='15px'>Hình ảnh sản phẩm</Typography>
                         {imageProductUrl ? (

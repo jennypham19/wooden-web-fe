@@ -53,6 +53,18 @@ export const getStatusProductColor = (status: string | null) => {
   }
 };
 
+export const getEvaluatedProductLabelAndColor = (isEvaluated: boolean | null | undefined) => {
+  if(isEvaluated === null || isEvaluated === undefined) return { label: 'Không xác định', color: 'default' as const };
+  switch (isEvaluated) {
+    case true:
+      return { label: 'Đã đánh giá', color: 'error' as const };
+    case false:
+    default:
+      return { label: 'Chưa đánh giá', color: 'warning' as const };
+  }
+}
+
+
 // End product
 
 // Design Request

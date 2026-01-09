@@ -10,6 +10,7 @@ import { IOrder } from "@/types/order";
 import { useState } from "react";
 import ViewProductsInOrder from "./ViewProductsInOrder";
 import UpdateOrder from "./UpdateOrder";
+import DialogListImageProduct from "./DialogListImageProduct";
 
 
 interface CheckedOrderProps{
@@ -23,6 +24,7 @@ const CheckedOrder = (props: CheckedOrderProps) => {
     const [order, setOrder] = useState<IOrder | null>(null);
     const [openViewProductsInOrder, setOpenViewProductsInOrder] = useState(false);
     const [openUpdateOrder, setOpenUpdateOrder] = useState(false);
+    const [viewImageProducts, setViewImageProducts] = useState(false);
 
     const handleClose = () => {
         onClose()
@@ -52,13 +54,24 @@ const CheckedOrder = (props: CheckedOrderProps) => {
       onFetchData()
     }
 
+    // view image products
+    const handleOpenViewImageProducts = (order: IOrder) => {
+      setOrder(order);
+      setViewImageProducts(true)
+    }
+
+    const handleCloseViewImageProducts = () => {
+      setOrder(null);
+      setViewImageProducts(false)
+    }
+
     return (
       <Box>
         {!openViewProductsInOrder && (
           <>
             <NavigateBack title='Kiểm soát đơn hàng' onBack={handleClose} />
             <Paper sx={{ borderRadius: 2, m: 1.5, p: 2 }}>
-              <CardDetailDataOrder order={data}>
+              <CardDetailDataOrder order={data} onViewImageProducts={handleOpenViewImageProducts}>
                 <ProductStatusStepper products={data.products} />
               </CardDetailDataOrder>
               {data.reason !== null && (
@@ -97,6 +110,13 @@ const CheckedOrder = (props: CheckedOrderProps) => {
           <ViewProductsInOrder
             data={order}
             onBack={handleCloseViewProductsInOrder}
+          />
+        )}
+        {viewImageProducts && order && (
+          <DialogListImageProduct
+            order={order}
+            onClose={handleCloseViewImageProducts}
+            open={viewImageProducts}
           />
         )}
       </Box>

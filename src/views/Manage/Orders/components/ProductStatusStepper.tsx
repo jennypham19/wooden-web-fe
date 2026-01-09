@@ -50,7 +50,9 @@ interface ProductStatusStepperProps {
 }
 
 const ProductStatusStepper: React.FC<ProductStatusStepperProps> = ({ products }) => {
-  const activeStatus = products.findIndex((product) => product.status ==='completed');
+  // số sản phẩm đã hoàn thành
+  const completedCount = products.filter(p => p.status === 'completed').length;
+  
   return (
     <Box
       sx={{
@@ -62,8 +64,8 @@ const ProductStatusStepper: React.FC<ProductStatusStepperProps> = ({ products })
     >
       <Stepper
         alternativeLabel
-        activeStep={activeStatus}
-        connector={<ColorConnector activeStatus={activeStatus} />}
+        activeStep={completedCount}
+        connector={<ColorConnector activeStatus={completedCount} />}
         sx={{
           width: '100%',
           mx: 'auto',
@@ -78,7 +80,7 @@ const ProductStatusStepper: React.FC<ProductStatusStepperProps> = ({ products })
         }}
       >
         {products.map((product, index) => {
-          const isActive = index <= activeStatus;
+          const completed = product.status === 'completed';
           return (
             <Step key={index}>
               <StepLabel
@@ -88,7 +90,7 @@ const ProductStatusStepper: React.FC<ProductStatusStepperProps> = ({ products })
                       width: 30,
                       height: 30,
                       borderRadius: '50%',
-                      backgroundColor: isActive ? '#bef3c2ff' : 'rgba(0,0,0,0.1)',
+                      backgroundColor: completed ? '#bef3c2ff' : 'rgba(0,0,0,0.1)',
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center',
@@ -99,17 +101,17 @@ const ProductStatusStepper: React.FC<ProductStatusStepperProps> = ({ products })
                         width: 20,
                         height: 20,
                         fontSize: 14,
-                        color: isActive ? '#ffffff' : '#9e9e9e',
-                        border: `2px solid ${isActive ? '#6d9b71ff' : '#bdbdbd'}`,
+                        color: completed ? '#ffffff' : '#9e9e9e',
+                        border: `2px solid ${completed ? '#6d9b71ff' : '#bdbdbd'}`,
                         borderRadius: '50%',
-                        bgcolor: isActive ? '#6d9b71ff' : 'rgba(0,0,0,0.1)',
+                        bgcolor: completed ? '#6d9b71ff' : 'rgba(0,0,0,0.1)',
                       }}
                     />
                   </Box>
                 )}
               >
                 <Typography variant='body2' sx={{ color: '#000' }}>
-                  SP{index + 1}
+                  SP{index + 1} ({product.name})
                 </Typography>
               </StepLabel>
             </Step>

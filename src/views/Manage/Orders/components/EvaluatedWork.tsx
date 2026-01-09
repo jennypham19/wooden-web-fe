@@ -1,26 +1,28 @@
-import { FormDataRequestMilestone, IProduct, PayloadRequestMilestone } from "@/types/product";
+import { FormDataRequestMilestone, IProduct, PayloadEvaluationMilestone, PayloadEvaluationWorkOrder, PayloadRequestMilestone } from "@/types/product";
 import { Alert, Avatar, Box, Button, Chip, IconButton, Paper, Stack, TextField, Tooltip, Typography } from "@mui/material";
 import NavigateBack from "../../components/NavigateBack";
 import useAuth from "@/hooks/useAuth";
 import useNotification from "@/hooks/useNotification";
 import { useEffect, useState } from "react";
 import { IWorkMilestone, IWorkOrder } from "@/types/order";
-import { getDetailWorkOrderByProduct, sendRequestMilestone } from "@/services/product-service";
+import { getDetailWorkOrderByProduct, sendEvaluationMilestone, sendEvaluationWorkOrder, sendRequestMilestone } from "@/services/product-service";
 import Grid from "@mui/material/Grid2"
 import { getEvaluatedStatusWorkMilestoneColor, getEvaluatedStatusWorkMilestoneLabel, getEvaluatedStatusWorkOrderColor, getEvaluatedStatusWorkOrderLabel, getNumber, getProccessWorkOrderColor, getProccessWorkOrderLabel, getProgressWorkOrderLabel, getStatusProductLabel } from "@/utils/labelEntoVni";
-import { ArrowDropDown, ArrowDropUp, Lock } from "@mui/icons-material";
+import { ArrowDropDown, ArrowDropUp, Lock, Visibility } from "@mui/icons-material";
 import CommonImage from "@/components/Image/index";
 import InputText from "@/components/InputText";
 import { COLORS } from "@/constants/colors";
 import LabeledStack from "@/components/LabeledStack";
+import DialogImageProduct from "./DialogImageProduct";
+import Backdrop from "@/components/Backdrop";
 
 interface InputTextProps{
     index: number,
     onInputChange: (index: number, name: string, value: any) => void;
     name: string,
-    value: string;
+    value: string | null;
     error?: boolean,
-    helperText?: string;
+    helperText?: string | null;
     label: string;
     disabled?: boolean;
     placeholder?: string
@@ -89,8 +91,12 @@ const EvaluatedWork = (props: EvaluatedWorkProps) => {
     })
     const [errorsRequestMilestone, setErrorsRequestMilestone] = useState<ErrorsRequestMilestone>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [errorNoti, setErrorNoti] = useState<string | null>(null);
     const [openRequestMilestone, setOpenRequestMilestone] = useState(false);
+    const [evaluationDescription, setEvaluationDescription] = useState<string[]>([]);
+    const [evaluationDescriptionError, setEvaluationDescriptionError] = useState<string[]>([]);
+    const [openDialogImageProduct, setOpenDialogImageProduct] = useState(false);
+    const [evaluationWorkOrder, setEvaluationWorkOrder] = useState<string | null>(null);
+    const [evaluationWorkOrderError, setEvaluationWorkOrderError] = useState<string | null>(null);
 
     const getWorkOrderByIdProduct = async(id: string) => {
         try {
@@ -110,7 +116,11 @@ const EvaluatedWork = (props: EvaluatedWorkProps) => {
     const reset = () => {
         setWorkMilestoneSelected(null);
         setErrorsRequestMilestone({});
-        setFormDataRequestMilestone({ reworkReason: null, reworkDeadline: null, reworkStartedAt: null })
+        setFormDataRequestMilestone({ reworkReason: null, reworkDeadline: null, reworkStartedAt: null });
+        setEvaluationDescription([]);
+        setEvaluationDescriptionError([]);
+        setEvaluationWorkOrder(null);
+        setEvaluationWorkOrderError(null)
     }
 
     const handleBack = () => {
@@ -243,6 +253,97 @@ const EvaluatedWork = (props: EvaluatedWorkProps) => {
     }
 
     /* ----------------- Yêu cầu làm lại -------------------- */
+
+    /* ----------------- Gửi đánh giá mốc công việc -------------------- */
+    const handleChangeInputEvaluationDescription = (index: number, name: string, value: any) => {
+        setEvaluationDescription((prev) => {
+            const updated = [...prev];
+            updated[index] = value;
+            return updated;
+        });
+        setEvaluationDescriptionError((prev) => {
+            const updated = [...prev];
+            updated[index] = '';
+            return updated
+        })
+    }
+
+    const handleSendEvaluationDescription = async(id: string,index: number) => {
+        const description = evaluationDescription[index];
+
+        if (!description || description.trim() === '') {
+            setEvaluationDescriptionError((prev) => {
+                const updated = [...prev];
+                updated[index] = 'Vui lòng nhập nội dung đánh giá';
+                return updated;
+            });
+            return;
+        }
+        setIsSubmitting(true)
+        try {
+            const payload: PayloadEvaluationMilestone = {
+                evaluatedStatus: 'approved',
+                evaluationDescription: description,
+                changedBy: profile ? profile.id : null,
+                changedRole: profile ? profile.role : null,
+                carpenters: workOrder?.workers ? workOrder.workers : []
+            }
+            const res = await sendEvaluationMilestone(id, payload);
+            notify({
+                message: res.message,
+                severity: 'success'
+            })
+            getWorkOrderByIdProduct(data.id)
+        } catch (error: any) {
+            notify({
+                message: error.message,
+                severity: 'error'
+            })
+        } finally {
+            setIsSubmitting(false)
+        }
+        
+    }
+    
+    /* ----------------- Gửi đánh giá mốc công việc -------------------- */
+
+    /* ----------------- Gửi đánh giá công việc -------------------- */
+    const handleChangeInputEvaluationWorkOrder = (name: string, value: any) => {
+        setEvaluationWorkOrder(value);
+        if(evaluationWorkOrderError){
+            setEvaluationWorkOrderError(null)
+        }
+    }
+    const handleSendEvaluationWorkOrder = async(id: string) => {
+        if(!evaluationWorkOrder || evaluationWorkOrder.trim() === ''){
+            setEvaluationWorkOrderError('Vui lòng nhập nội dung đánh giá công việc');
+            return;
+        }
+        setIsSubmitting(true)
+        try {
+            const payload: PayloadEvaluationWorkOrder = {
+                evaluatedStatusWorkOrder: 'approved',
+                evaluationDescriptionWorkOrder: evaluationWorkOrder,
+                changedBy: profile ? profile.id : null,
+                changedRole: profile ? profile.role : null,
+                carpenters: workOrder?.workers ? workOrder.workers : []
+            }
+            const res = await sendEvaluationWorkOrder(id, payload);
+            notify({
+                message: res.message,
+                severity: 'success'
+            })
+            getWorkOrderByIdProduct(data.id)
+        } catch (error: any) {
+            notify({
+                message: error.message,
+                severity: 'error'
+            })
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
+    /* ----------------- Gửi đánh giá công việc -------------------- */
     return(
         <Box>
             <NavigateBack
@@ -256,12 +357,12 @@ const EvaluatedWork = (props: EvaluatedWorkProps) => {
                         <Stack direction='row' display='flex' justifyContent='space-between'>
                             <Typography mb={1.5} fontWeight={600}>Thông tin công việc</Typography>
                             <Stack direction='row'>
-                                {/* {workOrder && (
+                                {workOrder?.workMilestones.every(milestone => milestone.evaluatedStatus === 'approved') && (
                                     <Chip
                                         label={getEvaluatedStatusWorkOrderLabel(workOrder?.evaluatedStatus)}
                                         color={getEvaluatedStatusWorkOrderColor(workOrder?.evaluatedStatus).color}
                                     />
-                                )} */}
+                                )}
                                 <IconButton
                                     onClick={() => {
                                         setOpenWorkOrder((prev) => !prev)
@@ -281,7 +382,13 @@ const EvaluatedWork = (props: EvaluatedWorkProps) => {
                                         <Stack direction='row'>
                                             <Typography fontSize='14px'>Tên công việc: </Typography>
                                             <Typography fontSize='14px' fontWeight={600}>{data.name}</Typography>
+                                            {data.urlImage && (
+                                                <IconButton sx={{ height: 0, pt: 1.3}} onClick={() => setOpenDialogImageProduct(true)}>
+                                                    <Visibility/>
+                                                </IconButton>
+                                            )}
                                         </Stack>
+                                        
                                     </Grid>
 
                                     {/* Hàng 2 */}
@@ -359,11 +466,13 @@ const EvaluatedWork = (props: EvaluatedWorkProps) => {
                         )}
                         <InputText
                             label="Đánh giá công việc"
-                            name=""
-                            value={''}
+                            name="evaluationDescriptionWorkOrder"
+                            value={evaluationWorkOrder}
                             type="text"
-                            onChange={() => {}}
-                            disabled={!workOrder?.workMilestones.every(el => el.evaluatedStatus === 'approved')}
+                            onChange={handleChangeInputEvaluationWorkOrder}
+                            disabled={!workOrder?.workMilestones.every(milestone => milestone.evaluatedStatus === 'approved')} // Disable nếu các mốc công việc chưa ở trạng thái đạt
+                            error={!!evaluationWorkOrderError}
+                            helperText={evaluationWorkOrderError}
                         />
                     </Grid>
 
@@ -373,6 +482,7 @@ const EvaluatedWork = (props: EvaluatedWorkProps) => {
                             {/*  Các mốc công việc*/}
                             {workOrder?.workMilestones.map((workMilestone, index) => {
                                 const isOpen = workMilestoneSelected === index;
+                                const description = workMilestone.evaluationDescription
                                 return(
                                     <Grid key={index} size={{ xs: 12 }}>
                                         <Stack mt={1} direction='row' display='flex' justifyContent='space-between'>
@@ -469,16 +579,19 @@ const EvaluatedWork = (props: EvaluatedWorkProps) => {
                                         <InputTextStep
                                             label={`Đánh giá mốc ${index + 1}`}
                                             index={index + 1}
-                                            name=""
-                                            onInputChange={() => {}}
-                                            value=""
-                                            disabled={isEvaluatedLocked(index)}
+                                            name="evaluationDescription"
+                                            onInputChange={handleChangeInputEvaluationDescription}
+                                            value={evaluationDescription[index] || description}
+                                            disabled={isEvaluatedLocked(index) || !!openRequestMilestone || workMilestone.evaluatedStatus === 'approved'}
+                                            error={!!evaluationDescriptionError[index]}
+                                            helperText={evaluationDescriptionError[index]}
                                         />
                                         {isMilestoneEvaluated(index) && (
                                             <Box mt={1.5} display='flex' justifyContent='center'>
                                                 <Button
                                                     sx={{ bgcolor: COLORS.BUTTON, width: 120, mr: 2 }}
                                                     disabled={!!openRequestMilestone}
+                                                    onClick={() => handleSendEvaluationDescription(workMilestone.id, index)}
                                                 >
                                                     Gửi đánh giá
                                                 </Button>
@@ -568,17 +681,28 @@ const EvaluatedWork = (props: EvaluatedWorkProps) => {
                     </Grid>
 
                     {/* ------------------ Button -------------------- */}
-                    {workOrder?.workMilestones.every(el => el.evaluatedStatus === 'approved') && (
+                    {workOrder?.workMilestones.every(milestone => milestone.evaluatedStatus === 'approved') && (
                         <Grid sx={{ display: 'flex', justifyContent: 'center' }} size={{ xs: 12 }}>
                             <Button
                                 sx={{ bgcolor: COLORS.BUTTON, width: 150 }}
+                                onClick={() => workOrder && handleSendEvaluationWorkOrder(workOrder.id)}
                             >
                                 Gửi đánh giá
                             </Button>
                         </Grid>                        
                     )}
                 </Grid>
+                {isSubmitting && (
+                    <Backdrop open={isSubmitting} />
+                )}
                 {/* <ProductReview/> */}
+                {openDialogImageProduct && (
+                    <DialogImageProduct
+                        open={openDialogImageProduct}
+                        onClose={() => { setOpenDialogImageProduct(false) }}
+                        imageUrl={data.urlImage}
+                    />
+                )}
             </Paper>
         </Box>
     )

@@ -21,6 +21,7 @@ import CheckedOrder from "./CheckedOrder";
 import { ProccessOrder } from "@/constants/status";
 import { IUser } from "@/types/user";
 import ViewProductsInOrder from "./ViewProductsInOrder";
+import DialogListImageProduct from "./DialogListImageProduct";
 
 
 interface AllListOrdersProps{
@@ -66,6 +67,7 @@ const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
         type: ''
     });
     const [viewOrder, setViewOrder] = useState(false);
+    const [viewImageProducts, setViewImageProducts] = useState(false);
     const [order, setOrder] = useState<IOrder | null>(null);
     
     const { error, fetchData, handlePageChange, handleSearch, listData, loading, page, rowsPerPage, searchTerm, total } = useFetchData<IOrder>(getOrders, 8, viewMode);
@@ -120,6 +122,17 @@ const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
     const handleCloseViewProduct = () => {
         setOrder(null);
         setOpenOrder({ open: false, type: 'view-product' })
+    }
+
+    // view image products
+    const handleOpenViewImageProducts = (order: IOrder) => {
+      setOrder(order);
+      setViewImageProducts(true)
+    }
+
+    const handleCloseViewImageProducts = () => {
+      setOrder(null);
+      setViewImageProducts(false)
     }
 
     const renderActionButton = (order: IOrder) => {
@@ -248,6 +261,7 @@ const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
                                                     <CardDataOrder
                                                         order={order}
                                                         onViewOrder={handleOpenViewOrder}
+                                                        onViewImageProducts={handleOpenViewImageProducts}
                                                     >
                                                         {renderActionButton(order)}
                                                     </CardDataOrder>
@@ -298,6 +312,13 @@ const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
                 <ViewProductsInOrder
                     data={order}
                     onBack={handleCloseViewProduct}
+                />
+            )}
+            {viewImageProducts && order && (
+                <DialogListImageProduct
+                    order={order}
+                    onClose={handleCloseViewImageProducts}
+                    open={viewImageProducts}
                 />
             )}
         </Box>

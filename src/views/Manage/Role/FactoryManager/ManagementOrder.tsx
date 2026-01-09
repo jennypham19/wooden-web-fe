@@ -19,6 +19,7 @@ import { IOrder } from "@/types/order";
 import AllListEvaluatedOrders from "../../Orders/components/AllListEvaluatedOrders";
 import { useFetchOrdersWithProccess } from "@/hooks/useFetchOrdersWithProccess";
 import AllListOrdersByManager from "../../Orders/components/AllListOrdersByManager";
+import DialogListImageProduct from "../../Orders/components/DialogListImageProduct";
 
 
 const ManagementOrderFactoryManager = () => {
@@ -29,6 +30,7 @@ const ManagementOrderFactoryManager = () => {
         type: ''
     });
     const [viewOrder, setViewOrder] = useState(false);
+    const [viewImageProducts, setViewImageProducts] = useState(false);
     const [order, setOrder] = useState<IOrder | null>(null);
 
     const { error: errorOrders, fetchData: fetchOrders, listData: orders, loading: loadingOrder, page: pageOrders, rowsPerPage: rowsPerPageOrders } = useFetchData<IOrder>(getOrdersByIdManager, 10, '', profile?.id);
@@ -68,6 +70,17 @@ const ManagementOrderFactoryManager = () => {
         setOrder(null);
         setViewOrder(false)
     }
+
+    // view image products
+    const handleOpenViewImageProducts = (order: IOrder) => {
+      setOrder(order);
+      setViewImageProducts(true)
+    }
+
+    const handleCloseViewImageProducts = () => {
+      setOrder(null);
+      setViewImageProducts(false)
+    }
     return (
       <Box>
         {!showAll && (
@@ -95,7 +108,7 @@ const ManagementOrderFactoryManager = () => {
                     ) : (
                       orders.slice(0, 3).map((order, index) => (
                         <Grid key={index} size={{ xs: 12, md: 4 }}>
-                          <CardDataOrder order={order} onViewOrder={handleOpenViewOrder} />
+                          <CardDataOrder order={order} onViewOrder={handleOpenViewOrder} onViewImageProducts={handleOpenViewImageProducts} />
                         </Grid>
                       ))
                     )}
@@ -111,7 +124,7 @@ const ManagementOrderFactoryManager = () => {
                     ) : (
                       ordersWithProccess.slice(0, 3).map((orderWithProccess, idx) => (
                         <Grid key={idx} size={{ xs: 12, md: 4 }}>
-                          <CardDataOrder order={orderWithProccess} onViewOrder={handleOpenViewOrder}/>
+                          <CardDataOrder order={orderWithProccess} onViewOrder={handleOpenViewOrder} onViewImageProducts={handleOpenViewImageProducts}/>
                         </Grid>
                       ))
                     )}
@@ -129,6 +142,13 @@ const ManagementOrderFactoryManager = () => {
         )}
         {viewOrder && order && (
           <DetailOrder open={viewOrder} data={order} onClose={handleCloseViewOrder} />
+        )}
+        {viewImageProducts && order && (
+          <DialogListImageProduct
+            order={order}
+            onClose={handleCloseViewImageProducts}
+            open={viewImageProducts}
+          />
         )}
       </Box>
     );

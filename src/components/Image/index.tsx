@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 interface CommonImageProps extends ImgHTMLAttributes<HTMLImageElement>{
     fallbackSrc?: string;
     sx?: SxProps;
-    borderRadius?: string;
+    borderRadius?: string | number;
     route?: string
 }
 

@@ -1,22 +1,23 @@
 import { IOrder } from "@/types/order";
-import { Avatar, Box, Card, CardContent, Chip, Stack, Typography } from "@mui/material";
+import { Avatar, Box, Card, CardContent, Chip, IconButton, Stack, Typography } from "@mui/material";
 import React from "react";
 import avatar from "@/assets/images/users/default-avatar.jpg";
 import { getProccessOrderLabel, getStatusOrderColor, getStatusOrderLabel } from "@/utils/labelEntoVni";
 import DateTime from "@/utils/DateTime";
 import { StatusProduct } from "@/constants/status";
-import IconButton from "@/components/IconButton/IconButton";
 import { Visibility } from "@mui/icons-material";
+import { IProduct } from "@/types/product";
 
 
 interface CardDataOrderProps{
     order: IOrder
     onViewOrder: (data: IOrder) => void;
     children?: React.ReactNode;
+    onViewImageProducts: (data: IOrder) => void;
 }
 
 const CardDataOrder = (props: CardDataOrderProps) => {
-    const { order, onViewOrder, children } = props;
+    const { order, onViewOrder, children, onViewImageProducts } = props;
     return(
         <Card
             sx={{ m: 1, boxShadow: "0px 2px 1px 1px rgba(0, 0, 0, 0.2)", borderRadius: 4 }}
@@ -54,10 +55,13 @@ const CardDataOrder = (props: CardDataOrderProps) => {
                     <Typography fontSize='15px'><b>Số lượng sản phẩm:</b> {order.amount} sản phẩm/ đơn hàng</Typography>
                         {order.products.every(el => el.status === StatusProduct.COMPLETED) && (
                             <IconButton
-                                handleFunt={() => {}}
-                                icon={<Visibility/>}
-                                height={0}
-                            />
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    order && onViewImageProducts(order)
+                                }}
+                            >
+                                <Visibility/>
+                            </IconButton>
                         )}
                 </Stack>
                 <Typography my={1} fontSize='15px'><b>Yêu cầu:</b> {order.requiredNote}</Typography> 

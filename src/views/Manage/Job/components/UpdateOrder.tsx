@@ -54,7 +54,7 @@ const UpdateOrder: React.FC<UpdateOrderProps> = ({ onBack, data }) => {
         if(!newData) {
             return false
         }
-        return true;
+        return true && data.proccess === ProccessOrder.IN_PROGRESS_50;
         
     }
 
@@ -92,7 +92,7 @@ const UpdateOrder: React.FC<UpdateOrderProps> = ({ onBack, data }) => {
                                     <Card sx={{ borderRadius: 2 }}>
                                         <CommonImage
                                             sx={{ px: 2, pt: 2, objectFit: 'cover', height: 250, width: '100%' }}
-                                            src={product.urlImage !== null ? product.urlImage : logo_product}
+                                            src={product.urlImage}
                                             alt={product.name}
                                         />
                                         <CardContent>

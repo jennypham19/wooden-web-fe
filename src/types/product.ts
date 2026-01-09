@@ -9,6 +9,9 @@ export interface FormDataProducts{
     proccess: string,
     status: string,
     managerId: string,
+    lenghtProduct: number | null,
+    widthProduct: number | null,
+    heightProduct: number | null
 }
 
 export interface FormDataRequestMilestone{
@@ -34,6 +37,34 @@ export interface PayloadRequestMilestone{
     carpenters: { id: string }[]
 }
 
+export interface PayloadEvaluationMilestone{
+    evaluatedStatus: string,
+    evaluationDescription: string,
+    changedBy: string | null,
+    changedRole: string | null,
+    carpenters: { id: string }[]
+}
+
+export interface PayloadEvaluationWorkOrder{
+    evaluatedStatusWorkOrder: string,
+    evaluationDescriptionWorkOrder: string,
+    changedBy: string | null,
+    changedRole: string | null,
+    carpenters: { id: string }[]
+}
+
+export interface PayloadEvaluationProduct{
+    reviews: {
+        overallQuality: number | null,
+        aesthetics: number | null,
+        customerRequirement: number | null,
+        satisfaction: number | null
+    },
+    comment: string | null,
+    averageScore: number | string,
+    orderId: string
+}
+
 // Đầu ra
 export interface IProduct{
     id: string,
@@ -47,5 +78,48 @@ export interface IProduct{
     updatedAt: string,
     isCreated: boolean,
     nameImage: string,
-    urlImage: string
+    urlImage: string,
+    isEvaluated: boolean,
+    completedDate: string | null,
+    dimension: {
+        length: number,
+        width: number,
+        height: number
+    }
+    order: {
+        id: string,
+        codeOrder: string,
+        name: string,
+        dateOfReceipt: string,
+        dateOfPayment: string,
+        proccess: string | ProccessOrder,
+        status: string | StatusOrder,
+        amount: number,
+        requiredNote: string,
+        isCreatedWork: boolean,
+        isEvaluated: boolean,
+        createdAt: string,
+        updatedAt: string,
+        customer: {
+            id: string,
+            name: string,
+            phone: string,
+            address: string,
+            amountOfOrders: number,
+            createdAt: string,
+            updatedAt: string,
+        }
+    }
+}
+
+export interface IProductReview{
+    id: string,
+    overallQuality: number,
+    aesthetics: number,
+    customerRequirement: number,
+    satisfaction: number,
+    comment: string | null,
+    averageScore: string,
+    createdAt: string,
+    updatedAt: string
 }

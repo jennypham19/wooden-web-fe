@@ -28,6 +28,7 @@ export const ROUTE_PATH = {
   MANAGE_PRODUCTIVITY_REPORT: 'productivity_report',
   MANAGE_NOTIFICATIONS_REMINDERS: 'notifications_reminders',
   MANAGE_DOCUMENTS_GUIDES: 'documents_guides',
+  MANAGE_FEEDBACK_CUSTOMER: 'feedback-customer',
 
   PRODUCT_CATEGORY: '/products/categories',
   PRODUCT_CATEGORY_CREATE: '/products/categories/create',

@@ -15,11 +15,12 @@ import { getProccessOrderLabel, getStatusOrderColor, getStatusOrderLabel } from 
 
 interface CardDetailDataOrderProps{
     order: IOrder | null,
-    children?: React.ReactNode
+    children?: React.ReactNode,
+    onViewImageProducts: (data: IOrder) => void;
 }
 
 const CardDetailDataOrder = (props: CardDetailDataOrderProps) => {
-    const { order, children } = props;
+    const { order, children, onViewImageProducts } = props;
     const { profile } = useAuth();
  
     return (
@@ -74,7 +75,7 @@ const CardDetailDataOrder = (props: CardDetailDataOrderProps) => {
               </Typography>
               {order.products.every((s) => s.status === 'completed') && (
                 <Tooltip title="Xem hình ảnh sản phẩm">
-                    <IconButton onClick={() => {}}>
+                    <IconButton onClick={() => order && onViewImageProducts(order)}>
                         <Visibility/>
                     </IconButton>
                 </Tooltip>

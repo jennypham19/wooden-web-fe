@@ -6,21 +6,22 @@ import { IProduct } from "@/types/product";
 import { getProductsByOrderId } from "@/services/product-service";
 import Grid from "@mui/material/Grid2";
 import CommonImage from "@/components/Image/index";
-import logo_product from "@/assets/images/users/logo_product.png";
 import { getStatusProductColor, getStatusProductLabel } from "@/utils/labelEntoVni";
 import { COLORS } from "@/constants/colors";
 import { getDetailOrder } from "@/services/order-service";
 import EvaluatedProduct from "./EvaluatedProduct";
 import EvaluatedWork from "./EvaluatedWork";
+import ViewEvaluatedWork from "./ViewEvaluatedWork";
 
 interface EvaluatedProductsInOrderProps{
     onBack: () => void;
     data: IOrder,
-    from?: string
+    from?: string,
+    onLoadData: () => void;
 }
 
 const EvaluatedProductsInOrder = (props: EvaluatedProductsInOrderProps) => {
-    const { onBack, data, from } = props;
+    const { onBack, data, from, onLoadData } = props;
     const [products, setProducts] = useState<IProduct[]>([]);
     const [product, setProduct] = useState<IProduct | null>(null);
     const [order, setOrder] = useState<IOrder | null>(null);
@@ -55,6 +56,7 @@ const EvaluatedProductsInOrder = (props: EvaluatedProductsInOrderProps) => {
     const handleCloseEvaluatedProduct = () => {
         setProduct(null)
         setOpenEvaluated({ type: 'product', open: false })
+        onLoadData()
     }
 
     /* Đánh giá công việc */
@@ -66,6 +68,17 @@ const EvaluatedProductsInOrder = (props: EvaluatedProductsInOrderProps) => {
     const handleCloseEvaluatedWork = () => {
         setProduct(null)
         setOpenEvaluated({ type: 'work', open: false })
+    }
+
+    /* Xem chi tiết đánh giá công việc */
+    const handleOpenViewEvaluatedWork = (product: IProduct) => {
+        setProduct(product)
+        setOpenEvaluated({ type: 'view-work', open: true })
+    }
+
+    const handleCloseViewEvaluatedWork = () => {
+        setProduct(null)
+        setOpenEvaluated({ type: 'view-work', open: false })
     }
     return(
         <Box>
@@ -82,7 +95,7 @@ const EvaluatedProductsInOrder = (props: EvaluatedProductsInOrderProps) => {
                                     <Card sx={{ borderRadius: 2 }}>
                                         <CommonImage
                                             sx={{ px: 2, pt: 2, objectFit: 'cover', height: 250, width: '100%' }}
-                                            src={product.urlImage !== null ? product.urlImage : logo_product}
+                                            src={product.urlImage}
                                             alt={product.name}
 
                                         />
@@ -99,13 +112,23 @@ const EvaluatedProductsInOrder = (props: EvaluatedProductsInOrderProps) => {
                                             </Box>
                                             <Typography mt={1} fontSize='14px'>{product.description}</Typography>
                                             {from === 'job' && (
-                                                <Button
-                                                    fullWidth
-                                                    sx={{ mt: 2, bgcolor: COLORS.BUTTON, borderRadius: 3 }}
-                                                    onClick={() => product && handleOpenEvaluatedWork(product)}
-                                                >
-                                                    Đánh giá công việc
-                                                </Button>                                               
+                                                product.status === 'completed' ? (
+                                                    <Button
+                                                        fullWidth
+                                                        sx={{ mt: 2, bgcolor: COLORS.BUTTON, borderRadius: 3 }}
+                                                        onClick={() => product && handleOpenViewEvaluatedWork(product)}
+                                                    >
+                                                        Xem chi tiết
+                                                    </Button>  
+                                                ) : (
+                                                    <Button
+                                                        fullWidth
+                                                        sx={{ mt: 2, bgcolor: COLORS.BUTTON, borderRadius: 3 }}
+                                                        onClick={() => product && handleOpenEvaluatedWork(product)}
+                                                    >
+                                                        Đánh giá công việc
+                                                    </Button>  
+                                                )
                                             )}
                                             {from === 'order' && (
                                                 <Button
@@ -124,9 +147,10 @@ const EvaluatedProductsInOrder = (props: EvaluatedProductsInOrderProps) => {
                     </Grid>                
                 </>
             )}
-            {openEvaluated.open && openEvaluated.type === 'product' && product &&  (
+            {openEvaluated.open && openEvaluated.type === 'product' && product && order && (
                 <EvaluatedProduct
                     data={product}
+                    order={order}
                     onBack={handleCloseEvaluatedProduct}
                 />
             )}
@@ -134,6 +158,12 @@ const EvaluatedProductsInOrder = (props: EvaluatedProductsInOrderProps) => {
                 <EvaluatedWork
                     data={product}
                     onBack={handleCloseEvaluatedWork}
+                />
+            )}
+            {openEvaluated.open && openEvaluated.type === 'view-work' && product && (
+                <ViewEvaluatedWork
+                    data={product}
+                    onBack={handleCloseViewEvaluatedWork}
                 />
             )}
         </Box>

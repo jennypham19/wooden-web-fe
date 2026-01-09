@@ -22,6 +22,7 @@ import { IProduct } from "@/types/product";
 import { useFetchData } from "@/hooks/useFetchData";
 import { getListCapenter } from "@/services/user-service";
 import Backdrop from "@/components/Backdrop";
+import DialogListImageProduct from "./DialogListImageProduct";
 
 interface JobInOrderProps{
     data: IOrder,
@@ -63,6 +64,7 @@ const JobInOrder = (props: JobInOrderProps) => {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [openDialogChooseWorkers, setOpenDialogChooseWorkers] = useState(false);
+    const [viewImageProducts, setViewImageProducts] = useState(false);
 
     const [order, setOrder] = useState<IOrder | null>(null);
     const [products, setProducts] = useState<IProduct[]>([]);
@@ -117,6 +119,17 @@ const JobInOrder = (props: JobInOrderProps) => {
     const handleClose = () => {
         onClose();
         reset();
+    }
+
+    // view image products
+    const handleOpenViewImageProducts = (order: IOrder) => {
+      setOrder(order);
+      setViewImageProducts(true)
+    }
+
+    const handleCloseViewImageProducts = () => {
+      setOrder(null);
+      setViewImageProducts(false)
     }
 
     const handleOpenDialogChooseWorkers = () => {
@@ -270,6 +283,7 @@ const JobInOrder = (props: JobInOrderProps) => {
             <Paper sx={{ borderRadius: 2, m:1.5, p: 2 }}>
                 <CardDetailDataOrder
                     order={order}
+                    onViewImageProducts={handleOpenViewImageProducts}
                 />
                 <Divider sx={{ mt: 3 }}/>
                 <Grid container spacing={2}>
@@ -413,6 +427,13 @@ const JobInOrder = (props: JobInOrderProps) => {
                 />
             )}
             {isSubmitting && (<Backdrop open={isSubmitting}/>)}
+            {viewImageProducts && order && (
+                <DialogListImageProduct
+                    order={order}
+                    onClose={handleCloseViewImageProducts}
+                    open={viewImageProducts}
+                />
+            )}
         </Box>
     )
 }

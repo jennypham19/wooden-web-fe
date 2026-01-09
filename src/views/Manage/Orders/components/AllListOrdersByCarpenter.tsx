@@ -14,6 +14,7 @@ import { ROLE } from "@/constants/roles";
 import CustomPagination from "@/components/Pagination/CustomPagination";
 import Tabs from "../../components/Tabs";
 import ViewOrderByCarpenter from "./ViewOrderByCapenter";
+import DialogListImageProduct from "./DialogListImageProduct";
 
 
 interface AllListOrdersByCarpenterProps{
@@ -51,6 +52,7 @@ const AllListOrdersByCarpenter: React.FC<AllListOrdersByCarpenterProps> = (props
         type: ''
     });
     const [order, setOrder] = useState<IOrder | null>(null);
+    const [viewImageProducts, setViewImageProducts] = useState(false);
     
     const { error, fetchData, handlePageChange, handleSearch, listData, loading, page, rowsPerPage, searchTerm, total } = useFetchData<IOrder>(getOrdersByCarpenter, 8, viewMode, profile?.id);
 
@@ -62,6 +64,17 @@ const AllListOrdersByCarpenter: React.FC<AllListOrdersByCarpenterProps> = (props
     const handleCloseViewOrder = () => {
         setOrder(null);
         setOpenOrder({ open: false, type: 'view'})
+    }
+
+    // view image products
+    const handleOpenViewImageProducts = (order: IOrder) => {
+      setOrder(order);
+      setViewImageProducts(true)
+    }
+
+    const handleCloseViewImageProducts = () => {
+      setOrder(null);
+      setViewImageProducts(false)
     }
 
     return(
@@ -97,6 +110,7 @@ const AllListOrdersByCarpenter: React.FC<AllListOrdersByCarpenterProps> = (props
                                                     <CardDataOrder
                                                         order={order}
                                                         onViewOrder={handleOpenViewOrder}
+                                                        onViewImageProducts={handleOpenViewImageProducts}
                                                     />
                                                 </Grid>                                    
                                             ))
@@ -119,6 +133,13 @@ const AllListOrdersByCarpenter: React.FC<AllListOrdersByCarpenterProps> = (props
                 <ViewOrderByCarpenter
                     data={order}
                     onBack={handleCloseViewOrder}
+                />
+            )}
+            {viewImageProducts && order && (
+                <DialogListImageProduct
+                    order={order}
+                    onClose={handleCloseViewImageProducts}
+                    open={viewImageProducts}
                 />
             )}
         </Box>
