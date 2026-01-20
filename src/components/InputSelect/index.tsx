@@ -3,6 +3,7 @@ import React from 'react';
 
 
 import { Chip, CircularProgress, FormControl, FormHelperText, InputLabel, ListSubheader, MenuItem, Select, SelectChangeEvent, SelectProps, SxProps, Theme } from '@mui/material';
+import { ArrowDropDown, Clear } from '@mui/icons-material';
 
 
 
@@ -22,7 +23,7 @@ export interface OptionGroup {
 interface InputSelectProps {
   name: string;
   label: string;
-  value: string | number | (string | number)[];
+  value: null | string | number | (string | number)[];
   onChange: (name: string, value: any) => void;
   options?: any[]; // dùng khi không group
   optionGroups?: OptionGroup[]; // dùng khi có group
@@ -41,6 +42,7 @@ interface InputSelectProps {
   loadingTitle?: string,
   renderChips?: boolean, // hiển thị selected dưới dạng Chip
   margin?: any,
+  onLoadData?: () => void
 }
 
 const InputSelect: React.FC<InputSelectProps> = ({
@@ -64,13 +66,22 @@ const InputSelect: React.FC<InputSelectProps> = ({
   title,
   loadingTitle,
   renderChips = false, // default = text
-  margin
+  margin,
+  onLoadData
 }) => {
   const handleChange = (event: SelectChangeEvent<typeof value>) => {
     const selectedValue = multiple ? event.target.value : event.target.value;
     onChange(name, selectedValue);
   };
 
+  const handleClear = () => {
+    onChange(name, multiple ? [] : null);
+     onLoadData && onLoadData()
+  }
+
+  const hasValue = multiple
+    ? Array.isArray(value) && value.length > 0
+    : value !== null && value !== undefined && value !== '';
 
   const finalOptions = React.useMemo(() => {
     if (transformOptions) return transformOptions(options);
@@ -185,7 +196,7 @@ const InputSelect: React.FC<InputSelectProps> = ({
         ...sx,
       }}
     >
-      <InputLabel sx={{ fontSize: '14px', mt: 0.5 }} id={`${name}-label`}>
+      <InputLabel sx={{ fontSize: '14px' }} id={`${name}-label`}>
         {label}
       </InputLabel>
       <Select
@@ -196,7 +207,18 @@ const InputSelect: React.FC<InputSelectProps> = ({
         onChange={handleChange}
         label={label}
         multiple={multiple}
-        displayEmpty
+        IconComponent={() => (
+          hasValue && (
+            <Clear
+              fontSize="small"
+              sx={{ cursor: 'pointer', mr: 1 }}
+              onMouseDown={(e) => {
+                e.stopPropagation(); // không mở menu
+                handleClear();
+              }}
+            />
+          )
+        )}
         MenuProps={MenuProps}
         renderValue={(selected) => {
           if ((multiple && Array.isArray(selected) && selected.length === 0) || !selected) {

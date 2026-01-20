@@ -9,7 +9,7 @@ export const getMimeTypeFromName = (name = "") => {
   return "other";
 };
 
-// Lấy độ dài của video
+// Lấy độ dài của video khi upload
 export const getVideoDuration = (file: File): Promise<number> => {
   return new Promise((resolve, reject) => {
     const video = document.createElement("video");

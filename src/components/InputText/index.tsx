@@ -59,6 +59,7 @@ interface CustomInputProps {
   onlyPositiveNumber?: boolean;
   from?: string;
   startAdornment?: React.ReactNode;
+  endAdornment?: React.ReactNode;
   mt?: any
 }
 
@@ -86,6 +87,7 @@ const InputText: React.FC<CustomInputProps> = ({
   maxDate,
   from,
   startAdornment,
+  endAdornment,
   mt
 }) => {
 
@@ -246,6 +248,7 @@ const InputText: React.FC<CustomInputProps> = ({
                 color: from ? 'white' : 'black'
             },
             startAdornment: startAdornment,
+            endAdornment: endAdornment
         }}
         InputLabelProps={{
           sx: {

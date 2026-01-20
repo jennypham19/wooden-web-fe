@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Card, CardContent, Stack, Typography } from "@mui/material";
+import { Alert, Box, Button, Card, CardContent, Chip, Stack, Typography } from "@mui/material";
 import SearchBox from "../../components/SearchBox";
 import { useFetchData } from "@/hooks/useFetchData";
 import { IProduct } from "@/types/product";
@@ -8,12 +8,14 @@ import Grid from "@mui/material/Grid2";
 import CommonImage from "@/components/Image/index";
 import CustomPagination from "@/components/Pagination/CustomPagination";
 import { COLORS } from "@/constants/colors";
+import { getFeedbackStatusInProductLabelAndColor } from "@/utils/labelEntoVni";
 
 interface ListCompletedProductsProps{
-    onOpenFeedback: (product: IProduct) => void
+    onOpenFeedback: (product: IProduct) => void;
+    onOpenViewFeedback: (product: IProduct) => void
 }
 const ListCompletedProducts = (props: ListCompletedProductsProps) => {
-    const { onOpenFeedback } = props;
+    const { onOpenFeedback, onOpenViewFeedback } = props;
 
     const { page, rowsPerPage, total, listData, loading, error, handlePageChange, handleSearch, searchTerm } = useFetchData<IProduct>(getListCompletedProducts, 4);
 
@@ -61,15 +63,33 @@ const ListCompletedProducts = (props: ListCompletedProductsProps) => {
                                                             <Typography mt={1} variant="body2" color="text.secondary">
                                                                 Số điện thoại: <b>{product.order.customer.phone}</b>
                                                             </Typography>
+                                                            <Typography mt={1} variant="body2" color="text.secondary">
+                                                                Trạng thái:
+                                                                <Chip
+                                                                    label={getFeedbackStatusInProductLabelAndColor(product.feedbackStatus).label}
+                                                                    color={getFeedbackStatusInProductLabelAndColor(product.feedbackStatus).color}
+                                                                />
+                                                            </Typography>
                                                         </Box>
                                                     </Stack>
-                                                    <Button
-                                                        fullWidth
-                                                        sx={{ bgcolor: COLORS.BUTTON, borderRadius: 1 }}
-                                                        onClick={() => product && onOpenFeedback(product)}
-                                                    >
-                                                        Ghi nhận phản hồi
-                                                    </Button>
+                                                    {product.feedbackStatus === null && (
+                                                        <Button
+                                                            fullWidth
+                                                            sx={{ bgcolor: COLORS.BUTTON, borderRadius: 1 }}
+                                                            onClick={() => product && onOpenFeedback(product)}
+                                                        >
+                                                            Ghi nhận phản hồi
+                                                        </Button>
+                                                    )}
+                                                    {product.feedbackStatus !== null && (
+                                                        <Button
+                                                            fullWidth
+                                                            sx={{ bgcolor: COLORS.BUTTON, borderRadius: 1 }}
+                                                            onClick={() => product && onOpenViewFeedback(product)}
+                                                        >
+                                                            Xem chi tiết phản hồi
+                                                        </Button>
+                                                    )}
                                                 </CardContent>
                                             </Card>
                                         </Grid>

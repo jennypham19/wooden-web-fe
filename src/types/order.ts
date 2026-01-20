@@ -107,7 +107,8 @@ export interface IOrder{
     reason: string,
     products: IProduct[],
     inputFiles: IInputFile[],
-    referenceLinks: IReferenceLink[]
+    referenceLinks: IReferenceLink[],
+    feedbackStatus: string
 }
 
 interface IImage{

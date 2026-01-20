@@ -81,6 +81,7 @@ export interface IProduct{
     urlImage: string,
     isEvaluated: boolean,
     completedDate: string | null,
+    feedbackStatus: string,
     dimension: {
         length: number,
         width: number,
@@ -100,6 +101,7 @@ export interface IProduct{
         isEvaluated: boolean,
         createdAt: string,
         updatedAt: string,
+        feedbackStatus: string,
         customer: {
             id: string,
             name: string,
@@ -108,6 +110,27 @@ export interface IProduct{
             amountOfOrders: number,
             createdAt: string,
             updatedAt: string,
+        }
+    },
+    feedback: {
+        id: string,
+        rating: number | null,
+        customerFeedbackText: string,
+        staffNote: string | null,
+        feedbackDate: string,
+        status: string,
+        createdAt: string,
+        updatedAt: string,
+        images: {
+            id: string,
+            name: string,
+            url: string
+        }[],
+        video: {
+            id: string,
+            name: string,
+            url: string,
+            duration: number
         }
     }
 }

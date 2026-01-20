@@ -64,6 +64,17 @@ export const getEvaluatedProductLabelAndColor = (isEvaluated: boolean | null | u
   }
 }
 
+export const getFeedbackStatusInProductLabelAndColor = (feedbackStatus: string) => {
+  if(feedbackStatus === null) return { label: 'Chưa đánh giá', color: 'default' as const };
+  switch (feedbackStatus) {
+    case 'draft':
+      return { label: 'Lưu nháp', color: 'warning' as const }
+    case 'confirmed': 
+    default:
+      return { label: 'Đã xác nhận', color: 'success' as const }
+  }
+}
+
 
 // End product
 
@@ -202,3 +213,15 @@ export const getNumber = (number: string) => {
       return 1;
   }
 }
+
+export const getStatusFeedback = (status: string) => {
+  switch (status) {
+    case 'all':
+      return { label: 'Tất cả' };
+    case 'draft':
+      return { label: 'Nháp' };
+    case 'confirmed':
+    default:
+      return { label: 'Đã xác nhận' };
+  }
+};

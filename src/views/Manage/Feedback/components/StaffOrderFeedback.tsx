@@ -23,30 +23,43 @@ import { resizeImage } from "@/utils/common";
 import ImagesAndVideo from "./images/ImagesAndVideo";
 import Grid from "@mui/material/Grid2"
 import { formatDuration, getVideoDuration } from "@/utils/file";
+import ViewFeedbackUnderRatingFiveStar from "./feedbacks/ViewFeedbackUnderRatingFiveStar";
+import useNotification from "@/hooks/useNotification";
+import { PayloadFeedbackConfirmed, PayloadFeedbackDraft, PayloadImagesFile, PayloadVideoFile, StaffFeedbackItem } from "@/types/feedback";
+import { saveFeedbackConfirmed, saveFeedbackDraft } from "@/services/feedback-service";
+import Backdrop from "@/components/Backdrop";
+import { uploadImages, uploadVideo } from "@/services/upload-service";
 
 interface StaffOrderFeedbackProps{
   onBack: () => void;
   product: IProduct
 }
 
-interface StaffFeedbackItem {
-  rating: number | null;
-  customerFeedbackText: string;
-  staffNote: string | null
+type ErrorsStaffFeedbackItem = {
+  [K in keyof StaffFeedbackItem]?: string
 }
-
 
 const StaffOrderFeedback = (props: StaffOrderFeedbackProps) => {
   const { onBack, product } = props;
   const { profile } = useAuth();
+  const notify = useNotification();
 
+  // state boolean
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // state data
   const fileImagesInputRef = useRef<HTMLInputElement>(null);
   const fileVideoInputRef = useRef<HTMLInputElement>(null);
   const [fileImages, setFileImages] = useState<File[]>([]);
   const [fileVideo, setFileVideo] = useState<File | null>(null);
   const [urlImages, setUrlImages] = useState<string[]>([]);
   const [urlVideo, setUrlVideo] = useState<string | null>(null);
-  const [duration, setDuration] = useState<string | null>(null)
+  const [errorVideo, setErrorVideo] = useState<string | null>(null);
+  const [errorImage, setErrorImage] = useState<string | null>(null);
+
+  const [duration, setDuration] = useState<string | null>(null);
+  const [rating, setRating] = useState<number | null>(null);
+  const [errors, setErrors] = useState<ErrorsStaffFeedbackItem>({})
 
   const [item, setItem] = useState<StaffFeedbackItem>({
     rating: null,
@@ -59,7 +72,10 @@ const StaffOrderFeedback = (props: StaffOrderFeedbackProps) => {
     setFileImages([]);
     setFileVideo(null);
     setUrlImages([]);
-    setUrlVideo(null)
+    setUrlVideo(null);
+    setRating(null);
+    setErrorImage(null);
+    setErrorVideo(null);
   }
 
   const handleClose = () => {
@@ -132,9 +148,117 @@ const StaffOrderFeedback = (props: StaffOrderFeedbackProps) => {
     setItem((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    console.log("STAFF_FEEDBACK_SUBMIT:", item);
+  /* Xác nhận phản hồi */
+  const validateSubmitConfirmed = (): boolean => {
+    const newErrors: ErrorsStaffFeedbackItem = {};
+    if(!item.rating) newErrors.rating = 'Vui lòng chọn mức độ hài lòng';
+    if(!item.customerFeedbackText) newErrors.customerFeedbackText = 'Vui lòng nhập ý kiến khách hàng';
+    if(fileImages.length === 0){
+      setErrorImage('Vui lòng upload ảnh')
+    }
+    if(!fileVideo){
+      setErrorVideo('Vui lòng upload video')
+    }
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0 && fileImages.length > 0 && fileVideo !== null;
+  }
+
+  const handleSave = async() => {
+    if(!validateSubmitConfirmed()){
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      let uploadResponse: any;
+      let uploadResponses: any;
+      /* upload video */
+      uploadResponse = await uploadVideo(fileVideo!, 'feedback/videos');
+      if(!uploadResponse.success || !uploadResponse.data.file){
+        throw new Error('Upload video thất bại hoặc không nhận được URL video'); 
+      }
+      /* upload images */
+      uploadResponses = await uploadImages(fileImages, 'feedback/images');
+      if(!uploadResponses.success || uploadResponses.data.files.length === 0){
+        throw new Error('Upload ảnh thất bại hoặc không nhận được URL ảnh');
+      }
+      const payloadVideoFile: PayloadVideoFile = {
+        name: uploadResponse.data.file.originalname,
+        url: uploadResponse.data.file.videoUrl,
+        duration: uploadResponse.data.file.duration
+      }
+
+      const payloadImagesFile: PayloadImagesFile[] = uploadResponses.data.files.map((file: any) => ({
+        name: file.originalname,
+        url: file.url
+      }))
+
+      const payload: PayloadFeedbackConfirmed = {
+        rating: item.rating ? item.rating : null,
+        customerFeedbackText: item.customerFeedbackText ? item.customerFeedbackText : '',
+        orderId: product.order.id,
+        productId: product.id,
+        customerId: product.order.customer.id,
+        staffId: profile ? profile.id : null,
+        feedbackDate: dayjs().toISOString(),
+        images: payloadImagesFile,
+        video: payloadVideoFile
+      }
+      const res = await saveFeedbackConfirmed(payload);
+      notify({
+        message: res.message,
+        severity: 'success'
+      })
+      handleClose()
+    } catch (error: any) {
+      notify({
+        message: error.message,
+        severity: 'error'
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   };
+
+  /* Lưu nháp */
+  const validateSubmitDraft = (): boolean => {
+    const newErrors: ErrorsStaffFeedbackItem = {};
+    if(!item.rating) newErrors.rating = 'Vui lòng chọn mức độ hài lòng';
+    if(!item.customerFeedbackText) newErrors.customerFeedbackText = 'Vui lòng nhập ý kiến khách hàng';
+    if(!item.staffNote) newErrors.staffNote = 'Vui lòng nhập ghi chú nội bộ';
+    setErrors(newErrors); 
+    return Object.keys(newErrors).length === 0;
+  }
+  const handleSaveDraft = async() => {
+    if(!validateSubmitDraft()){
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const payload: PayloadFeedbackDraft = {
+        rating: item.rating ? item.rating : null,
+        customerFeedbackText: item.customerFeedbackText ? item.customerFeedbackText : '',
+        staffNote: item.staffNote ? item.staffNote : null,
+        orderId: product.order.id,
+        productId: product.id,
+        customerId: product.order.customer.id,
+        staffId: profile ? profile.id : null,
+        feedbackDate: dayjs().toISOString()
+      }
+      const res = await saveFeedbackDraft(payload);
+      notify({
+        message: res.message,
+        severity: 'success'
+      })
+      handleClose()
+    } catch (error: any) {
+      notify({
+        message: error.message,
+        severity: 'error'
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
     <Box>
@@ -178,17 +302,21 @@ const StaffOrderFeedback = (props: StaffOrderFeedbackProps) => {
                       </Typography>
 
                       {/* Rating */}
-                      <Box mt={1} display='flex' flexDirection='column'>
+                      <Box gap={0.5} mt={1} display='flex' flexDirection='column'>
                         <Typography variant="caption" color="text.secondary">
                           Mức độ hài lòng theo phản hồi khách
                         </Typography>
                         <Rating
                           value={item.rating}
-                          onChange={(_, value) =>
+                          onChange={(_, value) => {
                             handleInputChange("rating", value)
-                          }
+                            setRating(value)
+                          }}
                           size="large"
                         />
+                        {errors.rating && (
+                          <Typography variant="caption" color="error">{errors.rating}</Typography>
+                        )}
                       </Box>
                     </Box>
                   </Stack>
@@ -207,89 +335,95 @@ const StaffOrderFeedback = (props: StaffOrderFeedbackProps) => {
                         name="customerFeedbackText"
                         onChange={handleInputChange}
                         placeholder="Ghi lại nguyên văn phản hồi của khách..."
+                        error={!!errors.customerFeedbackText}
+                        helperText={errors.customerFeedbackText}
                       />
                     </Grid>
-                    <Grid sx={{ mt: 2 }} size={{ xs: 12 }}>
-                      {/* Ghi chú nội bộ */}
-                      <InputText
-                        label="Ghi chú nội bộ"
-                        multiline
-                        rows={3}
-                        type="text"
-                        value={item.staffNote}
-                        name="staffNote"
-                        onChange={handleInputChange}
-                        placeholder="Ghi lại những mục cần chú ý (nếu có)..."
-                      />
-                    </Grid>
-                    <Grid sx={{ mt: 2 }} size={{ xs: 12 }}>
-                      {/* Upload */}
-                      {/* Khi upload ảnh hoặc video hoặc cả hai */}
-                      {(urlImages.length > 0 || urlVideo !== null || (urlImages.length > 0 && urlVideo !== null)) ? (
-                        <ImagesAndVideo
-                          imagesUrl={urlImages}
-                          videoUrl={urlVideo}
-                          onBoxClickVideo={handleBoxClickVideo}
-                          onBoxClickImage={handleBoxClickImage}
-                          onFileVideoChange={handleFileVideoChange}
-                          onFileImagesChange={handleFileImagesChange}
-                          imagesRef={fileImagesInputRef}
-                          videoRef={fileVideoInputRef}
-                          onRemoveVideo={handleRemoveVideo}
-                          onRemoveImages={handleRemoveImage}
-                          duration={duration}
+                    {rating !== null && rating < 4 && (
+                      <Grid sx={{ mt: 2 }} size={{ xs: 12 }}>
+                        <ViewFeedbackUnderRatingFiveStar
+                          item={item.staffNote ?? null}
+                          onInputChange={handleInputChange}
+                          error={errors.staffNote ?? undefined}
                         />
-                      ) : (
-                        <Box gap={2} width='100%' display='flex' justifyContent='space-between' pt={1} mt={2} my={1}>
-                          <Box width='50%'>
-                            <input ref={fileImagesInputRef} hidden type="file" capture="environment" multiple accept="image/*" onChange={handleFileImagesChange}/>
-                            <Box
-                              onClick={handleBoxClickImage}
-                              sx={{
-                                border: `1px solid ${COLORS.BUTTON}`,
-                                p: 3,
-                                cursor: 'pointer',
-                                '&:hover': { borderColor: 'primary.main' },
-                                height: 100,
-                                display: 'flex',
-                                justifyContent: 'center'
-                              }}
-                            >
-                              <Stack direction='column' alignItems='center'>
-                                <CameraAlt sx={{ fontSize: 30, color: 'text.secondary' }} />
-                                <Typography variant="caption">Thêm Hình ảnh</Typography>
-                              </Stack>
+                      </Grid>
+                    )}
+                    {(rating === null || rating > 3) && (
+                      <Grid sx={{ mt: 2 }} size={{ xs: 12 }}>
+                        {/* Upload */}
+                        {/* Khi upload ảnh hoặc video hoặc cả hai */}
+                        {(urlImages.length > 0 || urlVideo !== null || (urlImages.length > 0 && urlVideo !== null)) ? (
+                          <ImagesAndVideo
+                            imagesUrl={urlImages}
+                            videoUrl={urlVideo}
+                            onBoxClickVideo={handleBoxClickVideo}
+                            onBoxClickImage={handleBoxClickImage}
+                            onFileVideoChange={handleFileVideoChange}
+                            onFileImagesChange={handleFileImagesChange}
+                            imagesRef={fileImagesInputRef}
+                            videoRef={fileVideoInputRef}
+                            onRemoveVideo={handleRemoveVideo}
+                            onRemoveImages={handleRemoveImage}
+                            duration={duration}
+                          />
+                        ) : (
+                          <Box gap={2} width='100%' display='flex' justifyContent='space-between' pt={1} mt={2} my={1}>
+                            <Box width='50%'>
+                              <input ref={fileImagesInputRef} hidden type="file" capture="environment" multiple accept="image/*" onChange={handleFileImagesChange}/>
+                              <Box
+                                onClick={handleBoxClickImage}
+                                sx={{
+                                  border: errorImage !== null ? '1px solid #e41717' : `1px solid ${COLORS.BUTTON}`,
+                                  p: 3,
+                                  cursor: 'pointer',
+                                  '&:hover': { borderColor: 'primary.main' },
+                                  height: 100,
+                                  display: 'flex',
+                                  justifyContent: 'center'
+                                }}
+                              >
+                                <Stack direction='column' alignItems='center'>
+                                  <CameraAlt sx={{ fontSize: 30, color: 'text.secondary' }} />
+                                  <Typography variant="caption">Thêm Hình ảnh</Typography>
+                                </Stack>
+                              </Box>
+                              {errorImage && (
+                                <Typography variant="caption" color='error'>{errorImage}</Typography>
+                              )}
                             </Box>
-                          </Box>
-                          <Box width='50%'>
-                            <input ref={fileVideoInputRef} hidden type="file" multiple capture="environment" accept="video/*" onChange={handleFileVideoChange}/>
-                            <Box
-                              onClick={handleBoxClickVideo}
-                              sx={{
-                                border: `1px solid ${COLORS.BUTTON}`,
-                                p: 3,
-                                cursor: 'pointer',
-                                '&:hover': { borderColor: 'primary.main' },
-                                height: 100,
-                                display: 'flex',
-                                justifyContent: 'center'
-                              }}
-                            >
-                              <Stack direction='column' alignItems='center'>
-                                <VideoCameraBack sx={{ fontSize: 30, color: 'text.secondary' }} />
-                                <Typography variant="caption">Thêm Video</Typography>
-                              </Stack>
+                            <Box width='50%'>
+                              <input ref={fileVideoInputRef} hidden type="file" multiple capture="environment" accept="video/*" onChange={handleFileVideoChange}/>
+                              <Box
+                                onClick={handleBoxClickVideo}
+                                sx={{
+                                  border: errorVideo !== null ? '1px solid #e41717' : `1px solid ${COLORS.BUTTON}`,
+                                  p: 3,
+                                  cursor: 'pointer',
+                                  '&:hover': { borderColor: 'primary.main' },
+                                  height: 100,
+                                  display: 'flex',
+                                  justifyContent: 'center'
+                                }}
+                              >
+                                <Stack direction='column' alignItems='center'>
+                                  <VideoCameraBack sx={{ fontSize: 30, color: 'text.secondary' }} />
+                                  <Typography variant="caption">Thêm Video</Typography>
+                                </Stack>
+                              </Box>
+                              {errorVideo && (
+                                <Typography variant="caption" color='error'>{errorVideo}</Typography>
+                              )}
                             </Box>
-                          </Box>
-                        </Box>                    
-                      )}
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                      >
-                        Ảnh, video do nhân viên chụp / khách cung cấp
-                      </Typography>                      
-                    </Grid>
+                          </Box>                    
+                        )}
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                        >
+                          Ảnh, video do nhân viên chụp / khách cung cấp
+                        </Typography>                      
+                      </Grid>
+                    )}
                   </Grid>
               </CardContent>
             </Card>
@@ -305,14 +439,17 @@ const StaffOrderFeedback = (props: StaffOrderFeedbackProps) => {
             </Typography>
 
             <Stack direction="row" justifyContent='center' spacing={1}>
-              <Button variant="outlined" sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, width: 150 }}>Lưu nháp</Button>
-              <Button variant="contained" sx={{ bgcolor: COLORS.BUTTON, width: 150 }} onClick={handleSave}>
+              <Button disabled={rating !== null && rating > 3 } variant="outlined" sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, width: 150 }} onClick={handleSaveDraft}>Lưu nháp</Button>
+              <Button disabled={rating !== null && rating < 4} variant="contained" sx={{ bgcolor: COLORS.BUTTON, width: 150 }} onClick={handleSave}>
                 Xác nhận phản hồi
               </Button>
             </Stack>
           </Stack>
         </Box>
       </Box>
+      {isSubmitting && (
+        <Backdrop open={isSubmitting} />
+      )}
     </Box>
   );
 }

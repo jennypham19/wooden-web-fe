@@ -16,6 +16,18 @@ export const uploadImage = (file: File, type: string): Promise<HttpResponse<{ fi
   );
 };
 
+export const uploadVideo = (file: File, type: string): Promise<HttpResponse<{ file: { videoUrl: string, fileName: string, originalname: string, duration: number }, folder: string }>> => {
+  const formData = new FormData();
+  formData.append('type', type);
+  formData.append('video', file);
+  
+  return HttpClient.post(
+    `${prefix}/upload-video`, 
+    formData,
+    { headers: { 'Content-Type': 'multipart/form-data' } }
+  );
+};
+
 export const uploadImages = (files: File[], type: string): Promise<HttpResponse<{ files: any[], folder: string }>> => {
   const formData = new FormData();
   formData.append('type', type);
