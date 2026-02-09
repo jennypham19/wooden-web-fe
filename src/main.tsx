@@ -12,7 +12,7 @@ import { BrowserRouter } from 'react-router-dom';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ClickToComponent editor='cursor' />
-    <BrowserRouter>
+    <BrowserRouter basename='/moc'>
       <App />
     </BrowserRouter>
   </StrictMode>,
