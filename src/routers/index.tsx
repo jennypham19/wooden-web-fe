@@ -40,21 +40,21 @@ const routes: RouteObject[] = [
   },
 
   // chỉ để xử lý trường hợp truy cập vào root path, sẽ tự động chuyển hướng đến trang đăng nhập
-  // {
-  //   path: '/',
-  //   element: <Navigate to="/auth/login" replace />,
-  // },
   {
     path: '/',
-    element: (
-      <PublicRoute>
-        <AuthLayout />
-      </PublicRoute>
-    ),
-    children: [
-      { index: true, element: <Login /> },
-    ],
+    element: <Navigate to="/auth/login" replace />,
   },
+  // {
+  //   path: '/',
+  //   element: (
+  //     <PublicRoute>
+  //       <AuthLayout />
+  //     </PublicRoute>
+  //   ),
+  //   children: [
+  //     { index: true, element: <Login /> },
+  //   ],
+  // },
 
   // --- NHÁNH 2: CÁC TRANG XÁC THỰC (CHỈ DÀNH CHO NGƯỜI CHƯA ĐĂNG NHẬP) ---
   {
