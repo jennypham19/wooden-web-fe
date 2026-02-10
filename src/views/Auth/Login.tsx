@@ -189,7 +189,7 @@ export default function Login() {
                   <Typography
                     color='primary'
                     component={RouterLink}
-                    to={`/${ROUTE_PATH.AUTH}/${ROUTE_PATH.FORGOT_PASSWORD}`}
+                    to={`/${ROUTE_PATH.FORGOT_PASSWORD}`}
                     sx={{ textAlign: 'end', display: 'block', color: '#000' }}
                   >
                     Quên mật khẩu?
@@ -209,7 +209,7 @@ export default function Login() {
               <Box mt={5} display='flex' justifyContent='center' alignItems='center' flexWrap='wrap' gap={2}>
                 <Typography>Bạn chưa có tài khoản?</Typography>
                 <Typography
-                  to={`/${ROUTE_PATH.AUTH}/${ROUTE_PATH.REGISTRATION}`}
+                  to={`/${ROUTE_PATH.REGISTRATION}`}
                   component={RouterLink}
                   sx={{ color: '#416327'}}
                 >

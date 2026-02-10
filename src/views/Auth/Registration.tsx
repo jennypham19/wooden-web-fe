@@ -59,7 +59,7 @@ export default function Registration() {
         message: t('registration_success'),
         severity: 'success',
       });
-      navigate(ROUTE_PATH.TO_LOGIN);
+      navigate(ROUTE_PATH.LOGIN);
     } catch (error: any) {
       setError(error.message);
     } finally {
@@ -129,7 +129,7 @@ export default function Registration() {
           Register
         </LoadingButton>
         <Button
-          onClick={() => navigate(`/${ROUTE_PATH.AUTH}/${ROUTE_PATH.LOGIN}`)}
+          onClick={() => navigate(`/${ROUTE_PATH.LOGIN}`)}
           variant='outlined'
           fullWidth
           sx={{ mt: 2 }}
