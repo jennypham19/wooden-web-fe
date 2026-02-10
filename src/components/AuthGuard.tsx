@@ -12,7 +12,7 @@ const AuthGuard = () => {
     }
 
     if(!isAuthenticated) {
-        return <Navigate to={`/${ROUTE_PATH.AUTH}/${ROUTE_PATH.LOGIN}`} state={{ from: location }} replace />
+        return <Navigate to={`/${ROUTE_PATH.LOGIN}`} state={{ from: location }} replace />
     }
 
     return <Outlet />;

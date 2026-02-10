@@ -42,7 +42,7 @@ const routes: RouteObject[] = [
   // chỉ để xử lý trường hợp truy cập vào root path, sẽ tự động chuyển hướng đến trang đăng nhập
   {
     path: '/',
-    element: <Navigate to="/auth/login" replace />,
+    element: <Navigate to="/login" replace />,
   },
   // {
   //   path: '/',
@@ -58,7 +58,7 @@ const routes: RouteObject[] = [
 
   // --- NHÁNH 2: CÁC TRANG XÁC THỰC (CHỈ DÀNH CHO NGƯỜI CHƯA ĐĂNG NHẬP) ---
   {
-    path: '/auth',
+    path: '/',
     element: <PublicRoute/>,
     children: [
       {
