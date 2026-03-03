@@ -65,18 +65,28 @@ export const createMenu = (payload: FormDataMenus) => {
 }
 
 //Lấy chi tiết chức năng
-export const getMenu = (id: number) => {
+export const getMenu = (id: string) => {
     return HttpClient.get<any, HttpResponse<IMenu>>(`${prefix}/menu/${id}`)
 }
 
 // Cập nhật chức năng
-export const updateMenu = (id: number, payload: FormDataMenus ) => {
+export const updateMenu = (id: string, payload: FormDataMenus ) => {
     return HttpClient.put<any, HttpResponse<IMenu>>(`${prefix}/update-menu/${id}`, payload)
 }
 
 // Lấy danh sách chức năng kèm thao tác
 export const getAllModules = () => {
     return HttpClient.get<any, HttpResponse<IMenu>>(`${prefix}/menu-with-action`);
+}
+
+// Kích hoạt
+export const activeMenu = (id: string) => {
+  return HttpClient.patch(`${prefix}/active-menu/${id}`)
+}
+
+// Vô hiệu hóa
+export const unActiveMenu = (id: string) => {
+  return HttpClient.patch(`${prefix}/unactive-menu/${id}`)
 }
 
 /* 3. Quyền */

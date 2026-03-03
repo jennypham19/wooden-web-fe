@@ -8,12 +8,14 @@ interface DialogConfirmProps {
   onClose: () => void;
   title: string;
   onAgree: () => void;
+  dialogTitle?: string;
 }
 
 const DialogConfirm: React.FC<DialogConfirmProps> = (props) => {
-    const { open, onClose, title, onAgree } = props;
+    const { open, onClose, title, onAgree, dialogTitle } = props;
     return(
         <DialogComponent
+            dialogTitle={dialogTitle}
             dialogKey={open}
             handleClose={onClose}
             isActiveFooter={false}

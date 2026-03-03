@@ -99,3 +99,25 @@ export const getDetailUserWithPermission = async(id: string) => {
 export const getListCapenter = async(params: GetParams) => {
   return HttpClient.get(`${prefix}/list-carpenters`, { params })
 }
+
+// Cập nhật tài khoản
+
+// Reset mật khẩu
+export const resetPassword = async(id: string) => {
+  return HttpClient.patch(`${prefix}/reset-password-account/${id}`)
+}
+
+// Vô hiệu hóa
+export const disableAccount = async(id: string) => {
+  return HttpClient.patch(`${prefix}/disable-account/${id}`)
+}
+
+// Kích hoạt
+export const enableAccount = async(id: string) => {
+  return HttpClient.patch(`${prefix}/enable-account/${id}`)
+}
+
+// Xóa
+export const deleteAccount = async(id: string) => {
+  return HttpClient.patch(`${prefix}/delete-account/${id}`)
+}

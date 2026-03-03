@@ -5,15 +5,16 @@ import { Alert, Box, Button, CircularProgress, Paper, Table, TableBody, TableCel
 import { useState } from "react";
 import SearchBox from "../../components/SearchBox";
 import { COLORS } from "@/constants/colors";
-import { Add, Delete, Edit } from "@mui/icons-material";
+import { Add, Delete, Edit, ToggleOff, ToggleOn } from "@mui/icons-material";
 import IconButton from "@/components/IconButton/IconButton";
 import CustomPagination from "@/components/Pagination/CustomPagination";
 import Grid from "@mui/material/Grid2"
 import InputText from "@/components/InputText";
 import DialogAction from "./components/DialogAction";
-import { createMenu, getMenu, getObjectPermisstion, updateMenu } from "@/services/permission-service";
+import { activeMenu, createMenu, getMenu, getObjectPermisstion, unActiveMenu, updateMenu } from "@/services/permission-service";
 import TableData from "../../components/TableData";
 import { useDataList } from "@/hooks/useDataList";
+import DialogConfirm from "../../components/DialogConfirm";
 
 export interface FormDataActionMenu {
     code: string;
@@ -40,6 +41,7 @@ const Menus = () => {
         open: false
     });
     const [openDialogAction, setOpenDialogAction] = useState(false);
+    const [openDialogUnactiveAndActive, setOpenDialogUnactiveAndActive] = useState(false)
     const [data, setData] = useState<IMenu | null>(null);
     const [formData, setFormData] = useState<FormDataMenus>({
         code: '' , name: '', parentCode: '', path: '', icon: '', actions: []
@@ -174,6 +176,37 @@ const Menus = () => {
         }));
     }
 
+    /* Vô hiệu hóa - Kích hoạt chức năng */
+    const handleOpenDialogConfirmActiveAndUnactive = (menu: IMenu) => {
+        setOpenDialogUnactiveAndActive(true)
+        setData(menu)
+    }
+
+    const handleAgreeUnactiveAndActive = async() => {
+        try {
+            let res: any
+            switch (data?.isActived) {
+                case true:
+                    res = await unActiveMenu(data.id)
+                    break;
+                case false:
+                    res = await activeMenu(data.id)
+                    break;
+            }
+            notify({
+                message: res.message,
+                severity: 'success'
+            })
+            setOpenDialogUnactiveAndActive(false)
+            fetchData(page, rowsPerPage); 
+        } catch (error: any) {
+            notify({
+                message: error.message,
+                severity: 'error'
+            })
+        }
+    }
+
     return (
         <Page title="Quản lý quyền - Chức năng">
             <Box>
@@ -218,6 +251,11 @@ const Menus = () => {
                                                     handleFunt={() => menu && handleOpenAddMenuChildren(menu)}
                                                     icon={<Add color="primary"/>}
                                                     tooltip="Thêm chức năng con"
+                                                />
+                                                <IconButton
+                                                    handleFunt={() => menu && handleOpenDialogConfirmActiveAndUnactive(menu)}
+                                                    icon={menu.isActived ? <ToggleOff color="error"/> : <ToggleOn color="success"/>}
+                                                    tooltip={menu.isActived ? "Vô hiệu hóa" : "Kích hoạt"}
                                                 />
                                                 <IconButton
                                                     handleFunt={() => menu && handleOpenEditMenu(menu)}
@@ -430,6 +468,11 @@ const Menus = () => {
                                                             tooltip="Thêm chức năng con"
                                                         />
                                                         <IconButton
+                                                            handleFunt={() => menu && handleOpenDialogConfirmActiveAndUnactive(menu)}
+                                                            icon={menu.isActived ? <ToggleOff color="error"/> : <ToggleOn color="success"/>}
+                                                            tooltip={menu.isActived ? "Vô hiệu hóa" : "Kích hoạt"}
+                                                        />
+                                                        <IconButton
                                                             handleFunt={() => menu && handleOpenEditMenu(menu)}
                                                             icon={<Edit color="info"/>}
                                                             tooltip="Chỉnh sửa"
@@ -467,6 +510,16 @@ const Menus = () => {
                     menuCode={formData.code}
                     onSave={handleSaveAction}
                     formData={formData}
+                />
+            )}
+            {openDialogUnactiveAndActive && data && (
+                <DialogConfirm
+                    open={openDialogUnactiveAndActive}
+                    title={data?.isActived ? `Bạn có muốn vô hiệu hóa chức năng ${data.name} không?` : `Bạn có muốn kích hoạt chức năng ${data.name} không?`}
+                    onAgree={handleAgreeUnactiveAndActive}
+                    onClose={() => {
+                        setOpenDialogUnactiveAndActive(false)
+                    }}
                 />
             )}
         </Page>

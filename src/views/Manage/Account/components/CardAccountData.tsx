@@ -8,10 +8,11 @@ import avatar from "@/assets/images/users/default-avatar.jpg";
 interface CardAccountDataProps{
     account: IUser;
     onDetail?: (account: IUser) => void;
+    children?: React.ReactNode
 }
 
 const CardAccountData = (props: CardAccountDataProps) => {
-    const { account, onDetail } = props;
+    const { account, onDetail, children } = props;
     return(
         <Card onClick={() => account && onDetail && onDetail(account)} sx={{ p: 2, borderRadius: 3, boxShadow: "0px 2px 1px 1px rgba(0, 0, 0, 0.2)", cursor: 'pointer'}}>
             <Grid container spacing={2}>
@@ -38,6 +39,9 @@ const CardAccountData = (props: CardAccountDataProps) => {
                             <Typography fontSize='15px'>{getRoleLabel(account.role)}</Typography>
                         </Stack>
                     </Box>
+                </Grid>
+                <Grid sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, flexDirection: { xs: 'column', lg: 'row'} }} size={{ xs: 12 }}>
+                    {children}
                 </Grid>
             </Grid>
         </Card> 

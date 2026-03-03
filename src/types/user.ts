@@ -3,6 +3,7 @@ import { IMenu } from "./permission";
 export interface IUser{
     id: string,
     email: string,
+    password: string
     fullName: string,
     address: string,
     avatarUrl: string,
@@ -19,5 +20,7 @@ export interface IUser{
     updatedAt?: string,
     work: string,
     isPermission: boolean,
-    permissions: IMenu[]
+    permissions: IMenu[],
+    isDeleted: number,
+    isDefaultType: number
 }

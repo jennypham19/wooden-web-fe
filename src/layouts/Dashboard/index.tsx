@@ -8,6 +8,9 @@ import { useAppSelector } from '@/store';
 import { IPermission } from '@/types/permission';
 import { getDetailUserWithPermission } from '@/services/user-service';
 import { SidebarTitleContext } from '@/contexts/SidebarTitleContext';
+import { COLORS } from '@/constants/colors';
+import { Star } from '@mui/icons-material';
+import { Typography } from '@mui/material';
 
 const DashboardLayout = () => {
   const [openSidebar, setOpenSidebar] = useState<boolean>(false);
@@ -65,7 +68,10 @@ const DashboardLayout = () => {
             onToggleSidebar={handleToggleSidebar}
             onToggleCollapsed={handleToggleCollapsed}
           />
-
+          <Box display='flex' flexDirection='row' p={2} bgcolor={COLORS.BUTTON}>
+            <Star sx={{ color: '#fff'}}></Star>
+            <Typography sx={{ color: '#fff', ml: 1 }}>Xin chào {profile?.fullName}</Typography>
+          </Box>
           <Box sx={{ flexGrow: 1 }}>
             <Outlet />
           </Box>

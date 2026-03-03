@@ -7,7 +7,7 @@ export interface IAction {
 }
 
 export interface IMenu {
-    id: number,
+    id: string,
     code: string,
     name: string,
     parentCode?: string,
@@ -17,7 +17,8 @@ export interface IMenu {
     createdAt?: string,
     updatedAt?: string,
     actions?: IAction[],
-    children?: IMenu[]
+    children?: IMenu[],
+    isActived: boolean
 }
 
 export interface IPermission {

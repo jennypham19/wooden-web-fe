@@ -6,14 +6,17 @@ import useNotification from '@/hooks/useNotification';
 import { changePasswordSchema } from '@/schemas/auth-schema';
 import { forgotPassword } from '@/services/auth-service';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Lock } from '@mui/icons-material';
+import { Lock, Visibility, VisibilityOff } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
-import { Alert, Box, Button, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, IconButton, InputAdornment, Stack, TextField, Typography } from '@mui/material';
 import axios from 'axios';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import Grid from "@mui/material/Grid2";
+import logo_auth from "@/assets/images/users/logo-auth.png"
+import CommonImage from '@/components/Image/index';
 
 interface IChangePasswordForm {
   password: string;
@@ -37,6 +40,8 @@ export default function ChangePassword() {
   const { t } = useTranslation('auth');
   const notify = useNotification();
   const [_hasErrors, setHasErrors] = useBoolean(false);
+  const [showPassword, setShowPassword] = useBoolean(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useBoolean(false);
 
   useEffect(() => {
     if (password && password?.length === getValues('confirmPassword')?.length) {
@@ -44,11 +49,12 @@ export default function ChangePassword() {
     }
   }, [password, trigger]);
 
+  
   const onSubmit = (values: IChangePasswordForm) => {
     setLoading.on();
     forgotPassword({
       password: values.password,
-      token: searchParams.get('token') || '',
+      token: searchParams.get('accessToken') || '',
     })
       .then((resp) => {
         if (resp.statusCode === axios.HttpStatusCode.Ok) {
@@ -71,58 +77,111 @@ export default function ChangePassword() {
   };
 
   return (
-    <Page title='Change Password'>
-      <Box
-        component='form'
-        onSubmit={handleSubmit(onSubmit)}
-        sx={{ maxWidth: 400, margin: 'auto', mt: 4 }}
-      >
-        <Typography variant='h4' component='h1' gutterBottom>
-          Change Password
-        </Typography>
-        {_hasErrors && (
-          <Alert variant='filled' severity='warning'>
-            Sorry, looks like there are some errors detected, please try again.
-          </Alert>
-        )}
-        <ControllerTextField<IChangePasswordForm>
-          controllerProps={{
-            name: 'password',
-            defaultValue: '',
-            control: control,
-          }}
-          textFieldProps={{
-            label: 'Password',
-            type: 'password',
-            error: !!errors.password,
-            helperText: errors.password?.message,
-          }}
-          prefixIcon={Lock}
-        />
-        <ControllerTextField<IChangePasswordForm>
-          controllerProps={{
-            name: 'confirmPassword',
-            defaultValue: '',
-            control: control,
-          }}
-          textFieldProps={{
-            label: 'Confirm Password',
-            type: 'password',
-            error: !!errors.confirmPassword,
-            helperText: errors.confirmPassword?.message,
-          }}
-          prefixIcon={Lock}
-        />
-        <LoadingButton
-          loading={_loading}
-          type='submit'
-          variant='contained'
-          fullWidth
-          sx={{ mt: 2 }}
-        >
-          Change Password
-        </LoadingButton>
-      </Box>
+    <Page title='Wooden website'>
+      <Grid container sx={{ minHeight: '100vh', bgcolor: '#FFFAE4' }}>
+        <Grid size={{ xs: 12, md: 6 }} sx={{ height: '100%', display: 'flex',alignItems: 'center', justifyContent: 'center'}}>
+          <Box sx={{ flexDirection: 'column', margin: 'auto 0', paddingX: { xs: 2, lg: 0 }, width: { xs: '100%', lg: '50%'} }}>
+            <Box>
+              <Typography
+                component='h1'
+                variant='h4'
+                fontWeight={500}
+                sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 3.5rem)', mb: 3, fontWeight: 700, fontFamily: 'Kavoon' }}
+              >
+                Change Password
+              </Typography>
+              {_hasErrors && (
+                <Alert variant='filled' severity='warning'>
+                  Sorry, looks like there are some errors detected, please try again.
+                </Alert>
+              )}
+            </Box>
+            <Box
+              component='form'
+              onSubmit={handleSubmit(onSubmit)}
+              sx={{ gap: 2 }}
+            >
+              <Stack mb={2}>
+                <Typography fontWeight={600}>Mật khẩu mới</Typography>
+                <ControllerTextField<IChangePasswordForm>
+                  controllerProps={{
+                    name: 'password',
+                    defaultValue: '',
+                    control: control,
+                  }}
+                  textFieldProps={{
+                    placeholder: 'Mật khẩu mới',
+                    label: '',
+                    type: showPassword ? 'text' : 'password',
+                    error: !!errors.password,
+                    helperText: errors.password?.message,
+                    slotProps: {
+                      input: {
+                        endAdornment: (
+                          <InputAdornment position='end'>
+                            <IconButton
+                              aria-label='toggle password visibility'
+                              onClick={() => setShowPassword.toggle()}
+                              edge='end'
+                            >
+                              {showPassword ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      },
+                    },
+
+                  }}
+                  prefixIcon={Lock}
+                />
+              </Stack>
+              <Stack mb={2}>
+                <Typography fontWeight={600}>Xác nhận mật khẩu</Typography>
+                <ControllerTextField<IChangePasswordForm>
+                  controllerProps={{
+                    name: 'confirmPassword',
+                    defaultValue: '',
+                    control: control,
+                  }}
+                  textFieldProps={{
+                    placeholder: 'Xác nhận mật khẩu',
+                    label: '',
+                    type: showConfirmPassword ? 'text' : 'password',
+                    error: !!errors.confirmPassword,
+                    helperText: errors.confirmPassword?.message,
+                    slotProps: {
+                      input: {
+                        endAdornment: (
+                          <InputAdornment position='end'>
+                            <IconButton
+                              aria-label='toggle password visibility'
+                              onClick={() => setShowConfirmPassword.toggle()}
+                              edge='end'
+                            >
+                              {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      },
+                    },
+                  }}
+                  prefixIcon={Lock}
+                />                
+              </Stack>
+
+              <LoadingButton sx={{ bgcolor: '#416327', borderRadius: 8, height: 50, my: 2}} loading={_loading} type='submit' variant='contained' fullWidth>
+                Thay đổi mật khẩu
+              </LoadingButton>
+            </Box>            
+          </Box>
+
+        </Grid>
+        <Grid sx={{ height: '100%'}} size={{ xs: 12, md: 6 }}>
+          <Box m={3} >
+              <CommonImage sx={{ borderRadius: 8 }} src={logo_auth}/>
+          </Box>
+        </Grid>
+      </Grid>
     </Page>
   );
 }

@@ -34,6 +34,8 @@ import Grid from "@mui/material/Grid2";
 import logo_auth from "@/assets/images/users/logo-auth.png"
 import CommonImage from '@/components/Image/index';
 
+export const ID_USER = 'user_id'
+
 interface LoginFormInputs {
   email: string;
   password: string;
@@ -73,25 +75,23 @@ export default function Login() {
       const userProfile = respAuth.data?.user;
       if (accessToken && userProfile) {
         setAccessToken(accessToken);
-
         // Xét trường is_change_type
-        if(userProfile.isReset){
-          // localStorage.setItem(ID_USER, String(userProfile.id));
-          navigate(`/${ROUTE_PATH.AUTH}/${ROUTE_PATH.CHANGE_PASSWORD}`)
+        if(userProfile.isReset && userProfile.isDefaultType === -1){
+          localStorage.setItem(ID_USER, String(userProfile.id));
+          navigate('/' + ROUTE_PATH.CHANGE_PASSWORD)
         }else{
           // 3. Cập nhật state của Redux/Context
           // Thông tin user đã có sẵn từ response login, không cần gọi /me nữa
           dispatch(setProfile(userProfile));
           dispatch(setIsAuth(true));
+          // 4. Thông báo và chuyển hướng
+          notify({
+            message: t('login_success'),
+            severity: 'success',
+          });
+
+          navigate(ROUTE_PATH.MANAGE, { replace: true });   
         }
-
-        // 4. Thông báo và chuyển hướng
-        notify({
-          message: t('login_success'),
-          severity: 'success',
-        });
-
-        navigate(ROUTE_PATH.MANAGE, { replace: true });     
       } else {
         setError(respAuth.message || 'Login failed, no access token returned.');
       }
