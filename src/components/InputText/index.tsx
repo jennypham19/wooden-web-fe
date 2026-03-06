@@ -236,16 +236,16 @@ const InputText: React.FC<CustomInputProps> = ({
         InputProps={{
             sx:{
                 "& .MuiOutlinedInput-notchedOutline":{
-                    border: from ? "1px solid grey" : "1px solid rgb(53, 50, 50)",
+                    border: from ? "none" : "1px solid rgb(53, 50, 50)",
                     borderRadius:"8px",
                 },
                 "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    border: from ? "1px solid grey" : "1px solid rgb(53, 50, 50)",
+                    border: from ? "none" : "1px solid rgb(53, 50, 50)",
                 },
                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                    border: from ? "1px solid grey" : "1px solid rgb(53, 50, 50)",
+                    border: from ? "none" : "1px solid rgb(53, 50, 50)",
                 },
-                color: from ? 'white' : 'black'
+                color: 'black'
             },
             startAdornment: startAdornment,
             endAdornment: endAdornment

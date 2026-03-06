@@ -10,7 +10,7 @@ interface NavigateBackProps{
 const NavigateBack = (props: NavigateBackProps) => {
     const { title, onBack } = props;
     return(
-        <Stack my={1}>
+        <Stack mt={1}>
             <IconButton
                 handleFunt={onBack}
                 icon={<NavigateBefore sx={{ width: '28px', height: '28px'}}/>}

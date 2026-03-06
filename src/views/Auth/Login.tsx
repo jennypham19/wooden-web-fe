@@ -78,7 +78,7 @@ export default function Login() {
         // Xét trường is_change_type
         if(userProfile.isReset && userProfile.isDefaultType === -1){
           localStorage.setItem(ID_USER, String(userProfile.id));
-          navigate('/' + ROUTE_PATH.CHANGE_PASSWORD)
+          navigate('/moc/' + ROUTE_PATH.CHANGE_PASSWORD)
         }else{
           // 3. Cập nhật state của Redux/Context
           // Thông tin user đã có sẵn từ response login, không cần gọi /me nữa
@@ -90,7 +90,7 @@ export default function Login() {
             severity: 'success',
           });
 
-          navigate(ROUTE_PATH.MANAGE, { replace: true });   
+          navigate('/moc/' + ROUTE_PATH.MANAGE, { replace: true });   
         }
       } else {
         setError(respAuth.message || 'Login failed, no access token returned.');

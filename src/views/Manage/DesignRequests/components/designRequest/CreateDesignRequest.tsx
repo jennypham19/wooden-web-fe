@@ -21,6 +21,7 @@ import FileViewer from "./FileViewer";
 import Backdrop from "@/components/Backdrop";
 import { createDesignRequest } from "@/services/design-request-service";
 import useAuth from "@/hooks/useAuth";
+import { set } from "nprogress";
 
 interface CreateDesignRequestProps{
     onBack: () => void;
@@ -105,6 +106,8 @@ const CreateDesignRequest = (props: CreateDesignRequestProps) => {
     const [openDialogFile, setOpenDialogFile] = useState<boolean>(false);
     const [file, setFile] = useState<File | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errorTechnicalSpecification, setErrorTechnicalSpecification] = useState<string | null>(null);
+
 
     useEffect(() => {
         if(open){
@@ -123,7 +126,7 @@ const CreateDesignRequest = (props: CreateDesignRequestProps) => {
         setErrorCodeReq(null);
         setErrors({})
         setFormData({
-            title: '', orderId: '', productId: '', priority: '', status: 'pending', dueDate: null, description: '', specialRequirement: ''
+            title: '', orderId: '', productId: '', priority: '', status: '', dueDate: null, description: '', specialRequirement: ''
         });
         setCodeReq('');
         setCustomer({ id: '', name: ''});
@@ -145,6 +148,7 @@ const CreateDesignRequest = (props: CreateDesignRequestProps) => {
         if(errorsTechnicalSpecification[name as keyof typeof errorsTechnicalSpecification]){
             setErrorsTechnicalSpecification(prev => ({ ...prev, [name]: undefined }))
         }
+        setErrorTechnicalSpecification(null);
     }
 
     const handleChangeSelect = async(name: string, value: any) => {
@@ -239,6 +243,10 @@ const CreateDesignRequest = (props: CreateDesignRequestProps) => {
         if(!formData.dueDate) newErrors.dueDate = 'Deadline hoàn thành không được để trống';
         if(!formData.description) newErrors.description = 'Mô tả không được để trống';
 
+        if(!formDataTechnicalSpecification.length && !formDataTechnicalSpecification.width && !formDataTechnicalSpecification.height && !formDataTechnicalSpecification.weight && !formDataTechnicalSpecification.material && !formDataTechnicalSpecification.color){
+            setErrorTechnicalSpecification('Vui lòng điền trường thông số kỹ thuật')
+        }
+
         const newErrorsTechnicalSpecification: FormErrorsTechnicalSpecification = {};
         if(!formDataTechnicalSpecification.length) newErrorsTechnicalSpecification.length = 'Độ dài không được để trống';
         if(!formDataTechnicalSpecification.width) newErrorsTechnicalSpecification.width = 'Độ rộng không được để trống';
@@ -246,7 +254,7 @@ const CreateDesignRequest = (props: CreateDesignRequestProps) => {
         if(!formDataTechnicalSpecification.weight) newErrorsTechnicalSpecification.weight = 'Cân nặng không được để trống';
         if(!formDataTechnicalSpecification.material) newErrorsTechnicalSpecification.material = 'Chất liệu không được để trống';
         if(!formDataTechnicalSpecification.color) newErrorsTechnicalSpecification.color = 'Màu sắc không được để trống';
-
+        
         setErrors(newErrors);
         setErrorsTechnicalSpecification(newErrorsTechnicalSpecification);
         return Object.keys(newErrors).length === 0 && !!codeReq && Object.keys(newErrorsTechnicalSpecification).length === 0;
@@ -256,6 +264,7 @@ const CreateDesignRequest = (props: CreateDesignRequestProps) => {
         if(!validateForm()){
             return;
         }
+        
         setIsSubmitting(true)
         try {
             const payloadReferenceLink: FormDataReferenceLinks[] = referenceLinkSlots.map((slot) => ({
@@ -347,6 +356,8 @@ const CreateDesignRequest = (props: CreateDesignRequestProps) => {
                             placeholder="Chọn đơn hàng"
                             error={!!errors.orderId}
                             helperText={errors.orderId}
+                            loadingTitle='Đang tải đơn hàng...'
+                            title="Chưa có đơn hàng. Vui lòng tạo đơn hàng trước khi tạo yêu cầu thiết kế"
                         />
                     </Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
@@ -363,10 +374,12 @@ const CreateDesignRequest = (props: CreateDesignRequestProps) => {
                                 }))
                             }
                             onChange={handleInputChange}
-                            placeholder="Chọn sản phẩm"
+                            placeholder={!formData.orderId ? "Vui lòng chọn đơn hàng trước" : "Chọn sản phẩm"}
                             error={!!errors.productId}
                             helperText={errors.productId}
                             disabled={!formData.orderId}
+                            loadingTitle="Đang tải sản phẩm"
+                            title="Chưa có sản phẩm. Vui lòng chọn đơn hàng trước khi chọn sản phẩm"
                         />
                     </Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
@@ -378,6 +391,7 @@ const CreateDesignRequest = (props: CreateDesignRequestProps) => {
                             type="text"
                             onChange={handleInputChange}
                             disabled
+                            placeholder="Vui lòng chọn đơn hàng để hiển thị khách hàng tương ứng"
                         />
                         
                     </Grid>
@@ -563,6 +577,7 @@ const CreateDesignRequest = (props: CreateDesignRequestProps) => {
                     </Grid>
                     <Grid size={{ xs: 12 }}>
                         <TechnicalSpecification
+                            errorTechnicalSpecification={errorTechnicalSpecification}
                             formData={formDataTechnicalSpecification}
                             onInputChange={handleInputChangeTechnicalSpecification}
                             errorsTechnicalSpecification={errorsTechnicalSpecification}

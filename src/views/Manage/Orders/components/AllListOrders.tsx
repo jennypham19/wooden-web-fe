@@ -22,6 +22,7 @@ import { ProccessOrder } from "@/constants/status";
 import { IUser } from "@/types/user";
 import ViewProductsInOrder from "./ViewProductsInOrder";
 import DialogListImageProduct from "./DialogListImageProduct";
+import AddOrder from "./AddOrder";
 
 
 interface AllListOrdersProps{
@@ -283,7 +284,11 @@ const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
                 </>
             )}
             {openOrder.open && openOrder.type === 'add' && (
-                <DialogAddOrder
+                // <DialogAddOrder
+                //     open={openOrder.open}
+                //     onClose={handleCloseAddOrder}
+                // />
+                <AddOrder
                     open={openOrder.open}
                     onClose={handleCloseAddOrder}
                 />

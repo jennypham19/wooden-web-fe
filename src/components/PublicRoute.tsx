@@ -7,7 +7,7 @@ const PublicRoute: FCC = ({ }) => {
   const { isAuthenticated } = useAppSelector((state) => state.auth);
 
   if (isAuthenticated) {
-    return <Navigate to={`/${ROUTE_PATH.MANAGE}`} replace />;
+    return <Navigate to={`/moc/${ROUTE_PATH.MANAGE}`} replace />;
   }
 
   return <Outlet />;
