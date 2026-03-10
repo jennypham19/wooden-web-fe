@@ -1,24 +1,31 @@
 import AutocompleteComponent from "@/components/Autocomplete";
 import InputText from "@/components/InputText";
-import { getCustomers } from "@/services/customer-service";
-import { ICustomer } from "@/types/customer";
+import { getCustomerInFuni } from "@/services/customer-service";
+import { ICustomerInFuni } from "@/types/customer";
 import { Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 
-const OldCustomer = () => {
+interface FuniCustomerProps{
+    onChange: (value: ICustomerInFuni | null) => void;
+    infoCustomer: ICustomerInFuni | null
+}
+
+const FuniCustomer = ({ onChange, infoCustomer } : FuniCustomerProps) => {
+    
     return(
         <Grid container spacing={2}>
             <Grid size={{ xs: 12 }}>
                 <Typography fontSize='15px' fontWeight={500}>Tên khách hàng</Typography>
-                <AutocompleteComponent<ICustomer>
+                <AutocompleteComponent<ICustomerInFuni>
                     label=""
                     placeholder="Nhập tên sản phẩm..."
-                    fetchOptions={getCustomers}
+                    fetchOptions={getCustomerInFuni}
                     getOptionLabel={(option) => option.name}
-                    onChange={(value) => {
-                        console.log("selected", value);
-                    }}
                     getOptionKey={(option) => option.id}
+                    onChange={(value) => {
+                        onChange(value)
+                    }}
+                    page={0}
                     getRenderOption={(option) => (
                         <Typography variant="subtitle2">{option.name + " - " + option.phone}</Typography>
                     )}
@@ -28,8 +35,8 @@ const OldCustomer = () => {
                 <Typography fontSize='15px' fontWeight={500}>Số điện thoại</Typography>
                 <InputText
                     label=""
-                    name=""
-                    value={''}
+                    name="phone"
+                    value={infoCustomer? infoCustomer.phone : ''}
                     type="text"
                     onChange={() => {}}
                     sx={{ mt: 0.5 }}
@@ -40,16 +47,16 @@ const OldCustomer = () => {
                 <Typography fontSize='15px' fontWeight={500}>Địa chỉ</Typography>
                 <InputText
                     label=""
-                    name=""
+                    name="address"
                     value={''}
                     type="text"
                     onChange={() => {}}
                     sx={{ mt: 0.5 }}
-                    disabled
+                    disabled={infoCustomer === null}
                 />
             </Grid>
         </Grid>
     )
 }
 
-export default OldCustomer;
+export default FuniCustomer;

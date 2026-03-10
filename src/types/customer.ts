@@ -7,3 +7,16 @@ export interface ICustomer{
     createdAt: string;
     updatedAt: string
 }
+
+export interface ICustomerInFuni{
+    id: string,
+    name: string,
+    email: string,
+    phone: string,
+    isRead: boolean,
+    createdAt?: string,
+    updatedAt?: string,
+    title: string,
+    status: number,
+    requiredNote: string
+}

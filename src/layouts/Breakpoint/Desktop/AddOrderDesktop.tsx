@@ -1,12 +1,18 @@
 import InputText from "@/components/InputText";
 import { COLORS } from "@/constants/colors";
-import { FormDataOrders } from "@/types/order";
+import { ICustomer, ICustomerInFuni } from "@/types/customer";
+import { FormDataInputOrders } from "@/types/order";
+import { FormDataProducts } from "@/types/product";
 import { IUser } from "@/types/user";
 import FilesUpload from "@/views/Manage/components/FilesUpload";
+import { FormErrors, FormProductErrors } from "@/views/Manage/Orders/components/AddOrder";
+import ProductOrder from "@/views/Manage/Orders/components/ProductOrder";
+import FuniCustomer from "@/views/Manage/Orders/components/typeCustomer/FuniCustomer";
 import NewCustomer from "@/views/Manage/Orders/components/typeCustomer/NewCustomer";
 import OldCustomer from "@/views/Manage/Orders/components/typeCustomer/OldCustomer";
-import { AttachFile, CloudUpload, EditNote, Info, Inventory, Person, SpeakerNotes } from "@mui/icons-material";
-import { Box, Checkbox, FormControlLabel, FormGroup, Paper, Stack, TextField, Typography } from "@mui/material";
+import UploadFiles from "@/views/Manage/Orders/components/UploadFiles";
+import { AttachFile, CloudUpload, Description, EditNote, Image, Info, Inventory, Person, SpeakerNotes, VideoCameraBack } from "@mui/icons-material";
+import { Box, Button, Checkbox, FormControlLabel, FormGroup, Paper, Stack, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2"
 import dayjs from "dayjs";
 import { useState } from "react";
@@ -14,11 +20,16 @@ import { v4 as uuidv4 } from "uuid"
 
 interface AddOrderDesktopProps{
     profile: IUser | null,
-    formData: FormDataOrders,
-    onChangeInput: (name: string, value: any) =>  void;
+    onClose: () => void;
+    users: IUser[]
 }
 
 const DATA_CUSTOMER: {id: string, label: string, value: string}[] = [
+    {
+        id: uuidv4(),
+        label: 'Khách mới',
+        value: 'new'
+    },    
     {
         id: uuidv4(),
         label: 'Khách cũ',
@@ -26,38 +37,101 @@ const DATA_CUSTOMER: {id: string, label: string, value: string}[] = [
     },
     {
         id: uuidv4(),
-        label: 'Khách mới',
-        value: 'new'
-    },
+        label: 'Khách (Funi)',
+        value: 'cus-funi'
+    }
 ]
 
 const AddOrderDesktop = (props: AddOrderDesktopProps) => {
-    const { profile, formData, onChangeInput } = props;
+    const { profile, onClose, users } = props;
     const [checked, setChecked] = useState<string | null>(null);
+    const [infoCustomer, setInfoCustomer] = useState<ICustomerInFuni | null>(null)
+    const [ formData, setFormData ] = useState<FormDataInputOrders>({
+        name: '', dateOfReceipt: dayjs(), dateOfPayment: null, proccess: 'not_started_0%', status: 'pending', amount: null, requiredNote: '', products: [], internalNote: ''})
+    const [errors, setErrors] = useState<FormErrors>({});
+    const [customers, setCustomers] = useState<ICustomer[]>([]);
+    const [amountProduct, setAmountProduct] = useState<number | null>(null);
+    const [products, setProducts] = useState<number[]>([]);
+    const [formDataProduct, setFormDataProduct] = useState<FormDataProducts[]>([])
+    const [productErrors, setProductErrors] = useState<FormProductErrors[]>([])
+    const [referenceLinkSlots, setReferenceLinkSlots] = useState<(string | null)[]>([]);
+    const [files, setFiles] = useState<File[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isRemove, setIsRemove] = useState(false);
     
+    const handleClose = () => {
+        onClose()
+    }
     const handleCheck = (value: string) => () => {
         setChecked(value)
     }
 
-    const handleChangeNumber = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const val = event.target.value
-        //Cho phép xóa trắng
-        if(val.trim() === ''){
-          onChangeInput('amount', val);
-          return;
+    const handleChangeInput = (name: string, value: any) => {
+        const validName = name as keyof FormDataInputOrders;
+        if(validName === 'amount') {
+            const valueNum = Number(value);
+            if(!isNaN(valueNum) && valueNum > 0){
+                setAmountProduct(valueNum);
+                setProducts(Array.from({ length: valueNum }, (_, i) => i + 1))
+                setFormDataProduct(
+                    Array.from({ length: valueNum }, () => ({
+                        name: "",
+                        description: "",
+                        target: "",
+                        proccess: "not_started_0%",
+                        status: "pending",
+                        managerId: "",
+                        lenghtProduct: null,
+                        widthProduct: null,
+                        heightProduct: null
+                    }))
+                )
+            }else{
+                setAmountProduct(null);
+                setProducts([])
+            }
+        }
+        setFormData(prev => ({ ...prev, [name]: value }));
+        if(errors[name as keyof typeof errors]){
+            setErrors(prev => ({ ...prev, [name]: undefined }))
         }
 
-        // Chỉ cho phép nhập số
-        // const regex = /^\d+$/;
-
-        // Chỉ cho phép nhập số nguyên dương
-        const regex = /^[1-9]\d*$/;
-        console.log("regex.test(val): ", regex.test(val));
-        
-        if(regex.test(val)){
-            onChangeInput('amount',val);
-        }
     }
+
+    const handleInputChangeProduct = (index: number, name: string, value: any) => {
+        setFormDataProduct((prev) => {
+            const updated = [...prev];
+            updated[index] = { ...updated[index], [name]: value };
+            return updated;
+        })
+        // Xóa lỗi tại ô đang nhập
+        setProductErrors((prev) => {
+            const updated = [...prev];
+            updated[index] = { ...updated[index], [name]: undefined };
+            return updated;
+        });
+    }
+
+    const handleFilesSelect = (files: File[]) => {
+        setFiles(prev => {
+          const newFiles = [...(prev || []), ...files];
+          return newFiles
+        });
+    }
+
+    const handleRemoveFile = (index: number) => {
+        const newFiles = (files || []).filter((_, i) => i !== index);
+        setFiles(newFiles);
+        handleFilesSelect(newFiles);
+        setIsRemove(true)
+    }
+    console.log("files: ", files);
+    
+
+    const handleChangeInfoFuniCus = (value: ICustomerInFuni | null) => {
+        setInfoCustomer(value)
+    }
+
     return(
         <Grid container spacing={2}>
             {/* Thông tin khách hàng, Danh sách sản phẩm, Yêu cầu khách, Ghi chú nội bộ */}
@@ -95,6 +169,7 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
                         </FormGroup>
                     </Stack>
                     {checked === 'old' && (<OldCustomer/>)}
+                    {checked === 'cus-funi' && (<FuniCustomer onChange={handleChangeInfoFuniCus} infoCustomer={infoCustomer}/>)}
                     {checked === 'new' && (<NewCustomer/>)}
                 </Paper>
 
@@ -107,24 +182,28 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
                         </Box>
                         <Box display='flex' flexDirection='row' gap={1.5} alignItems="baseline">
                             <Typography variant="subtitle2">Số lượng: </Typography>
-                            <TextField
+                            <InputText
+                                label=""
                                 name="amount"
                                 value={formData.amount}
-                                onChange={handleChangeNumber}
-                                sx={{
-                                    width: 40
-                                }}
+                                sx={{ width: 40 }}
                                 type="text"
-                                variant="standard"
-                                InputProps={{ 
-                                    disableUnderline: false,
-                                    inputMode: 'numeric',
-                                     
-                                }}
-                            />
+                                onlyPositiveNumber={true}
+                                onChange={handleChangeInput}
+                                placeholder="" 
+                                from="order-desktop" 
+                                variant="standard"                          />
                             <Typography variant="subtitle2">sản phẩm </Typography>
                         </Box>
                     </Box>
+                    {amountProduct !== null && products.length > 0 && (
+                        <Box mt={3}>
+                            <Typography fontWeight={600} mb={1} fontSize='15px'> Danh sách sản phẩm kèm theo</Typography>
+                            {formDataProduct.map((num, idx) => (
+                                <ProductOrder onInputChange={handleInputChangeProduct} errors={productErrors[idx] || {}} formData={num} key={idx} index={idx + 1} users={users}/>
+                            ))}
+                        </Box>
+                    )}
                 </Paper>
 
                 {/* ----------- Yêu cầu của khách, ghi chú nội bộ -------------- */}
@@ -137,12 +216,12 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
                             </Box>
                             <InputText
                                 label=""
-                                name=""
-                                value={''}
+                                name="requiredNote"
+                                value={checked === 'cus-funi' ? infoCustomer?.requiredNote : formData.requiredNote}
                                 type="text"
                                 multiline
                                 rows={6}
-                                onChange={() => {}}
+                                onChange={handleChangeInput}
                                 placeholder="Nhập các yêu cầu cụ thể từ khách hàng..."
                             />
                         </Paper>
@@ -155,12 +234,12 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
                             </Box>
                             <InputText
                                 label=""
-                                name=""
-                                value={''}
+                                name="internalNote"
+                                value={formData.internalNote}
                                 type="text"
                                 multiline
                                 rows={6}
-                                onChange={() => {}}
+                                onChange={handleChangeInput}
                                 placeholder="Thông tin chỉ dành cho nội bộ xem..."
                             />
                         </Paper>
@@ -177,23 +256,12 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
                     </Box>
                     <Grid container spacing={1}>
                         <Grid size={{ md: 12 }}>
-                            <Typography fontSize='15px' fontWeight={500}>Mã đơn hàng</Typography>
-                            <InputText
-                                label=""
-                                name=""
-                                value={''}
-                                onChange={() => {}}
-                                type="text"
-                                sx={{ mt: 0.5 }}
-                            />
-                        </Grid>
-                        <Grid size={{ md: 12 }}>
                             <Typography fontSize='15px' fontWeight={500}>Tên đơn hàng</Typography>
                             <InputText
                                 label=""
-                                name=""
-                                value={''}
-                                onChange={() => {}}
+                                name="name"
+                                value={formData.name}
+                                onChange={handleChangeInput}
                                 type="text"
                                 sx={{ mt: 0.5 }}
                             />
@@ -202,7 +270,7 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
                             <Typography fontSize='15px' fontWeight={500}>Nhân viên tạo</Typography>
                             <InputText
                                 label=""
-                                name=""
+                                name="fullName"
                                 value={profile?.fullName}
                                 onChange={() => {}}
                                 type="text"
@@ -214,22 +282,23 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
                             <Typography fontSize='15px' fontWeight={500}>Ngày tạo đơn</Typography>
                             <InputText
                                 label=""
-                                name=""
+                                name="dateOfReceipt"
                                 value={dayjs()}
-                                onChange={() => {}}
+                                onChange={handleChangeInput}
                                 type="date"
-                                sx={{ mt: 0.5 }}
+                                mt={0.5}
+                                required
                             />
                         </Grid>
                         <Grid size={{ md: 12 }}>
                             <Typography fontSize='15px' fontWeight={500}>Ngày giao dự kiến</Typography>
                             <InputText
                                 label=""
-                                name=""
-                                value={''}
-                                onChange={() => {}}
-                                type="text"
-                                sx={{ mt: 0.5 }}
+                                name="dateOfPayment"
+                                value={formData.dateOfPayment}
+                                onChange={handleChangeInput}
+                                type="date"
+                                mt={0.5}
                             />
                         </Grid>
                     </Grid>
@@ -241,10 +310,22 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
                         <CloudUpload sx={{ color: COLORS.BUTTON }}/>
                         <Typography fontWeight={500}>5. Tài liệu đính kèm</Typography>
                     </Box>
-                    <FilesUpload
-                        onFilesSelect={() => {}}
+                    <UploadFiles
+                        onFilesSelect={handleFilesSelect}
                         height={200}
+                        isRemove={isRemove}
                     />
+                    <Box mt={2}>
+                        {files && files.length > 0 && files.map((file, index) => {
+                            const showIcon = file.type.includes('mp4') ? <VideoCameraBack/> : file.type.includes("image") ? <Image/> : <Description/>
+                            return(
+                                <Stack py={0.5} key={index} direction='row'>
+                                    {showIcon}
+                                    <Typography variant="subtitle2">{file.name}</Typography>
+                                </Stack>
+                            )
+                        })}
+                    </Box>
                 </Paper>
 
                 {/* ----------- Tài liệu tham khảo -------------- */}
@@ -254,6 +335,21 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
                         <Typography fontWeight={500}>6. Tài liệu tham khảo</Typography>
                     </Box>
                 </Paper>
+            </Grid>
+            <Grid size={{ md: 12 }} sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+                <Button
+                    onClick={() => {}}
+                    sx={{ bgcolor: COLORS.BUTTON, width: 120 }}
+                >
+                    Lưu
+                </Button>
+                <Button
+                    variant="outlined"
+                    onClick={handleClose}
+                    sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, width: 120 }}
+                >
+                    Hủy
+                </Button>
             </Grid>
         </Grid>
     )

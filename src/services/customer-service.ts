@@ -2,8 +2,9 @@ import { HttpResponse } from "@/types/common";
 import HttpClient from "@/utils/HttpClient";
 import { FormDataCustomer } from "@/views/Manage/Customers/components/DialogAddCustomer";
 import { PaginatedResponse } from "./base-service";
-import { ICustomer } from "@/types/customer";
+import { ICustomer, ICustomerInFuni } from "@/types/customer";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'; 
+const API_FUNI_URL = import.meta.env.VITE_API_FUNI_URL || '/api'; 
 const prefix = `${API_BASE_URL}/api/customers`;
 
 export interface GetParams{
@@ -46,4 +47,26 @@ export const updateCustomer = (id: string, payload: FormDataCustomer) => {
 // Xóa khách hàng
 export const deleteCustomer = (id: string) => {
   return HttpClient.delete(`${prefix}/delete-customer/${id}`)
+}
+
+// Lấy danh sách khách hàng bên funi
+export const getCustomerInFuni = async(getParams: GetParams): Promise<HttpResponse<PaginatedResponse<ICustomerInFuni>>> => {
+  const url = `${API_FUNI_URL}/api/contacts/customer-for-wooden`;
+  const params: Record<string, any> = {
+    page: getParams.page,
+    limit: getParams.limit,
+  }
+  if(getParams.searchTerm && getParams.searchTerm.trim()) {
+    params.searchTerm = getParams.searchTerm
+  }
+  const response = await HttpClient.get<{
+    success: boolean,
+    message: string,
+    data: PaginatedResponse<ICustomerInFuni>
+  }>(url,  { params });
+  if(response.success && response.data) {
+    return response;
+  }else{
+    throw new Error(response.message || 'Failed to fetch list customers')
+  }
 }
