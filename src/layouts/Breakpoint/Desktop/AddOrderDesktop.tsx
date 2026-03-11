@@ -4,15 +4,14 @@ import { ICustomer, ICustomerInFuni } from "@/types/customer";
 import { FormDataInputOrders } from "@/types/order";
 import { FormDataProducts } from "@/types/product";
 import { IUser } from "@/types/user";
-import FilesUpload from "@/views/Manage/components/FilesUpload";
 import { FormErrors, FormProductErrors } from "@/views/Manage/Orders/components/AddOrder";
 import ProductOrder from "@/views/Manage/Orders/components/ProductOrder";
 import FuniCustomer from "@/views/Manage/Orders/components/typeCustomer/FuniCustomer";
 import NewCustomer from "@/views/Manage/Orders/components/typeCustomer/NewCustomer";
 import OldCustomer from "@/views/Manage/Orders/components/typeCustomer/OldCustomer";
 import UploadFiles from "@/views/Manage/Orders/components/UploadFiles";
-import { AttachFile, CloudUpload, Description, EditNote, Image, Info, Inventory, Person, SpeakerNotes, VideoCameraBack } from "@mui/icons-material";
-import { Box, Button, Checkbox, FormControlLabel, FormGroup, Paper, Stack, TextField, Typography } from "@mui/material";
+import { Add, AttachFile, Close, CloudUpload, EditNote, Info, Inventory, Link, Person, SpeakerNotes } from "@mui/icons-material";
+import { Box, Button, Checkbox, FormControlLabel, FormGroup, IconButton, Paper, Stack, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2"
 import dayjs from "dayjs";
 import { useState } from "react";
@@ -54,13 +53,17 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
     const [products, setProducts] = useState<number[]>([]);
     const [formDataProduct, setFormDataProduct] = useState<FormDataProducts[]>([])
     const [productErrors, setProductErrors] = useState<FormProductErrors[]>([])
-    const [referenceLinkSlots, setReferenceLinkSlots] = useState<(string | null)[]>([]);
+    const [referenceLinkSlots, setReferenceLinkSlots] = useState<(string)[]>([]);
+    const [link, setLink] = useState("");
     const [files, setFiles] = useState<File[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isRemove, setIsRemove] = useState(false);
     
     const handleClose = () => {
-        onClose()
+        onClose();
+        setErrors({});
+        setReferenceLinkSlots([]);
+        setFormData({ name: '', dateOfReceipt: dayjs(), dateOfPayment: null, proccess: 'not_started_0%', status: 'pending', amount: null, requiredNote: '', products: [], internalNote: '' })
+        setLink('')
     }
     const handleCheck = (value: string) => () => {
         setChecked(value)
@@ -113,25 +116,27 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
     }
 
     const handleFilesSelect = (files: File[]) => {
-        setFiles(prev => {
-          const newFiles = [...(prev || []), ...files];
-          return newFiles
-        });
+        setFiles(files)
     }
-
-    const handleRemoveFile = (index: number) => {
-        const newFiles = (files || []).filter((_, i) => i !== index);
-        setFiles(newFiles);
-        handleFilesSelect(newFiles);
-        setIsRemove(true)
-    }
-    console.log("files: ", files);
-    
 
     const handleChangeInfoFuniCus = (value: ICustomerInFuni | null) => {
         setInfoCustomer(value)
     }
 
+    // Link tài liệu tham khảo
+    const handleAddReferenceLinkSlot = () => {
+        if(!link.trim()) return;
+        setReferenceLinkSlots(prev => [...prev, link]);
+        setLink("")
+    }
+
+    const handleRemoveReferenceLinkSlot = (indexToRemove: number) => {
+        setReferenceLinkSlots(prev => prev.filter((_, index) => index !== indexToRemove))
+    }
+
+    const handleReferenceLinkSlotChange = (newValue: string) => {
+        setLink(newValue)
+    }
     return(
         <Grid container spacing={2}>
             {/* Thông tin khách hàng, Danh sách sản phẩm, Yêu cầu khách, Ghi chú nội bộ */}
@@ -313,19 +318,7 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
                     <UploadFiles
                         onFilesSelect={handleFilesSelect}
                         height={200}
-                        isRemove={isRemove}
                     />
-                    <Box mt={2}>
-                        {files && files.length > 0 && files.map((file, index) => {
-                            const showIcon = file.type.includes('mp4') ? <VideoCameraBack/> : file.type.includes("image") ? <Image/> : <Description/>
-                            return(
-                                <Stack py={0.5} key={index} direction='row'>
-                                    {showIcon}
-                                    <Typography variant="subtitle2">{file.name}</Typography>
-                                </Stack>
-                            )
-                        })}
-                    </Box>
                 </Paper>
 
                 {/* ----------- Tài liệu tham khảo -------------- */}
@@ -333,6 +326,62 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
                     <Box mb={2} display='flex' flexDirection='row' gap={1.5}>
                         <AttachFile sx={{ color: COLORS.BUTTON }}/>
                         <Typography fontWeight={500}>6. Tài liệu tham khảo</Typography>
+                    </Box>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                        <TextField
+                            label=''
+                            name="url"
+                            type="text"
+                            value={link}
+                            onChange={(newValue: any) => handleReferenceLinkSlotChange(newValue.target.value)}
+                            placeholder="Nhập link tài liệu tham khảo..."
+                            InputProps={{
+                                sx: {
+                                    "& .MuiOutlinedInput-notchedOutline": {
+                                        border: '1px solid rgb(53, 50, 50)',
+                                        borderRadius: '8px'
+                                    },
+                                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                                        border: '1px solid rgb(53, 50, 50)'
+                                    },
+                                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                                        border: '1px solid rgb(53, 50, 50)'
+                                    },
+                                    color: '#000'
+                                }
+                            }}
+                        />
+                        <IconButton
+                            onClick={handleAddReferenceLinkSlot}
+                            sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
+                        >
+                            <Add sx={{ color: COLORS.BUTTON }}/>
+                        </IconButton>  
+                    </Stack>
+                    <Box mt={2}>
+                        {referenceLinkSlots.map((link, index) => (
+                            <Box key={index} display='flex' justifyContent='space-between'>
+                                <Stack py={0.5} direction='row'>
+                                    <Link/>
+                                    <Typography
+                                        sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all'}} 
+                                        fontStyle='italic' 
+                                        variant="subtitle2"
+                                    >
+                                        {link}
+                                    </Typography>
+                                </Stack>
+                                <IconButton
+                                    onClick={() => handleRemoveReferenceLinkSlot(index)}
+                                    sx={{
+                                        bgcolor: 'rgba(255, 255, 255, 0.7)',
+                                        '&:hover': { backgroundColor: 'rgba(255, 255, 255, 1)' }
+                                    }}
+                                >
+                                    <Close/>
+                                </IconButton>
+                            </Box>
+                        ))}
                     </Box>
                 </Paper>
             </Grid>
