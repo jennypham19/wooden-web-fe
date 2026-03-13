@@ -34,7 +34,6 @@ export interface FormDataInputOrders{
     status: string,
     amount: number | null,
     requiredNote: string,
-    products: FormDataProducts[],
     internalNote?: string
 }
 

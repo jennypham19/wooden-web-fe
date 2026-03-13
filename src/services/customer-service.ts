@@ -3,6 +3,7 @@ import HttpClient from "@/utils/HttpClient";
 import { FormDataCustomer } from "@/views/Manage/Customers/components/DialogAddCustomer";
 import { PaginatedResponse } from "./base-service";
 import { ICustomer, ICustomerInFuni } from "@/types/customer";
+import { mapFuniCustomersToMoc } from "@/utils/data";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'; 
 const API_FUNI_URL = import.meta.env.VITE_API_FUNI_URL || '/api'; 
 const prefix = `${API_BASE_URL}/api/customers`;
@@ -68,5 +69,33 @@ export const getCustomerInFuni = async(getParams: GetParams): Promise<HttpRespon
     return response;
   }else{
     throw new Error(response.message || 'Failed to fetch list customers')
+  }
+}
+
+export const searchCustomer = async(getParams: GetParams): Promise<HttpResponse<PaginatedResponse<ICustomer>>> => {
+  const [mocRes, funiRes] = await Promise.all([
+    getCustomers(getParams),
+    getCustomerInFuni(getParams)
+  ])
+  const mocCustomers = mocRes.data?.data || []
+
+  const funiCustomers = mapFuniCustomersToMoc(
+    funiRes.data?.data || []
+  )
+
+  const mergedCustomers = [
+    ...mocCustomers,
+    ...funiCustomers
+  ]
+
+  console.log("mergedCustomers: ", mergedCustomers);
+  
+
+  return {
+    ...mocRes, 
+    // data: {
+    //   ...mocRes.data,
+    //   data: mergedCustomers
+    // }
   }
 }

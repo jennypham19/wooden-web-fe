@@ -18,7 +18,7 @@ const FuniCustomer = ({ onChange, infoCustomer } : FuniCustomerProps) => {
                 <Typography fontSize='15px' fontWeight={500}>Tên khách hàng</Typography>
                 <AutocompleteComponent<ICustomerInFuni>
                     label=""
-                    placeholder="Nhập tên sản phẩm..."
+                    placeholder="Nhập tên khách hàng..."
                     fetchOptions={getCustomerInFuni}
                     getOptionLabel={(option) => option.name}
                     getOptionKey={(option) => option.id}

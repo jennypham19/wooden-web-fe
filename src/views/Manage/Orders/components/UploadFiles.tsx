@@ -5,10 +5,10 @@ import { Close, Description, FolderCopyOutlined, Image, VideoCameraBack } from '
 interface FilesUploadProps {
   onFilesSelect: (files: File[]) => void;
   height?: number;
-  errorImage?: string | null,
+  error?: string,
 }
 
-const UploadFiles: React.FC<FilesUploadProps> = ({ onFilesSelect, height = 250, errorImage }) => {
+const UploadFiles: React.FC<FilesUploadProps> = ({ onFilesSelect, height = 250, error }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [files, setFiles] = useState<File[]>([]);
 
@@ -54,7 +54,7 @@ const UploadFiles: React.FC<FilesUploadProps> = ({ onFilesSelect, height = 250, 
             <Box
                 onClick={handleBoxClick}
                 sx={{
-                    border: errorImage ? '2px dashed #d82020ff' : '2px dashed #ccc',
+                    border: error ? '2px dashed #d82020ff' : '2px dashed #ccc',
                     borderRadius: 2,
                     p: 3,
                     textAlign: 'center',

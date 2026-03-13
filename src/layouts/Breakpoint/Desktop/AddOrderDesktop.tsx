@@ -1,5 +1,6 @@
 import InputText from "@/components/InputText";
 import { COLORS } from "@/constants/colors";
+import { searchCustomer } from "@/services/customer-service";
 import { ICustomer, ICustomerInFuni } from "@/types/customer";
 import { FormDataInputOrders } from "@/types/order";
 import { FormDataProducts } from "@/types/product";
@@ -14,7 +15,7 @@ import { Add, AttachFile, Close, CloudUpload, EditNote, Info, Inventory, Link, P
 import { Box, Button, Checkbox, FormControlLabel, FormGroup, IconButton, Paper, Stack, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2"
 import dayjs from "dayjs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid"
 
 interface AddOrderDesktopProps{
@@ -46,7 +47,7 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
     const [checked, setChecked] = useState<string | null>(null);
     const [infoCustomer, setInfoCustomer] = useState<ICustomerInFuni | null>(null)
     const [ formData, setFormData ] = useState<FormDataInputOrders>({
-        name: '', dateOfReceipt: dayjs(), dateOfPayment: null, proccess: 'not_started_0%', status: 'pending', amount: null, requiredNote: '', products: [], internalNote: ''})
+        name: '', dateOfReceipt: dayjs(), dateOfPayment: null, proccess: 'not_started_0%', status: 'pending', amount: null, requiredNote: '', internalNote: ''})
     const [errors, setErrors] = useState<FormErrors>({});
     const [customers, setCustomers] = useState<ICustomer[]>([]);
     const [amountProduct, setAmountProduct] = useState<number | null>(null);
@@ -57,16 +58,33 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
     const [link, setLink] = useState("");
     const [files, setFiles] = useState<File[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState<{checked: string, files: string}>({checked: '' , files: ''})
+    const [inforNewCustomer, setInforNewCustomer] = useState<{}>();
+
+    useEffect(() => {
+        const getData = async() => {
+            const data = await searchCustomer({ page: 1, limit: 10 });
+            console.log("Data: ", data);
+            
+        }
+        getData()
+    }, [profile])
     
     const handleClose = () => {
         onClose();
         setErrors({});
         setReferenceLinkSlots([]);
-        setFormData({ name: '', dateOfReceipt: dayjs(), dateOfPayment: null, proccess: 'not_started_0%', status: 'pending', amount: null, requiredNote: '', products: [], internalNote: '' })
+        setFormData({ name: '', dateOfReceipt: dayjs(), dateOfPayment: null, proccess: 'not_started_0%', status: 'pending', amount: null, requiredNote: '', internalNote: '' })
         setLink('')
     }
     const handleCheck = (value: string) => () => {
         setChecked(value)
+        setErrors({})
+        setProductErrors([])
+        setAmountProduct(null)
+        setFormData({ name: '', dateOfReceipt: dayjs(), dateOfPayment: null, proccess: 'not_started_0%', status: 'pending', amount: null, requiredNote: '', internalNote: '' })
+        setInfoCustomer(null)
+        setError({ checked: '', files: '' })
     }
 
     const handleChangeInput = (name: string, value: any) => {
@@ -137,6 +155,49 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
     const handleReferenceLinkSlotChange = (newValue: string) => {
         setLink(newValue)
     }
+
+    const validateForm = (): boolean => {
+        const newErrors: FormErrors = {};
+        if(!formData.name) newErrors.name = "Vui lòng nhập tên đơn hàng";
+        if(!formData.dateOfPayment) newErrors.dateOfPayment = "Vui lòng chọn ngày giao dự kiến";
+        if(!formData.requiredNote) newErrors.requiredNote = "Vui lòng nhập yêu cầu của khách";
+        if(!formData.amount) newErrors.amount = "Vui lòng nhập số lượng"
+
+        const newProductErrors: FormProductErrors[] = [];
+        formDataProduct.forEach((product, idx) => {
+            const pError: FormProductErrors = {};
+            if (!product.name) pError.name = `Sản phẩm ${idx + 1}: Vui lòng nhập tên sản phẩm`;
+            if (!product.description) pError.description = `Sản phẩm ${idx + 1}: Vui lòng nhập mô tả`;
+            if (!product.lenghtProduct) pError.lenghtProduct = `Sản phẩm ${idx + 1}: Vui lòng nhập chiều dài`;
+            if (!product.widthProduct) pError.widthProduct = `Sản phẩm ${idx + 1}: Vui lòng nhập chiều rộng`;
+            if (!product.heightProduct) pError.heightProduct = `Sản phẩm ${idx + 1}: Vui lòng nhập chiều cao`;
+            if (!product.target) pError.target = `Sản phẩm ${idx + 1}: Vui lòng nhập mục tiêu sản xuất`;
+            if (!product.managerId) pError.managerId = `Sản phẩm ${idx + 1}: Vui lòng chọn người phụ trách`;
+            newProductErrors.push(pError); 
+        })
+
+        const newError: { checked: string, files: string } = { checked: '', files: ''}
+        if(checked === null){
+            newError.checked = "Vui lòng chọn khách hàng"
+        }
+
+        if(files.length === 0){
+            newError.files = "Vui lòng tải tài liệu đính kèm"
+        }
+
+        setError(newError)
+
+        const hasProductError = newProductErrors.some((e) => Object.keys(e).length > 0);
+        setErrors(newErrors);
+        setProductErrors(newProductErrors)
+        return Object.keys(newErrors).length === 0 && !hasProductError && checked !== null && files.length > 0;    
+    }
+
+    const handleSave = async() => {
+        if(!validateForm()){
+            return;
+        }
+    }
     return(
         <Grid container spacing={2}>
             {/* Thông tin khách hàng, Danh sách sản phẩm, Yêu cầu khách, Ghi chú nội bộ */}
@@ -173,6 +234,9 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
                             ))}
                         </FormGroup>
                     </Stack>
+                    {error.checked && (
+                        <Typography variant="caption" color="error">{error.checked}</Typography>
+                    )}
                     {checked === 'old' && (<OldCustomer/>)}
                     {checked === 'cus-funi' && (<FuniCustomer onChange={handleChangeInfoFuniCus} infoCustomer={infoCustomer}/>)}
                     {checked === 'new' && (<NewCustomer/>)}
@@ -197,7 +261,10 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
                                 onChange={handleChangeInput}
                                 placeholder="" 
                                 from="order-desktop" 
-                                variant="standard"                          />
+                                variant="standard"
+                                error={!!errors.amount}
+                                helperText={errors.amount}
+                            />
                             <Typography variant="subtitle2">sản phẩm </Typography>
                         </Box>
                     </Box>
@@ -213,25 +280,29 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
 
                 {/* ----------- Yêu cầu của khách, ghi chú nội bộ -------------- */}
                 <Grid container spacing={1}>
-                    <Grid size={{ md: 6 }}>
-                        <Paper sx={{ p: 2 }}>
-                            <Box mb={2} display='flex' flexDirection='row' gap={1.5}>
-                                <SpeakerNotes sx={{ color: COLORS.BUTTON }}/>
-                                <Typography fontWeight={500}>4. Yêu cầu của khách</Typography>
-                            </Box>
-                            <InputText
-                                label=""
-                                name="requiredNote"
-                                value={checked === 'cus-funi' ? infoCustomer?.requiredNote : formData.requiredNote}
-                                type="text"
-                                multiline
-                                rows={6}
-                                onChange={handleChangeInput}
-                                placeholder="Nhập các yêu cầu cụ thể từ khách hàng..."
-                            />
-                        </Paper>
-                    </Grid>
-                    <Grid size={{ md: 6 }}>
+                    {checked !== null && (
+                        <Grid size={{ md: 6 }}>
+                            <Paper sx={{ p: 2 }}>
+                                <Box mb={2} display='flex' flexDirection='row' gap={1.5}>
+                                    <SpeakerNotes sx={{ color: COLORS.BUTTON }}/>
+                                    <Typography fontWeight={500}>4. Yêu cầu của khách</Typography>
+                                </Box>
+                                <InputText
+                                    label=""
+                                    name="requiredNote"
+                                    value={checked === 'cus-funi' ? infoCustomer?.requiredNote : formData.requiredNote}
+                                    type="text"
+                                    multiline
+                                    rows={6}
+                                    onChange={handleChangeInput}
+                                    placeholder="Nhập các yêu cầu cụ thể từ khách hàng..."
+                                    error={checked === 'cus-funi' ? false : !!errors.requiredNote}
+                                    helperText={checked === 'cus-funi' ? '' : errors.requiredNote}
+                                />
+                            </Paper>
+                        </Grid>
+                    )}
+                    <Grid size={{ md: checked === null ? 12 : 6 }}>
                         <Paper sx={{ p: 2 }}>
                             <Box mb={2} display='flex' flexDirection='row' gap={1.5}>
                                 <EditNote sx={{ color: COLORS.BUTTON }}/>
@@ -269,6 +340,8 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
                                 onChange={handleChangeInput}
                                 type="text"
                                 sx={{ mt: 0.5 }}
+                                error={!!errors.name}
+                                helperText={errors.name}
                             />
                         </Grid>
                         <Grid size={{ md: 12 }}>
@@ -292,7 +365,7 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
                                 onChange={handleChangeInput}
                                 type="date"
                                 mt={0.5}
-                                required
+                                disabled
                             />
                         </Grid>
                         <Grid size={{ md: 12 }}>
@@ -304,6 +377,8 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
                                 onChange={handleChangeInput}
                                 type="date"
                                 mt={0.5}
+                                error={!!errors.dateOfPayment}
+                                helperText={errors.dateOfPayment}
                             />
                         </Grid>
                     </Grid>
@@ -318,6 +393,7 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
                     <UploadFiles
                         onFilesSelect={handleFilesSelect}
                         height={200}
+                        error={error.files}
                     />
                 </Paper>
 
@@ -387,7 +463,7 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
             </Grid>
             <Grid size={{ md: 12 }} sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
                 <Button
-                    onClick={() => {}}
+                    onClick={handleSave}
                     sx={{ bgcolor: COLORS.BUTTON, width: 120 }}
                 >
                     Lưu
