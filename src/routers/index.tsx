@@ -30,7 +30,7 @@ const PermissionDenied = Loadable(lazy(() => import('@/views/Errors/PermissionDe
 const routes: RouteObject[] = [
    // --- NHÁNH 1: CÁC TRANG ĐƯỢC BẢO VỆ (PRIVATE) ---
   {
-    path: '/moc/manage',
+    path: 'manage',
     element: <AuthGuard/>,
     children: [
       {
@@ -41,27 +41,17 @@ const routes: RouteObject[] = [
   },
 
   // chỉ để xử lý trường hợp truy cập vào root path, sẽ tự động chuyển hướng đến trang đăng nhập
-  {
-    path: '/',
-    element: <Navigate to="/moc/login" replace />,
-  },
-
-  // TRANG ĐẶT HÀNG (KHÔNG CẦN XÁC THỰC)
-  {
-    path: '/don-hang',
-    element: <OrderLink />,
-  },
   // {
   //   path: '/',
-  //   element: (
-  //     <PublicRoute>
-  //       <AuthLayout />
-  //     </PublicRoute>
-  //   ),
-  //   children: [
-  //     { index: true, element: <Login /> },
-  //   ],
+  //   element: <Navigate to="/moc/login" replace />,
   // },
+
+  // TRANG ĐẶT HÀNG (KHÔNG CẦN XÁC THỰC)
+  // {
+  //   path: '/don-hang',
+  //   element: <OrderLink />,
+  // },
+
 
   // --- NHÁNH 2: CÁC TRANG XÁC THỰC (CHỈ DÀNH CHO NGƯỜI CHƯA ĐĂNG NHẬP) ---
   {
@@ -71,11 +61,16 @@ const routes: RouteObject[] = [
       {
         element: <AuthLayout/>,
         children: [
-          { index: true, element: <Navigate to='/moc/login' replace /> },
-          { path: 'moc/login', element: <Login /> },
-          { path: 'moc/registration', element: <Registration /> },
-          { path: 'moc/forgot-password', element: <ForgotPassword /> },
-          { path: 'moc/change-password', element: <ChangePassword /> },
+          // { index: true, element: <Navigate to='/moc/login' replace /> },
+          // { path: 'moc/login', element: <Login /> },
+          { index: true, element: <Login/> },
+          { path: 'registration', element: <Registration /> },
+          { path: 'forgot-password', element: <ForgotPassword /> },
+          { path: 'change-password', element: <ChangePassword /> },
+          {
+            path: '/don-hang',
+            element: <OrderLink />,
+          },
         ]
       },
     ],
