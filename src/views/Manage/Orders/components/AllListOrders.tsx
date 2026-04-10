@@ -284,14 +284,14 @@ const AllListOrders: React.FC<AllListOrdersProps> = (props) => {
                 </>
             )}
             {openOrder.open && openOrder.type === 'add' && (
-                // <DialogAddOrder
-                //     open={openOrder.open}
-                //     onClose={handleCloseAddOrder}
-                // />
-                <AddOrder
+                <DialogAddOrder
                     open={openOrder.open}
                     onClose={handleCloseAddOrder}
                 />
+                // <AddOrder
+                //     open={openOrder.open}
+                //     onClose={handleCloseAddOrder}
+                // />
             )}
             {viewOrder && order && (
                 <DetailOrder

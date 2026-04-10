@@ -89,7 +89,7 @@ class Axios {
             removeAccessToken();
             // Chuyển hướng về trang đăng nhập
             // Cách tốt nhất là dispatch một action logout ở đây
-            window.location.href = '/moc/login'; 
+            window.location.href = '/moc'; 
             
             return Promise.reject(refreshError);
           } finally {

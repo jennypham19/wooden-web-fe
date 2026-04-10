@@ -10,9 +10,10 @@ interface ImageUploadProps {
   height?: number;
   index?: number
   errorImage?: string | null
+  children: React.ReactNode
 }
 
-const FileUploadDesign: React.FC<ImageUploadProps> = ({ onFileSelect, initialImage, height, index, errorImage }) => {
+const FilesUpload: React.FC<ImageUploadProps> = ({ onFileSelect, initialImage, height, index, errorImage, children }) => {
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -90,8 +91,7 @@ const FileUploadDesign: React.FC<ImageUploadProps> = ({ onFileSelect, initialIma
         >
           <Box sx={{ margin: 'auto 0'}}>
             <CloudUploadIcon sx={{ fontSize: 48, color: 'text.secondary' }} />
-            <Typography fontSize='15px'>Kéo và thả file thiết kế vào đây</Typography>
-            <Typography variant='caption' color='text.secondary'>Hoặc click để chọn file từ máy tính (JPG, PNG, PDF, AI)</Typography>
+            {children}
           </Box>
         </Box>
       )}
@@ -99,4 +99,4 @@ const FileUploadDesign: React.FC<ImageUploadProps> = ({ onFileSelect, initialIma
   );
 };
 
-export default FileUploadDesign;
+export default FilesUpload;

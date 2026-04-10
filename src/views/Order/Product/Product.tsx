@@ -2,11 +2,11 @@ import InputText from "@/components/InputText";
 import { Box, Button, IconButton, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2"
 import { Add, Delete, FileUpload, ListAlt, Timeline, Upload } from "@mui/icons-material";
-import FileUploadDesign from "../components/FileUpload";
 import { COLORS } from "@/constants/colors";
 import { useState } from "react";
 import InputSelect from "@/components/InputSelect";
 import { v4 as uuidv4 } from "uuid";
+import FilesUpload from "../components/FileUpload";
 
 
 const DATA_MATERIAL = [
@@ -95,9 +95,12 @@ const Product = () => {
                 </Grid>
                 <Grid size={{ xs: 12 }}>
                     <Typography variant="caption" fontWeight={500}>Tài liệu thiết kế</Typography>
-                    <FileUploadDesign
+                    <FilesUpload
                         onFileSelect={() => {}}
-                    />
+                    >
+                        <Typography fontSize='15px'>Kéo và thả file thiết kế vào đây</Typography>
+                        <Typography variant='caption' color='text.secondary'>Hoặc click để chọn file từ thiết bị (JPG, PNG, PDF, AI)</Typography>
+                    </FilesUpload>
                 </Grid>
             </Grid>
             <Box mt={3} mb={1.5} display='flex' flexDirection={{ xs: 'column', md: 'row' }} justifyContent={{ xs: 'flex-start', md: 'space-between' }}>
