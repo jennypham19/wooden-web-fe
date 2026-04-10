@@ -41,10 +41,10 @@ const routes: RouteObject[] = [
   },
 
   // chỉ để xử lý trường hợp truy cập vào root path, sẽ tự động chuyển hướng đến trang đăng nhập
-  {
-    path: '/',
-    element: <Navigate to="/moc" replace />,
-  },
+  // {
+  //   path: '/',
+  //   element: <Navigate to="/moc" replace />,
+  // },
 
   // TRANG ĐẶT HÀNG (KHÔNG CẦN XÁC THỰC)
   {
@@ -71,7 +71,7 @@ const routes: RouteObject[] = [
       {
         element: <AuthLayout/>,
         children: [
-          { index: true, element: <Navigate to='moc' replace /> },
+          { index: true, element: <Navigate to='/moc' replace /> },
           { path: 'moc', element: <Login /> },
           { path: 'moc/registration', element: <Registration /> },
           { path: 'moc/forgot-password', element: <ForgotPassword /> },
