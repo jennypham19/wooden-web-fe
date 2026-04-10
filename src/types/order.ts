@@ -23,6 +23,18 @@ export interface FormDataOrders{
     amount: number | null,
     requiredNote: string,
     products: FormDataProducts[],
+    internalNote?: string
+}
+
+export interface FormDataInputOrders{
+    name: string,
+    dateOfReceipt: Dayjs | null,
+    dateOfPayment: Dayjs | null,
+    proccess: string,
+    status: string,
+    amount: number | null,
+    requiredNote: string,
+    internalNote?: string
 }
 
 export interface FormDataImageStep{

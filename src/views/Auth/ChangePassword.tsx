@@ -63,7 +63,7 @@ export default function ChangePassword() {
             message: t('reset_password_successful'),
             severity: 'success',
           });
-          navigate(`/${ROUTE_PATH.LOGIN}`);
+          navigate(`/moc/${ROUTE_PATH.LOGIN}`);
         } else {
           throw new Error(resp.message);
         }

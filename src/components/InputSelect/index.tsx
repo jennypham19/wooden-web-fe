@@ -4,6 +4,7 @@ import React from 'react';
 
 import { Chip, CircularProgress, FormControl, FormHelperText, InputLabel, ListSubheader, MenuItem, Select, SelectChangeEvent, SelectProps, SxProps, Theme } from '@mui/material';
 import { ArrowDropDown, Clear } from '@mui/icons-material';
+import { log } from 'console';
 
 
 
@@ -83,6 +84,7 @@ const InputSelect: React.FC<InputSelectProps> = ({
     ? Array.isArray(value) && value.length > 0
     : value !== null && value !== undefined && value !== '';
 
+  
   const finalOptions = React.useMemo(() => {
     if (transformOptions) return transformOptions(options);
     if (optionGroups) return optionGroups;
@@ -200,6 +202,7 @@ const InputSelect: React.FC<InputSelectProps> = ({
         {label}
       </InputLabel>
       <Select
+        displayEmpty
         labelId={`${name}-label`}
         id={`${name}-select`}
         name={name}
@@ -208,7 +211,7 @@ const InputSelect: React.FC<InputSelectProps> = ({
         label={label}
         multiple={multiple}
         IconComponent={() => (
-          hasValue && (
+          hasValue && !disabled && (
             <Clear
               fontSize="small"
               sx={{ cursor: 'pointer', mr: 1 }}
@@ -217,11 +220,14 @@ const InputSelect: React.FC<InputSelectProps> = ({
                 handleClear();
               }}
             />
-          )
+          ) 
         )}
         MenuProps={MenuProps}
         renderValue={(selected) => {
-          if ((multiple && Array.isArray(selected) && selected.length === 0) || !selected) {
+            const isEmpty = multiple
+              ? !Array.isArray(selected) || selected.length === 0
+              : selected === null || selected === undefined || selected === '';
+          if (isEmpty) {
             return <span style={{ color: '#aaa' }}>{placeholder}</span>;
           }
 

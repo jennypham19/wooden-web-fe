@@ -1,4 +1,5 @@
 import { SectionItem } from "@/layouts/Dashboard/Sidebar/Sections";
+import { ICustomer, ICustomerInFuni } from "@/types/customer";
 import { IMenu, IPermission } from "@/types/permission";
 import { AccountCircle, Analytics, Assessment, Assignment, Build, BuildCircle, Construction, ContentPaste, DashboardCustomize, DrawOutlined, EventNote, Group, HomeOutlined, Hub, InventoryOutlined, List, ListAlt, LockOutlined, MenuBook, MenuBookOutlined, Notifications, PrecisionManufacturing, Settings, SupportAgent, SvgIconComponent, Timeline, TrackChanges, WorkOutline } from "@mui/icons-material";
 
@@ -44,3 +45,22 @@ export const mapMenuToSectionItems = (menus: IMenu[]): SectionItem[] => {
 export const mapPermissionsToSectionItems = (group: IPermission): SectionItem[] => {
     return mapMenuToSectionItems(group.permissions) 
 };
+
+const mapFuniCustomerToMoc = (customer: ICustomerInFuni): ICustomer => {
+  return {
+    id: customer.id,
+    name: customer.name,
+    phone: customer.phone,
+    type: customer.type,
+    title: customer.title,
+    address: customer.address,
+    requiredNote: customer.requiredNote,
+    amountOfOrders: customer.amountOfOrder,
+    createdAt: customer.createdAt,
+    updatedAt: customer.updatedAt
+  }
+}
+
+export const mapFuniCustomersToMoc = (customers: ICustomerInFuni[]) : ICustomer[] => {
+  return customers.map(mapFuniCustomerToMoc)
+}

@@ -8,15 +8,19 @@ import InputText from "@/components/InputText";
 interface TechnicalSpecificationProps{
     formData: FormDataTechnicalSpecification;
     onInputChange: (name: string, value: any) => void;
-    errorsTechnicalSpecification: FormErrorsTechnicalSpecification
+    errorsTechnicalSpecification: FormErrorsTechnicalSpecification;
+    errorTechnicalSpecification: string | null
 }
 
 const TechnicalSpecification = (props: TechnicalSpecificationProps) => {
-    const { formData, onInputChange, errorsTechnicalSpecification } = props;
+    const { formData, onInputChange, errorsTechnicalSpecification, errorTechnicalSpecification } = props;
     return(
         <Accordion>
             <AccordionSummary expandIcon={<ExpandMore/>}>
                 <Typography fontWeight={600} fontSize='16px'>Thông số kỹ thuật</Typography>
+                {errorTechnicalSpecification && (
+                    <Typography fontSize='14px' color='error' sx={{ ml: 2 }}>{errorTechnicalSpecification}</Typography>
+                )}
             </AccordionSummary>
             <Divider sx={{ mx: 2}}/>
             <AccordionDetails>

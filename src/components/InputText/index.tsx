@@ -206,8 +206,8 @@ const InputText: React.FC<CustomInputProps> = ({
 
         // Kiểm tra số dương hợp lệ (số thực hoặc số nguyên dương)
         const numVal = Number(val);
-        
-        if(!isNaN(numVal) && /^\d*\.?\d*$/.test(val)){
+        const regex = /^[1-9]\d*$/;
+        if(!isNaN(numVal) && regex.test(val)){
           onChange(name,val);
         }
         // Nếu không hợp lệ thì bỏ qua, không gọi onChange => không update value
@@ -236,16 +236,16 @@ const InputText: React.FC<CustomInputProps> = ({
         InputProps={{
             sx:{
                 "& .MuiOutlinedInput-notchedOutline":{
-                    border: from ? "1px solid grey" : "1px solid rgb(53, 50, 50)",
+                    border: from ? "none" : "1px solid rgb(53, 50, 50)",
                     borderRadius:"8px",
                 },
                 "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    border: from ? "1px solid grey" : "1px solid rgb(53, 50, 50)",
+                    border: from ? "none" : "1px solid rgb(53, 50, 50)",
                 },
                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                    border: from ? "1px solid grey" : "1px solid rgb(53, 50, 50)",
+                    border: from ? "none" : "1px solid rgb(53, 50, 50)",
                 },
-                color: from ? 'white' : 'black'
+                color: 'black'
             },
             startAdornment: startAdornment,
             endAdornment: endAdornment

@@ -68,7 +68,7 @@ const ProductOrder = (props: ProductOrderProps) => {
     const { users, index, formData, onInputChange, errors } = props;
     
     return(
-        <Box borderRadius={2} p={1.5} mt={2} border='1px solid #b3acacff' display='flex' flexDirection='column'>
+        <Box borderRadius={2} p={1.5} mt={2} border='1px solid rgb(231, 229, 229)' display='flex' flexDirection='column'>
                 <Typography fontWeight={700} fontSize="15px" mb={1}>
                     Sản phẩm thứ {index}
                 </Typography>
