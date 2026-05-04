@@ -12,7 +12,7 @@ const OldCustomer = () => {
                 <Typography fontSize='15px' fontWeight={500}>Tên khách hàng</Typography>
                 <AutocompleteComponent<ICustomer>
                     label=""
-                    placeholder="Nhập tên sản phẩm..."
+                    placeholder="Nhập tên khách hàng..."
                     fetchOptions={getCustomers}
                     getOptionLabel={(option) => option.name}
                     onChange={(value) => {

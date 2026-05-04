@@ -40,7 +40,7 @@ const AdminSections = (): Section[] => [
     items: [
       {
         title: 'Dashboard quản lý',
-        path: `/${ROUTE_PATH.MANAGE}/${ROUTE_PATH.MANAGE_HOME}`,
+        path: `/${ROUTE_PATH.MANAGE_HOME}`,
         icon: HomeOutlined,
       },
     ],
@@ -50,7 +50,7 @@ const AdminSections = (): Section[] => [
     items: [
       {
         title: 'Phân quyền quản lý',
-        path: `/${ROUTE_PATH.MANAGE}/${ROUTE_PATH.MANAGE_DECENTRALIZATION_ACCOUNT}`,
+        path: `/${ROUTE_PATH.MANAGE_DECENTRALIZATION_ACCOUNT}`,
         icon: LockOutlined,
       },
     ],
@@ -60,7 +60,7 @@ const AdminSections = (): Section[] => [
     items: [
       {
         title: 'Quản lý công việc',
-        path: `/${ROUTE_PATH.MANAGE}/${ROUTE_PATH.MANAGE_JOB}`,
+        path: `/${ROUTE_PATH.MANAGE_JOB}`,
         icon: WorkOutline,
       },
     ],
@@ -70,7 +70,7 @@ const AdminSections = (): Section[] => [
     items: [
       {
         title: 'Thông tin cá nhân',
-        path: `/${ROUTE_PATH.MANAGE}/${ROUTE_PATH.MANAGE_INFORMATION}`,
+        path: `/${ROUTE_PATH.MANAGE_INFORMATION}`,
         icon: AccountCircle,
       },
     ],
@@ -85,12 +85,12 @@ const AdminSections = (): Section[] => [
         children: [
           {
             title: 'Thao tác',
-            path: `/${ROUTE_PATH.MANAGE}/${ROUTE_PATH.MANAGE_ACTION}`,
+            path: `/${ROUTE_PATH.MANAGE_ACTION}`,
             icon: Build,
           },
           {
             title: 'Chức năng',
-            path: `/${ROUTE_PATH.MANAGE}/${ROUTE_PATH.MANAGE_MENU}`,
+            path: `/${ROUTE_PATH.MANAGE_MENU}`,
             icon: List,
           }
         ]

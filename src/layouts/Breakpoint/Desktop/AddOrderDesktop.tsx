@@ -35,11 +35,11 @@ const DATA_CUSTOMER: {id: string, label: string, value: string}[] = [
         label: 'Khách cũ',
         value: 'old'
     },
-    {
-        id: uuidv4(),
-        label: 'Khách (Funi)',
-        value: 'cus-funi'
-    }
+    // {
+    //     id: uuidv4(),
+    //     label: 'Khách (Funi)',
+    //     value: 'cus-funi'
+    // }
 ]
 
 const AddOrderDesktop = (props: AddOrderDesktopProps) => {
@@ -49,7 +49,6 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
     const [ formData, setFormData ] = useState<FormDataInputOrders>({
         name: '', dateOfReceipt: dayjs(), dateOfPayment: null, proccess: 'not_started_0%', status: 'pending', amount: null, requiredNote: '', internalNote: ''})
     const [errors, setErrors] = useState<FormErrors>({});
-    const [customers, setCustomers] = useState<ICustomer[]>([]);
     const [amountProduct, setAmountProduct] = useState<number | null>(null);
     const [products, setProducts] = useState<number[]>([]);
     const [formDataProduct, setFormDataProduct] = useState<FormDataProducts[]>([])
@@ -57,19 +56,15 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
     const [referenceLinkSlots, setReferenceLinkSlots] = useState<(string)[]>([]);
     const [link, setLink] = useState("");
     const [files, setFiles] = useState<File[]>([]);
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<{checked: string, files: string}>({checked: '' , files: ''})
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Khách mới
     const [inforNewCustomer, setInforNewCustomer] = useState<{}>();
 
-    useEffect(() => {
-        const getData = async() => {
-            const data = await searchCustomer({ page: 1, limit: 10 });
-            console.log("Data: ", data);
-            
-        }
-        getData()
-    }, [profile])
-    
+    // Khách cũ
+    const [inforOldCustomer, setInforOldCustomer] = useState<{}>();
+
     const handleClose = () => {
         onClose();
         setErrors({});
