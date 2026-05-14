@@ -250,39 +250,53 @@ const AllManagedAccount: React.FC<AllManagedAccountProps> = (props) => {
                                                 >
                                                     {account.isActive ? (
                                                         <>
-                                                            <Button
-                                                                fullWidth
-                                                                sx={{ bgcolor: COLORS.BUTTON }}
-                                                                startIcon={<RestartAlt/>} 
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    account && handleOpenResetPassword(account)
-                                                                }}
-                                                            >
-                                                                Reset
-                                                            </Button>
-                                                            <Button
-                                                                fullWidth
-                                                                sx={{ bgcolor: account.isActive ? COLORS.DEACTIVED : COLORS.ACTIVED }}
-                                                                startIcon={account.isActive ? <ToggleOff/> : <ToggleOn/>}
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    account && handleOpenUnactiveAccount(account)
-                                                                }}
-                                                            >
-                                                                {account.isActive ? "Vô hiệu hóa" : "Kích hoạt"}
-                                                            </Button>
-                                                            <Button
-                                                                fullWidth
-                                                                sx={{ bgcolor: COLORS.BUTTON }}
-                                                                startIcon={<Delete/>}
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    account && handleOpenDeletedAccount(account)
-                                                                }}
-                                                            >
-                                                                Xóa
-                                                            </Button>
+                                                            <Box display='flex' justifyContent='space-between' gap={2}>
+                                                                <Button
+                                                                    fullWidth
+                                                                    sx={{ bgcolor: COLORS.BUTTON }}
+                                                                    startIcon={<Edit/>}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                    }}
+                                                                >
+                                                                    Sửa
+                                                                </Button>
+                                                                <Button
+                                                                    fullWidth
+                                                                    sx={{ bgcolor: COLORS.BUTTON }}
+                                                                    startIcon={<RestartAlt/>} 
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        account && handleOpenResetPassword(account)
+                                                                    }}
+                                                                >
+                                                                    Reset
+                                                                </Button>                                                            
+                                                            </Box>
+                                                            <Box display='flex' justifyContent='space-between' gap={2}>
+                                                                <Button
+                                                                    fullWidth
+                                                                    sx={{ bgcolor: account.isActive ? COLORS.DEACTIVED : COLORS.ACTIVED }}
+                                                                    startIcon={account.isActive ? <ToggleOff/> : <ToggleOn/>}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        account && handleOpenUnactiveAccount(account)
+                                                                    }}
+                                                                >
+                                                                    {account.isActive ? "Vô hiệu hóa" : "Kích hoạt"}
+                                                                </Button>
+                                                                <Button
+                                                                    fullWidth
+                                                                    sx={{ bgcolor: COLORS.BUTTON }}
+                                                                    startIcon={<Delete/>}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        account && handleOpenDeletedAccount(account)
+                                                                    }}
+                                                                >
+                                                                    Xóa
+                                                                </Button>
+                                                            </Box>    
                                                         </>
                                                     ) : (
                                                         <Button

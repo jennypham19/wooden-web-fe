@@ -27,6 +27,7 @@ const ProductivityReport = Loadable(lazy(() => import('@/views/Manage/Reports/Pr
 const NotificationsReminders = Loadable(lazy(() => import('@/views/Manage/AdditionalSupport/NotificationsReminders/index')));    // Thông báo/ Nhắc việc
 const DocumentsGuides = Loadable(lazy(() => import('@/views/Manage/AdditionalSupport/DocumentsGuides/index')));    // Tài liệu & hướng dẫn
 const FeedbackCustomer = Loadable(lazy(() => import('@/views/Manage/Feedback/index'))); // Phản hồi của khách hàng
+const AdminitrativeBoundaries = Loadable(lazy(() => import('@/views/Manage/AdministrativeBoundaries/index'))); // Địa giới hành chính
 
 
 const manageRoutes: RouteObject[] = [
@@ -54,7 +55,8 @@ const manageRoutes: RouteObject[] = [
     { path: ROUTE_PATH.MANAGE_PRODUCTIVITY_REPORT, element: <ProductivityReport/> },
     { path: ROUTE_PATH.MANAGE_NOTIFICATIONS_REMINDERS, element: <NotificationsReminders/> },
     { path: ROUTE_PATH.MANAGE_DOCUMENTS_GUIDES, element: <DocumentsGuides/> },
-    { path: ROUTE_PATH.MANAGE_FEEDBACK_CUSTOMER, element: <FeedbackCustomer/> }
+    { path: ROUTE_PATH.MANAGE_FEEDBACK_CUSTOMER, element: <FeedbackCustomer/> },
+    { path: ROUTE_PATH.MANAGE_ADMINISTRATIVE_BOUNDARIES, element: <AdminitrativeBoundaries/> },
 ];
 
 export default manageRoutes;
