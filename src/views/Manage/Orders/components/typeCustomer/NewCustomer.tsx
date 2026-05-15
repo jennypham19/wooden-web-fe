@@ -1,6 +1,9 @@
 import InputText from "@/components/InputText";
+import { ICustomerInput } from "@/types/customer";
+import { FormInfoNewCustomerErrors } from "@/types/error";
 import { Checkbox, FormControlLabel, FormGroup, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
+import { error } from "console";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid"
 
@@ -17,11 +20,18 @@ const DATA_ADDRESS: {id: string, label: string, value: string}[] = [
     }
 ]
 
-const NewCustomer = () => {
-    const [checked, setChecked] = useState<string | null>(null);
+interface NewCustomerProps{
+    inforNewCustomer: ICustomerInput,
+    onCheck: (value: string) => void;
+    onHandleChangeInfoNewCus: (name: string, value: any) => void;
+    infoNewCusErrors: FormInfoNewCustomerErrors
+}
+
+const NewCustomer = (props: NewCustomerProps) => {
+    const { inforNewCustomer, onCheck, onHandleChangeInfoNewCus, infoNewCusErrors } = props;
 
     const handleCheck = (value: string) => () => {
-        setChecked(value);
+        onCheck(value);
     };
     return(
         <Grid container spacing={2}>
@@ -29,22 +39,26 @@ const NewCustomer = () => {
                 <Typography fontSize='15px' fontWeight={500}>Tên khách hàng</Typography>
                 <InputText
                     label=""
-                    name=""
-                    value={''}
+                    name="name"
+                    value={inforNewCustomer.name}
                     type="text"
-                    onChange={() => {}}
+                    onChange={onHandleChangeInfoNewCus}
                     sx={{ mt: 0.5 }}
+                    error={!!infoNewCusErrors.name}
+                    helperText={infoNewCusErrors.name}
                 />
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
                 <Typography fontSize='15px' fontWeight={500}>Số điện thoại</Typography>
                 <InputText
                     label=""
-                    name=""
-                    value={''}
+                    name="phone"
+                    value={inforNewCustomer.phone}
                     type="text"
-                    onChange={() => {}}
+                    onChange={onHandleChangeInfoNewCus}
                     sx={{ mt: 0.5 }}
+                    error={!!infoNewCusErrors.phone}
+                    helperText={infoNewCusErrors.phone}
                 />
             </Grid>
             <Grid size={{ xs: 12, md: 12 }}>
@@ -60,7 +74,7 @@ const NewCustomer = () => {
                                 }}
                                 control={
                                     <Checkbox
-                                        checked={checked === data.value}
+                                        checked={inforNewCustomer.type === data.value}
                                         onChange={handleCheck(data.value)}
                                         sx={{
                                             color: "#000",
@@ -74,14 +88,24 @@ const NewCustomer = () => {
                         ))}
                     </FormGroup>
                 </Stack>
-                <InputText
-                    label=""
-                    name=""
-                    value={''}
-                    type="text"
-                    onChange={() => {}}
-                    sx={{ mt: 0.5 }}
-                />
+                {infoNewCusErrors.type && (
+                    <Typography color="error" fontSize="13px" mb={1}>{infoNewCusErrors.type}</Typography>
+                )}
+                {inforNewCustomer.type && (
+                    <InputText
+                        label=""
+                        name="address"
+                        value={inforNewCustomer.address}
+                        type="text"
+                        onChange={onHandleChangeInfoNewCus}
+                        sx={{ mt: 0.5 }}
+                        multiline
+                        rows={5}
+                        error={!!infoNewCusErrors.address}
+                        helperText={infoNewCusErrors.address}
+                    />                    
+                )}
+
             </Grid>
         </Grid>
     )

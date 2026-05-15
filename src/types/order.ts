@@ -2,6 +2,7 @@ import { ProccessOrder, ProccessWorkOrder, ProgressWorkOrder, StatusOrder } from
 import { Dayjs } from "dayjs";
 import { FormDataProducts, IProduct } from "./product";
 import { IInputFile, IReferenceLink } from "./file";
+import { ICustomerInput } from "./customer";
 
 // Đầu vào
 export interface FormDataInputFiles{
@@ -34,7 +35,8 @@ export interface FormDataInputOrders{
     status: string,
     amount: number | null,
     requiredNote: string,
-    internalNote?: string
+    internalNote?: string,
+    managerId: string | null
 }
 
 export interface FormDataImageStep{
@@ -70,6 +72,23 @@ export interface OrderPayloadRequest{
     inputFiles?: FormDataInputFiles[],
     referenceLinks?: FormDataReferenceLinks[] | null[],
     products: FormDataProducts[],
+    createdBy: string | null
+}
+
+export interface OrderPayload{
+    typeCustomer: string | null,
+    customer: ICustomerInput | null,
+    name: string,
+    dateOfReceipt: Dayjs | null | string,
+    dateOfPayment: Dayjs | null | string,
+    managerId: string | null,
+    proccess: string,
+    status: string,
+    amount: number | null,
+    requiredNote: string,
+    products: FormDataProducts[],
+    inputFiles?: FormDataInputFiles[],
+    referenceLinks?: FormDataReferenceLinks[] | null[],
     createdBy: string | null
 }
 

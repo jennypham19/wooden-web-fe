@@ -3,7 +3,7 @@ import React from 'react';
 
 
 import { Chip, CircularProgress, FormControl, FormHelperText, InputLabel, ListSubheader, MenuItem, Select, SelectChangeEvent, SelectProps, SxProps, Theme } from '@mui/material';
-import { ArrowDropDown, Clear } from '@mui/icons-material';
+import { ArrowDropDown, ArrowDropUp, Clear } from '@mui/icons-material';
 import { log } from 'console';
 
 
@@ -70,6 +70,7 @@ const InputSelect: React.FC<InputSelectProps> = ({
   margin,
   onLoadData
 }) => {
+  const [open, setOpen] = React.useState(false);
   const handleChange = (event: SelectChangeEvent<typeof value>) => {
     const selectedValue = multiple ? event.target.value : event.target.value;
     onChange(name, selectedValue);
@@ -202,6 +203,9 @@ const InputSelect: React.FC<InputSelectProps> = ({
         {label}
       </InputLabel>
       <Select
+        open={open}
+        onOpen={() => setOpen(true)}
+        onClose={() => setOpen(false)}
         displayEmpty
         labelId={`${name}-label`}
         id={`${name}-select`}
@@ -211,7 +215,7 @@ const InputSelect: React.FC<InputSelectProps> = ({
         label={label}
         multiple={multiple}
         IconComponent={() => (
-          hasValue && !disabled && (
+          hasValue && !disabled ? (
             <Clear
               fontSize="small"
               sx={{ cursor: 'pointer', mr: 1 }}
@@ -220,7 +224,23 @@ const InputSelect: React.FC<InputSelectProps> = ({
                 handleClear();
               }}
             />
-          ) 
+          ) : open ? (
+            <ArrowDropUp
+              fontSize="small"
+              sx={{ cursor: 'pointer', mr: 1 }}
+              onMouseUp={(e) => {
+                setOpen(false)
+              }}
+            />
+          ) : (
+            <ArrowDropDown
+              fontSize="small"
+              sx={{ cursor: 'pointer', mr: 1 }}
+              onMouseDown={(e) => {
+                setOpen(true)
+              }}
+            />
+          )
         )}
         MenuProps={MenuProps}
         renderValue={(selected) => {

@@ -148,7 +148,7 @@ const ProductOrder = (props: ProductOrderProps) => {
                             helperText={errors.target}
                         />
                     </Grid>
-                    <Grid size={{ xs: 12, md: 4 }}>
+                    <Grid size={{ xs: 12, md: 6 }}>
                         <Typography fontWeight={700} fontSize='15px'>Tiến độ</Typography>
                         <InputText
                             label=""
@@ -159,7 +159,7 @@ const ProductOrder = (props: ProductOrderProps) => {
                             disabled
                         />
                     </Grid>
-                    <Grid size={{ xs: 12, md: 4 }}>
+                    <Grid size={{ xs: 12, md: 6 }}>
                         <Typography fontWeight={700} fontSize='15px'>Trạng thái</Typography>
                         <InputText
                             label=""
@@ -170,7 +170,7 @@ const ProductOrder = (props: ProductOrderProps) => {
                             disabled
                         />
                     </Grid>
-                    <Grid size={{ xs: 12, md: 4 }}>
+                    {/* <Grid size={{ xs: 12, md: 4 }}>
                         <Typography fontWeight={700} fontSize='15px'>Người quản lý</Typography>
                         <InputSelect
                             index={index - 1}
@@ -189,7 +189,7 @@ const ProductOrder = (props: ProductOrderProps) => {
                             error={!!errors.managerId}
                             helperText={errors.managerId}
                         />
-                    </Grid>
+                    </Grid> */}
                 </Grid>
         </Box>
     )

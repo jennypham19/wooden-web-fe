@@ -8,7 +8,6 @@ export interface FormDataProducts{
     target: string
     proccess: string,
     status: string,
-    managerId: string,
     lenghtProduct: number | null,
     widthProduct: number | null,
     heightProduct: number | null

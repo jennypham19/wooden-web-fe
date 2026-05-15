@@ -1,12 +1,14 @@
 import React, { useState, useRef } from 'react';
 import { Box, Typography, IconButton, Stack } from '@mui/material';
 import { Close, Description, FolderCopyOutlined, Image, VideoCameraBack } from '@mui/icons-material';
+import { compressImage } from '@/utils/file';
 
 interface FilesUploadProps {
   onFilesSelect: (files: File[]) => void;
   height?: number;
   error?: string,
 }
+
 
 const UploadFiles: React.FC<FilesUploadProps> = ({ onFilesSelect, height = 250, error }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -16,10 +18,11 @@ const UploadFiles: React.FC<FilesUploadProps> = ({ onFilesSelect, height = 250, 
         const files = event.target.files;
         if (files) {
             const arrFiles = Array.from(files); // Convert FileList => File[]
-
+            // nén toàn bộ files
+            const processFiles = await Promise.all(arrFiles.map(file => compressImage(file)));
             // update files
             setFiles(prev => {
-                const newFiles = [...(prev || []), ...arrFiles];
+                const newFiles = [...(prev || []), ...processFiles];
                 onFilesSelect(newFiles);  // cb đồng bộ với state
                 return newFiles
             });

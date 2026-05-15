@@ -1,13 +1,15 @@
+import InputSelect from "@/components/InputSelect";
 import InputText from "@/components/InputText";
 import { COLORS } from "@/constants/colors";
-import { searchCustomer } from "@/services/customer-service";
-import { ICustomer, ICustomerInFuni } from "@/types/customer";
-import { FormDataInputOrders } from "@/types/order";
+import useNotification from "@/hooks/useNotification";
+import { uploadFiles } from "@/services/upload-service";
+import { ICustomerInFuni, ICustomerInput } from "@/types/customer";
+import { FormInfoNewCustomerErrors } from "@/types/error";
+import { FormDataInputFiles, FormDataInputOrders, FormDataReferenceLinks, OrderPayload } from "@/types/order";
 import { FormDataProducts } from "@/types/product";
 import { IUser } from "@/types/user";
 import { FormErrors, FormProductErrors } from "@/views/Manage/Orders/components/AddOrder";
 import ProductOrder from "@/views/Manage/Orders/components/ProductOrder";
-import FuniCustomer from "@/views/Manage/Orders/components/typeCustomer/FuniCustomer";
 import NewCustomer from "@/views/Manage/Orders/components/typeCustomer/NewCustomer";
 import OldCustomer from "@/views/Manage/Orders/components/typeCustomer/OldCustomer";
 import UploadFiles from "@/views/Manage/Orders/components/UploadFiles";
@@ -15,7 +17,8 @@ import { Add, AttachFile, Close, CloudUpload, EditNote, Info, Inventory, Link, P
 import { Box, Button, Checkbox, FormControlLabel, FormGroup, IconButton, Paper, Stack, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2"
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import { t } from "i18next";
+import { useState } from "react";
 import { v4 as uuidv4 } from "uuid"
 
 interface AddOrderDesktopProps{
@@ -44,15 +47,17 @@ const DATA_CUSTOMER: {id: string, label: string, value: string}[] = [
 
 const AddOrderDesktop = (props: AddOrderDesktopProps) => {
     const { profile, onClose, users } = props;
+    const notify = useNotification();
     const [checked, setChecked] = useState<string | null>(null);
     const [infoCustomer, setInfoCustomer] = useState<ICustomerInFuni | null>(null)
     const [ formData, setFormData ] = useState<FormDataInputOrders>({
-        name: '', dateOfReceipt: dayjs(), dateOfPayment: null, proccess: 'not_started_0%', status: 'pending', amount: null, requiredNote: '', internalNote: ''})
+        name: '', dateOfReceipt: dayjs(), dateOfPayment: null, proccess: 'not_started_0%', status: 'pending', amount: null, requiredNote: '', internalNote: '', managerId: null})
     const [errors, setErrors] = useState<FormErrors>({});
     const [amountProduct, setAmountProduct] = useState<number | null>(null);
     const [products, setProducts] = useState<number[]>([]);
     const [formDataProduct, setFormDataProduct] = useState<FormDataProducts[]>([])
     const [productErrors, setProductErrors] = useState<FormProductErrors[]>([])
+    const [infoNewCusErrors, setInfoNewCusErrors] = useState<FormInfoNewCustomerErrors>({});
     const [referenceLinkSlots, setReferenceLinkSlots] = useState<(string)[]>([]);
     const [link, setLink] = useState("");
     const [files, setFiles] = useState<File[]>([]);
@@ -60,16 +65,16 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Khách mới
-    const [inforNewCustomer, setInforNewCustomer] = useState<{}>();
+    const [inforNewCustomer, setInforNewCustomer] = useState<ICustomerInput>({ name: '', phone: '', type: '', address: '' });
 
     // Khách cũ
-    const [inforOldCustomer, setInforOldCustomer] = useState<{}>();
+    const [inforOldCustomer, setInforOldCustomer] = useState<ICustomerInput>({ name: '', phone: '', type: '', address: '' });
 
     const handleClose = () => {
         onClose();
         setErrors({});
         setReferenceLinkSlots([]);
-        setFormData({ name: '', dateOfReceipt: dayjs(), dateOfPayment: null, proccess: 'not_started_0%', status: 'pending', amount: null, requiredNote: '', internalNote: '' })
+        setFormData({ name: '', dateOfReceipt: dayjs(), dateOfPayment: null, proccess: 'not_started_0%', status: 'pending', amount: null, requiredNote: '', internalNote: '', managerId: null })
         setLink('')
     }
     const handleCheck = (value: string) => () => {
@@ -77,7 +82,7 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
         setErrors({})
         setProductErrors([])
         setAmountProduct(null)
-        setFormData({ name: '', dateOfReceipt: dayjs(), dateOfPayment: null, proccess: 'not_started_0%', status: 'pending', amount: null, requiredNote: '', internalNote: '' })
+        setFormData({ name: '', dateOfReceipt: dayjs(), dateOfPayment: null, proccess: 'not_started_0%', status: 'pending', amount: null, requiredNote: '', internalNote: '', managerId: null })
         setInfoCustomer(null)
         setError({ checked: '', files: '' })
     }
@@ -136,6 +141,19 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
         setInfoCustomer(value)
     }
 
+    // Khách hàng mới
+    const handleCheckInfoNewCus = (value: string) => {
+        setInforNewCustomer(prev => ({ ...prev, type: value }));
+    }
+
+    const handleChangeInfoNewCus = (name: string, value: any) => {
+        setInforNewCustomer(prev => ({ ...prev, [name]: value }))
+        // Xóa lỗi khi người dùng bắt đầu nhập
+        if(infoNewCusErrors[name as keyof typeof infoNewCusErrors]){
+            setInfoNewCusErrors(prev => ({ ...prev, [name]: undefined }))
+        }
+    }
+
     // Link tài liệu tham khảo
     const handleAddReferenceLinkSlot = () => {
         if(!link.trim()) return;
@@ -152,11 +170,20 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
     }
 
     const validateForm = (): boolean => {
+        // bắt lỗi form thông tin khách hàng
+        const newErrorsInfoNewCustomer: FormInfoNewCustomerErrors = {};
+        if(!inforNewCustomer.name) newErrorsInfoNewCustomer.name = "Vui lòng nhập tên khách hàng";
+        if(!inforNewCustomer.phone) newErrorsInfoNewCustomer.phone = "Vui lòng nhập số điện thoại";
+        if(!inforNewCustomer.type) newErrorsInfoNewCustomer.type = "Vui lòng chọn loại địa chỉ";
+        if(!inforNewCustomer.address) newErrorsInfoNewCustomer.address = "Vui lòng nhập địa chỉ";
+        setInfoNewCusErrors(newErrorsInfoNewCustomer);
+
+        // bắt lỗi form chung của đơn hàng
         const newErrors: FormErrors = {};
         if(!formData.name) newErrors.name = "Vui lòng nhập tên đơn hàng";
         if(!formData.dateOfPayment) newErrors.dateOfPayment = "Vui lòng chọn ngày giao dự kiến";
-        if(!formData.requiredNote) newErrors.requiredNote = "Vui lòng nhập yêu cầu của khách";
-        if(!formData.amount) newErrors.amount = "Vui lòng nhập số lượng"
+        if(!formData.amount) newErrors.amount = "Vui lòng nhập số lượng";
+        if(!formData.managerId) newErrors.managerId = "Vui lòng chọn người quản lý";
 
         const newProductErrors: FormProductErrors[] = [];
         formDataProduct.forEach((product, idx) => {
@@ -167,7 +194,6 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
             if (!product.widthProduct) pError.widthProduct = `Sản phẩm ${idx + 1}: Vui lòng nhập chiều rộng`;
             if (!product.heightProduct) pError.heightProduct = `Sản phẩm ${idx + 1}: Vui lòng nhập chiều cao`;
             if (!product.target) pError.target = `Sản phẩm ${idx + 1}: Vui lòng nhập mục tiêu sản xuất`;
-            if (!product.managerId) pError.managerId = `Sản phẩm ${idx + 1}: Vui lòng chọn người phụ trách`;
             newProductErrors.push(pError); 
         })
 
@@ -183,16 +209,80 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
         setError(newError)
 
         const hasProductError = newProductErrors.some((e) => Object.keys(e).length > 0);
+        const hasInfoNewCustomerError = Object.keys(newErrorsInfoNewCustomer).length > 0;
         setErrors(newErrors);
         setProductErrors(newProductErrors)
-        return Object.keys(newErrors).length === 0 && !hasProductError && checked !== null && files.length > 0;    
+        return Object.keys(newErrors).length === 0 && !hasProductError && !hasInfoNewCustomerError && checked !== null && files.length > 0;    
     }
 
     const handleSave = async() => {
         if(!validateForm()){
             return;
         }
+
+        setIsSubmitting(true);
+        const payloadReferenceLink: FormDataReferenceLinks[] = referenceLinkSlots.map((slot) => ({
+            url: slot
+        }));
+
+        let uploadFilesResponses: any;
+        try {
+            uploadFilesResponses = files && await uploadFiles(files, 'order');
+            if(!uploadFilesResponses.success || !uploadFilesResponses.data?.files){
+                throw new Error('Upload ảnh thất bại hoặc không nhận được URL ảnh');
+            }            
+        } catch (error: any) {
+            notify({
+                message: error.message,
+                severity: 'error'
+            })
+            setIsSubmitting(false)
+        }
+
+        const payloadInputFiles: FormDataInputFiles[] =  uploadFilesResponses.data.files.map((file: any) => ({
+            name: file.originalname,
+            url: file.url
+        }))
+
+        try {
+            const payload: OrderPayload = {
+                typeCustomer: checked,
+                customer: checked === 'new' ? inforNewCustomer : null,
+                name: formData.name,
+                dateOfReceipt: formData.dateOfReceipt ? formData.dateOfReceipt?.toISOString() : '',
+                dateOfPayment: formData.dateOfPayment ? formData.dateOfPayment.toISOString() : '',
+                managerId: formData.managerId,
+                proccess: formData.proccess,
+                status: formData.status,
+                amount: Number(formData.amount),
+                requiredNote: formData.requiredNote,
+                products: formDataProduct.map((product) => ({
+                    name: product.name,
+                    description: product.description,
+                    target: product.target,
+                    proccess: product.proccess,
+                    status: product.status,
+                    lenghtProduct: Number(product.lenghtProduct),
+                    widthProduct: Number(product.widthProduct),
+                    heightProduct: Number(product.heightProduct)
+                })), 
+                inputFiles: files.length > 0 ? payloadInputFiles : [],
+                referenceLinks: referenceLinkSlots[0] === null ? [] : payloadReferenceLink,
+                createdBy: profile ? profile.id : null
+            }
+
+            console.log("payload: ", payload);
+            
+        } catch (error: any) {
+            notify({
+                message: error.message,
+                severity: 'error'
+            })
+        } finally {
+            setIsSubmitting(false);
+        }
     }
+
     return(
         <Grid container spacing={2}>
             {/* Thông tin khách hàng, Danh sách sản phẩm, Yêu cầu khách, Ghi chú nội bộ */}
@@ -233,8 +323,8 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
                         <Typography variant="caption" color="error">{error.checked}</Typography>
                     )}
                     {checked === 'old' && (<OldCustomer/>)}
-                    {checked === 'cus-funi' && (<FuniCustomer onChange={handleChangeInfoFuniCus} infoCustomer={infoCustomer}/>)}
-                    {checked === 'new' && (<NewCustomer/>)}
+                    {/* {checked === 'cus-funi' && (<FuniCustomer onChange={handleChangeInfoFuniCus} infoCustomer={infoCustomer}/>)} */}
+                    {checked === 'new' && (<NewCustomer infoNewCusErrors={infoNewCusErrors} onHandleChangeInfoNewCus={handleChangeInfoNewCus} onCheck={handleCheckInfoNewCus} inforNewCustomer={inforNewCustomer}/>)}
                 </Paper>
 
                 {/* ----------- Danh sách sản phẩm kèm theo -------------- */}
@@ -349,6 +439,26 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
                                 type="text"
                                 sx={{ mt: 0.5 }}
                                 disabled
+                            />
+                        </Grid>
+                        <Grid size={{ md: 12 }}>
+                            <Typography fontWeight={700} fontSize='15px'>Người quản lý</Typography>
+                            <InputSelect
+                                label=""
+                                name="managerId"
+                                value={formData.managerId}
+                                onChange={handleChangeInput}
+                                options={users}
+                                transformOptions={data =>
+                                    data.map((item) => ({
+                                        value: item.id,
+                                        label: item.fullName
+                                    }))
+                                }
+                                placeholder="Chọn người quản lý"
+                                error={!!errors.managerId}
+                                helperText={errors.managerId}
+                                margin='dense'
                             />
                         </Grid>
                         <Grid size={{ md: 12 }}>
