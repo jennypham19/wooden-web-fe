@@ -99,7 +99,7 @@ const ManagementOrderFactoryManager = () => {
             )}
             {!loadingOrder && !errorOrders && !loadingOrdersWithProccess && !errorOrderWithProccess && (
               <>
-                <OverviewData title='Danh sách đơn hàng' onShowAll={handleOpenShowAllListOrders}>
+                <OverviewData title='Danh sách đơn hàng đã tạo' onShowAll={handleOpenShowAllListOrders}>
                   <Grid container spacing={2}>
                     {orders.length === 0 ? (
                       <Typography p={2} fontWeight={700}>
@@ -114,8 +114,8 @@ const ManagementOrderFactoryManager = () => {
                     )}
                   </Grid>
                 </OverviewData>
-                <OverviewData
-                  title='Đánh giá đơn hàng'
+                {/* <OverviewData
+                  title='Danh sách đơn hàng đang làm'
                   onShowAll={handleOpenShowAllEvaluatedOrders}
                 >
                   <Grid container spacing={2}>
@@ -129,7 +129,7 @@ const ManagementOrderFactoryManager = () => {
                       ))
                     )}
                   </Grid>
-                </OverviewData>
+                </OverviewData> */}
               </>
             )}
           </>

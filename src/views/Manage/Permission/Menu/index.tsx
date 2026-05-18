@@ -317,7 +317,6 @@ const Menus = () => {
                                             error={!!errors.code}
                                             helperText={errors.code}
                                             disabled={openMenu.type === 'edit'}
-                                            onlyPositiveNumber={true}
                                         />
                                     </Grid>
                                     <Grid size={{ xs: 12}}>

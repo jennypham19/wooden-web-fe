@@ -70,6 +70,7 @@ const ManagementJobCarpenter = () => {
       setOrder(null);
       setViewImageProducts(false)
     }
+console.log("listData: ", listData);
 
     return(
         <Box>
@@ -113,8 +114,10 @@ const ManagementJobCarpenter = () => {
                                             onPageChange={handlePageChange}
                                         />
                                     </Box>
+                                    {listData.map((order) => order.products.every)}
                             </>
-                        )}                   
+                        )}
+                                       
                 </>
             )}
             {openOrder.open && openOrder.type === 'view' && order && (

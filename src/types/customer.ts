@@ -1,11 +1,17 @@
+// input
+export interface ICustomerInput{
+    name: string,
+    phone: string,
+    type: string,
+    address: string,
+}
+
 export interface ICustomer{
     id: string;
     name: string;
     phone: string;
     type: string,
-    title?: string,
-    address?: string,
-    requiredNote?: string,
+    address: string,
     amountOfOrders?: number;
     createdAt?: string;
     updatedAt?: string

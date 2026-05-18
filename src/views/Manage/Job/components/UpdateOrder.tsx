@@ -54,14 +54,14 @@ const UpdateOrder: React.FC<UpdateOrderProps> = ({ onBack, data }) => {
         if(!newData) {
             return false
         }
-        return true && data.proccess === ProccessOrder.IN_PROGRESS_50;
+        return true && data.proccess === ProccessOrder.IN_PROGRESS_75;
         
     }
 
     const handleFinished = async(id: string) => {
         try {
             const payload: { proccess: string } = {
-                proccess: 'in_progress_75%'
+                proccess: 'completed_100%'
             }
             const res = await updateProccessOder(id, payload);
             notify({

@@ -11,6 +11,7 @@ import TabProduct from "./TabProduct";
 import { IProduct } from "@/types/product";
 import { getDetailWorkOrderByProduct } from "@/services/product-service";
 import { COLORS } from "@/constants/colors";
+import useAuth from "@/hooks/useAuth";
 
 interface ViewOrderByCarpenterProps{
     onBack: () => void;
@@ -19,6 +20,7 @@ interface ViewOrderByCarpenterProps{
 
 const ViewOrderByCarpenter = (props: ViewOrderByCarpenterProps) => {
     const { onBack, data } = props;
+    const { profile } = useAuth();
     const [order, setOrder] = useState<IOrder | null>(null);
     const [currentTab, setCurrentTab] = useState(0);
     const [workOrder, setWorkOrder] = useState<IWorkOrder | null>(null);
@@ -185,7 +187,7 @@ const ViewOrderByCarpenter = (props: ViewOrderByCarpenterProps) => {
                                                     <Box display='flex' flexDirection='row'>
                                                         <Typography mr={1.5} display='flex' justifyContent='center' alignItems="center" fontSize='14px'>Nhân viên: </Typography>
                                                         {workOrder.workers.map((worker, idx) => (
-                                                            <Tooltip key={idx} title={worker.fullName}>
+                                                            <Tooltip key={idx} title={profile?.id === worker.id ? 'Bạn' : worker.fullName}>
                                                                 <Avatar
                                                                     src={worker.avatarUrl}
                                                                     sx={{ borderRadius: '50%'}}

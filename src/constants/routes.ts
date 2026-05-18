@@ -29,6 +29,7 @@ export const ROUTE_PATH = {
   MANAGE_NOTIFICATIONS_REMINDERS: 'notifications_reminders',
   MANAGE_DOCUMENTS_GUIDES: 'documents_guides',
   MANAGE_FEEDBACK_CUSTOMER: 'feedback-customer',
+  MANAGE_ADMINISTRATIVE_BOUNDARIES: 'administrative-boundaries',
 
   PRODUCT_CATEGORY: '/products/categories',
   PRODUCT_CATEGORY_CREATE: '/products/categories/create',

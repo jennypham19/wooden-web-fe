@@ -1,3 +1,5 @@
+import imageCompression from "browser-image-compression";
+
 export const getMimeTypeFromName = (name = "") => {
   const lower = name.toLowerCase();
   if (lower.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\.|$)/)) return "image";
@@ -31,4 +33,33 @@ export const formatDuration = (seconds: number) => {
   const min = Math.floor(seconds / 60);
   const sec = Math.floor(seconds % 60);
   return `${min} : ${sec.toString().padStart(2, "0")}`;
+};
+
+export const compressImage = async (file: File): Promise<File> => {
+    try {
+        // chỉ nén ảnh
+        if (!file.type.startsWith("image/")) {
+            return file;
+        }
+
+        const options = {
+            maxSizeMB: 1, // ảnh sau nén ~1MB
+            maxWidthOrHeight: 1920,
+            useWebWorker: true,
+        };
+
+        const compressedFile = await imageCompression(file, options);
+
+        return new File(
+            [compressedFile],
+            file.name,
+            {
+                type: compressedFile.type,
+                lastModified: Date.now(),
+            }
+        );
+    } catch (error) {
+        console.error("Compress image error:", error);
+        return file;
+    }
 };
