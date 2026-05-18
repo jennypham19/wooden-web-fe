@@ -34,8 +34,8 @@ export interface FormDataInputOrders{
     proccess: string,
     status: string,
     amount: number | null,
-    requiredNote: string,
-    internalNote?: string,
+    requiredNote: string | null,
+    internalNote?: string | null,
     managerId: string | null
 }
 
@@ -53,7 +53,7 @@ export interface FormDataStep{
 
 export interface FormDataWorkMilestone{
     name: string,
-    step: number | null,
+    step: number | null | string,
     target: string,
     steps: FormDataStep[]
 }
@@ -68,7 +68,7 @@ export interface OrderPayloadRequest{
     proccess: string,
     status: string,
     amount: number | null,
-    requiredNote: string,
+    requiredNote: string | null,
     inputFiles?: FormDataInputFiles[],
     referenceLinks?: FormDataReferenceLinks[] | null[],
     products: FormDataProducts[],
@@ -85,11 +85,12 @@ export interface OrderPayload{
     proccess: string,
     status: string,
     amount: number | null,
-    requiredNote: string,
+    requiredNote: string | null,
     products: FormDataProducts[],
     inputFiles?: FormDataInputFiles[],
     referenceLinks?: FormDataReferenceLinks[] | null[],
-    createdBy: string | null
+    createdBy: string | null,
+    internalNote: string | null
 }
 
 export interface WorkOderPayload{

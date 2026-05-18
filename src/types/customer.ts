@@ -12,7 +12,6 @@ export interface ICustomer{
     phone: string;
     type: string,
     address: string,
-    requiredNote?: string,
     amountOfOrders?: number;
     createdAt?: string;
     updatedAt?: string

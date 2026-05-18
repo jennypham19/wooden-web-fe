@@ -1,7 +1,7 @@
 import { HttpResponse } from "@/types/common";
 import HttpClient from "@/utils/HttpClient";
 import { GetParams, PaginatedResponse } from "./base-service";
-import { IOrder, OrderPayloadRequest, StepPayload, StepsPayload, WorkOderPayload } from "@/types/order";
+import { IOrder, OrderPayload, OrderPayloadRequest, StepPayload, StepsPayload, WorkOderPayload } from "@/types/order";
 import { IUser } from "@/types/user";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'; 
 const prefix = `${API_BASE_URL}/api/orders`;
@@ -15,7 +15,7 @@ interface GetParamsOrders {
 }
 
 // Tạo đơn hàng
-export const createOrder = (payload: OrderPayloadRequest) => {
+export const createOrder = (payload: OrderPayload) => {
     return HttpClient.post(`${prefix}/create-order`, payload)
 }
 

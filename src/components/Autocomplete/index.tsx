@@ -7,19 +7,20 @@ import { useEffect, useMemo, useState } from "react";
 import avatar from "@/assets/images/users/avatar-1.png"
 
 export interface AutocompleteProps<T>{
-  label?: string;
-  placeholder?: string;
-  fetchOptions: (getParams: GetParams) => Promise<HttpResponse<PaginatedResponse<T>>>;
-  getOptionLabel: (option: T) => string;
-  getRenderOption: (option: T) => React.ReactNode;
-  onChange: (value: T | null) => void;
-  getOptionKey: (option: T) => string | number;
-  debounceTime?: number;
-  page?: number
+    label?: string;
+    placeholder?: string;
+    fetchOptions: (getParams: GetParams) => Promise<HttpResponse<PaginatedResponse<T>>>;
+    getOptionLabel: (option: T) => string;
+    getRenderOption: (option: T) => React.ReactNode;
+    onChange: (value: T | null) => void;
+    getOptionKey: (option: T) => string | number;
+    debounceTime?: number;
+    page?: number;
+    mt?: number;
 }
 
 export default function AutocompleteComponent<T>(props: AutocompleteProps<T>){
-    const { label, placeholder, fetchOptions, getOptionLabel, onChange, debounceTime = 400, page = 1, getRenderOption, getOptionKey } = props;
+    const { label, placeholder, fetchOptions, getOptionLabel, onChange, debounceTime = 400, page = 1, getRenderOption, getOptionKey, mt = 0.5 } = props;
     const [options, setOptions] = useState<T[]>([]); 
     const [loading, setLoading] = useState(false);
     const [isSearch, setIsSearch] = useState(false);
@@ -97,6 +98,7 @@ export default function AutocompleteComponent<T>(props: AutocompleteProps<T>){
                     placeholder={placeholder}
                     InputProps={{
                         ...params.InputProps,
+                        sx: { mt: mt },
                         endAdornment: (
                             <>
                                 {loading && <CircularProgress size={18} />}

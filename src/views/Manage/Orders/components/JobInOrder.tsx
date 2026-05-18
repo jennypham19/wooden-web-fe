@@ -146,7 +146,7 @@ const JobInOrder = (props: JobInOrderProps) => {
             setFormDataWorkMilestone(
                 Array.from({ length: newNumber }, () => ({
                     name: '',
-                    step: null,
+                    step: '',
                     target: '',
                     steps: []
                 }))

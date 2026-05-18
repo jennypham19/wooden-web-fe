@@ -2,8 +2,9 @@ import InputSelect from "@/components/InputSelect";
 import InputText from "@/components/InputText";
 import { COLORS } from "@/constants/colors";
 import useNotification from "@/hooks/useNotification";
+import { createOrder } from "@/services/order-service";
 import { uploadFiles } from "@/services/upload-service";
-import { ICustomerInFuni, ICustomerInput } from "@/types/customer";
+import { ICustomer, ICustomerInFuni, ICustomerInput } from "@/types/customer";
 import { FormInfoNewCustomerErrors } from "@/types/error";
 import { FormDataInputFiles, FormDataInputOrders, FormDataReferenceLinks, OrderPayload } from "@/types/order";
 import { FormDataProducts } from "@/types/product";
@@ -68,13 +69,13 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
     const [inforNewCustomer, setInforNewCustomer] = useState<ICustomerInput>({ name: '', phone: '', type: '', address: '' });
 
     // Khách cũ
-    const [inforOldCustomer, setInforOldCustomer] = useState<ICustomerInput>({ name: '', phone: '', type: '', address: '' });
+    const [inforOldCustomer, setInforOldCustomer] = useState<ICustomer | null>(null);
 
     const handleClose = () => {
         onClose();
         setErrors({});
         setReferenceLinkSlots([]);
-        setFormData({ name: '', dateOfReceipt: dayjs(), dateOfPayment: null, proccess: 'not_started_0%', status: 'pending', amount: null, requiredNote: '', internalNote: '', managerId: null })
+        setFormData({ name: '', dateOfReceipt: dayjs(), dateOfPayment: null, proccess: 'not_started_0%', status: 'pending', amount: null, requiredNote: null, internalNote: '', managerId: null })
         setLink('')
     }
     const handleCheck = (value: string) => () => {
@@ -82,7 +83,7 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
         setErrors({})
         setProductErrors([])
         setAmountProduct(null)
-        setFormData({ name: '', dateOfReceipt: dayjs(), dateOfPayment: null, proccess: 'not_started_0%', status: 'pending', amount: null, requiredNote: '', internalNote: '', managerId: null })
+        setFormData({ name: '', dateOfReceipt: dayjs(), dateOfPayment: null, proccess: 'not_started_0%', status: 'pending', amount: null, requiredNote: null, internalNote: '', managerId: null })
         setInfoCustomer(null)
         setError({ checked: '', files: '' })
     }
@@ -154,6 +155,11 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
         }
     }
 
+    // Khách hàng cũ
+    const handleChangeInfoOldCus = (value: ICustomer | null) => {
+        setInforOldCustomer(value)
+    }
+
     // Link tài liệu tham khảo
     const handleAddReferenceLinkSlot = () => {
         if(!link.trim()) return;
@@ -169,15 +175,18 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
         setLink(newValue)
     }
 
-    const validateForm = (): boolean => {
+    const validateInfoNewCustomer = (): boolean => {
         // bắt lỗi form thông tin khách hàng
         const newErrorsInfoNewCustomer: FormInfoNewCustomerErrors = {};
         if(!inforNewCustomer.name) newErrorsInfoNewCustomer.name = "Vui lòng nhập tên khách hàng";
         if(!inforNewCustomer.phone) newErrorsInfoNewCustomer.phone = "Vui lòng nhập số điện thoại";
         if(!inforNewCustomer.type) newErrorsInfoNewCustomer.type = "Vui lòng chọn loại địa chỉ";
         if(!inforNewCustomer.address) newErrorsInfoNewCustomer.address = "Vui lòng nhập địa chỉ";
-        setInfoNewCusErrors(newErrorsInfoNewCustomer);
+        setInfoNewCusErrors(newErrorsInfoNewCustomer); 
+        return Object.keys(newErrorsInfoNewCustomer).length === 0;
+    }
 
+    const validateForm = (): boolean => {
         // bắt lỗi form chung của đơn hàng
         const newErrors: FormErrors = {};
         if(!formData.name) newErrors.name = "Vui lòng nhập tên đơn hàng";
@@ -209,13 +218,15 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
         setError(newError)
 
         const hasProductError = newProductErrors.some((e) => Object.keys(e).length > 0);
-        const hasInfoNewCustomerError = Object.keys(newErrorsInfoNewCustomer).length > 0;
         setErrors(newErrors);
         setProductErrors(newProductErrors)
-        return Object.keys(newErrors).length === 0 && !hasProductError && !hasInfoNewCustomerError && checked !== null && files.length > 0;    
+        return Object.keys(newErrors).length === 0 && !hasProductError && checked !== null && files.length > 0;    
     }
 
     const handleSave = async() => {
+        if(checked === 'new' && !validateInfoNewCustomer()){
+            return;
+        }
         if(!validateForm()){
             return;
         }
@@ -247,7 +258,7 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
         try {
             const payload: OrderPayload = {
                 typeCustomer: checked,
-                customer: checked === 'new' ? inforNewCustomer : null,
+                customer: checked === 'new' ? inforNewCustomer : inforOldCustomer,
                 name: formData.name,
                 dateOfReceipt: formData.dateOfReceipt ? formData.dateOfReceipt?.toISOString() : '',
                 dateOfPayment: formData.dateOfPayment ? formData.dateOfPayment.toISOString() : '',
@@ -255,7 +266,7 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
                 proccess: formData.proccess,
                 status: formData.status,
                 amount: Number(formData.amount),
-                requiredNote: formData.requiredNote,
+                requiredNote: formData.requiredNote ? formData.requiredNote : null,
                 products: formDataProduct.map((product) => ({
                     name: product.name,
                     description: product.description,
@@ -268,11 +279,16 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
                 })), 
                 inputFiles: files.length > 0 ? payloadInputFiles : [],
                 referenceLinks: referenceLinkSlots[0] === null ? [] : payloadReferenceLink,
-                createdBy: profile ? profile.id : null
+                createdBy: profile ? profile.id : null,
+                internalNote: formData.internalNote ? formData.internalNote : null
             }
-
             console.log("payload: ", payload);
-            
+            const res = await createOrder(payload);
+            notify({
+                message: res.message,
+                severity: 'success'
+            })
+            handleClose();
         } catch (error: any) {
             notify({
                 message: error.message,
@@ -322,7 +338,7 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
                     {error.checked && (
                         <Typography variant="caption" color="error">{error.checked}</Typography>
                     )}
-                    {checked === 'old' && (<OldCustomer/>)}
+                    {checked === 'old' && (<OldCustomer inforOldCustomer={inforOldCustomer} onHandleChangeInfoOldCus={handleChangeInfoOldCus}/>)}
                     {/* {checked === 'cus-funi' && (<FuniCustomer onChange={handleChangeInfoFuniCus} infoCustomer={infoCustomer}/>)} */}
                     {checked === 'new' && (<NewCustomer infoNewCusErrors={infoNewCusErrors} onHandleChangeInfoNewCus={handleChangeInfoNewCus} onCheck={handleCheckInfoNewCus} inforNewCustomer={inforNewCustomer}/>)}
                 </Paper>

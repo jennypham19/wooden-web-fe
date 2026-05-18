@@ -7,7 +7,7 @@ import { error } from "console";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid"
 
-const DATA_ADDRESS: {id: string, label: string, value: string}[] = [
+export const DATA_ADDRESS: {id: string, label: string, value: string}[] = [
     {
         id: uuidv4(),
         label: 'Cơ quan',

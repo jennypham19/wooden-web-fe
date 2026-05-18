@@ -856,7 +856,7 @@ const ProgressProduct = (props: ProgressProductProps) => {
                             sx={{ bgcolor: COLORS.BUTTON, mt: 2, borderRadius: 3 }}
                             onClick={handleFinish}
                         >
-                            Hoàn thành đơn hàng
+                            Hoàn thành sản phẩm
                         </Button>  
                     </>                  
                 )}

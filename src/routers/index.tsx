@@ -47,10 +47,10 @@ const routes: RouteObject[] = [
   // },
 
   // TRANG ĐẶT HÀNG (KHÔNG CẦN XÁC THỰC)
-  // {
-  //   path: '/don-hang',
-  //   element: <OrderLink />,
-  // },
+  {
+    path: '/don-hang',
+    element: <OrderLink />,
+  },
 
 
   // --- NHÁNH 2: CÁC TRANG XÁC THỰC (CHỈ DÀNH CHO NGƯỜI CHƯA ĐĂNG NHẬP) ---
@@ -67,10 +67,10 @@ const routes: RouteObject[] = [
           { path: 'registration', element: <Registration /> },
           { path: 'forgot-password', element: <ForgotPassword /> },
           { path: 'change-password', element: <ChangePassword /> },
-          {
-            path: '/don-hang',
-            element: <OrderLink />,
-          },
+          // {
+          //   path: '/don-hang',
+          //   element: <OrderLink />,
+          // },
         ]
       },
     ],
