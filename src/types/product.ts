@@ -1,5 +1,6 @@
 import { ProccessOrder, StatusOrder } from "@/constants/status";
 import { Dayjs } from "dayjs";
+import { IWorkOrder } from "./order";
 
 // Đầu vào
 export interface FormDataProducts{
@@ -131,7 +132,8 @@ export interface IProduct{
             url: string,
             duration: number
         }
-    }
+    },
+    workOrder: IWorkOrder
 }
 
 export interface IProductReview{

@@ -3,6 +3,7 @@ import _ from 'lodash';
 import Papa from 'papaparse';
 import { PDFDocument } from "pdf-lib";
 import JSZip from "jszip";
+import { useMediaQuery, useTheme } from '@mui/material';
 // import { createFFmpeg } from "@ffmpeg/ffmpeg";
 
 
@@ -203,3 +204,4 @@ export const compressDocx = async (file: File): Promise<File> => {
 
 //   return new File([data.buffer], file.name, { type: "video/mp4" });
 // };
+

@@ -7,7 +7,8 @@ interface CommonImageProps extends ImgHTMLAttributes<HTMLImageElement>{
     fallbackSrc?: string;
     sx?: SxProps;
     borderRadius?: string | number;
-    route?: string
+    route?: string,
+    handleFunt?: (e: React.MouseEvent<HTMLImageElement>) => void,
 }
 
 const CommonImage: React.FC<CommonImageProps> = ({
@@ -18,6 +19,7 @@ const CommonImage: React.FC<CommonImageProps> = ({
     onError,
     borderRadius,
     route,
+    handleFunt,
     ...rest
 }) => {
     const navigate = useNavigate()
@@ -28,6 +30,11 @@ const CommonImage: React.FC<CommonImageProps> = ({
         if(onError) onError(e)
     }
 
+    const handleClick = (e: React.MouseEvent<HTMLImageElement>) => {
+        if(handleFunt) handleFunt(e);
+        if(route) navigate(route);
+    }
+
     return(
         <Box
             component='img'
@@ -35,7 +42,7 @@ const CommonImage: React.FC<CommonImageProps> = ({
             alt={alt}
             loading="lazy"
             onError={handleError}
-            onClick={() => route && navigate(route)}
+            onClick={handleClick}
             sx={{
                 maxWidth: '100%',
                 height:'auto',

@@ -14,5 +14,10 @@ export const COLORS = {
   NEED_TO_PAY: yellow[600],
   BUTTON: '#416327',
   ACTIVED: green[600],
-  DEACTIVED: red[600]
+  DEACTIVED: red[600],
+  STATUS: {
+    COMPLETED: '#17A34A',
+    PENDING: '#BA1B1C',
+    IN_PROGRESS: '#E7A22F'
+  }
 };
