@@ -1,5 +1,5 @@
 import { HttpResponse } from "@/types/common";
-import { IWorkOrder } from "@/types/order";
+import { IStep, IWorkOrder } from "@/types/order";
 import { FormUpdateProduct, IProduct, PayloadEvaluationMilestone, PayloadEvaluationProduct, PayloadEvaluationWorkOrder, PayloadRequestMilestone } from "@/types/product";
 import HttpClient from "@/utils/HttpClient";
 import { GetParams, PaginatedResponse } from "./base-service";
@@ -72,4 +72,9 @@ export const getListCompletedProducts = async(getParams: GetParams): Promise<Htt
     }else{
         throw new Error(response.message || 'Failed to fetch list completed products')
     }
+}
+
+// Lấy các bước theo id mốc công việc
+export const getListStepsByIdWorkMilestone = (id: string) => {
+    return HttpClient.get<any, HttpResponse<IStep>>(`${prefix}/list-step-by-id-workmilestone/${id}`)
 }

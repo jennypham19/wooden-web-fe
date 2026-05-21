@@ -247,49 +247,42 @@ const ViewProgressProduct = (props: ViewProgressProductProps) => {
                                             {/* Các bước trong mốc */}
                                             {workMilestone.steps.map((step, idx) => {
                                                 return(
-                                                    <>
-                                                        <Grid key={idx} size={{ xs: 12, md: 9 }}>
-                                                            <Box flexDirection='row' display='flex' justifyContent='space-between'>
-                                                                <Stack direction='row'>
-                                                                    <Typography
-                                                                        sx={{ 
-                                                                            whiteSpace: 'nowrap',
-                                                                            color: '#000' 
-                                                                        }} fontSize='14px'   
-                                                                    >
-                                                                        Bước {idx + 1}:
-                                                                    </Typography>
-                                                                    <Typography 
-                                                                        sx={{ 
-                                                                            whiteSpace: { xs: 'none', md: 'nowrap'},
-                                                                            color: '#000'
-                                                                        }} 
-                                                                        fontSize='14px' 
-                                                                    >
-                                                                        {step.name} 
-                                                                    </Typography>
-                                                                </Stack>                                                                
-                                                            </Box>
-
-                                                        </Grid>
-                                                        <Grid size={{ xs: 12, md: 3 }}>
-                                                            <Box flexDirection='row' display='flex' justifyContent='space-between'>
-                                                                <Stack direction='row'>
-                                                                    <Typography fontSize='14px'>Tiến độ: </Typography>
-                                                                    <Typography fontSize='14px'>{getProgressWorkOrderLabel(step.progress)}</Typography>
-                                                                </Stack> 
-                                                                <Chip
-                                                                    label={getProccessWorkOrderLabel(step.proccess)}
-                                                                    color={getProccessWorkOrderColor(step.proccess).color}
-                                                                />
-                                                            </Box>
-                                                        </Grid>
+                                                    <Grid key={idx} size={{ xs: 12, md: 6 }}>
+                                                        <Box flexDirection='row' display='flex' justifyContent='space-between'>
+                                                            <Stack direction='row'>
+                                                                <Typography
+                                                                    sx={{ 
+                                                                        whiteSpace: 'nowrap',
+                                                                        color: '#000' 
+                                                                    }} fontSize='14px'   
+                                                                >
+                                                                    Bước {idx + 1}:
+                                                                </Typography>
+                                                                <Typography 
+                                                                     sx={{ 
+                                                                        whiteSpace: { xs: 'none', md: 'nowrap'},
+                                                                        color: '#000'
+                                                                    }} 
+                                                                    fontSize='14px' 
+                                                                >
+                                                                    {step.name} 
+                                                                </Typography>
+                                                            </Stack>
+                                                            <Stack direction='row'>
+                                                                <Typography fontSize='14px'>Tiến độ: </Typography>
+                                                                <Typography fontSize='14px'>{getProgressWorkOrderLabel(step.progress)}</Typography>
+                                                            </Stack> 
+                                                            <Chip
+                                                                label={getProccessWorkOrderLabel(step.proccess)}
+                                                                color={getProccessWorkOrderColor(step.proccess).color}
+                                                            />
+                                                        </Box>
                                                         {/* Hình ảnh của bước trong mốc */}
                                                         {step.images.length > 0 && (
                                                             <Grid size={{ xs: 12}}>
                                                                 <Grid container spacing={1}>
                                                                     {step.images.map((img, imgIndex) => (
-                                                                        <Grid key={imgIndex} size={{ xs: 12, md: 3}}>
+                                                                        <Grid key={imgIndex} size={{ xs: 12, md: 6}}>
                                                                             <CommonImage
                                                                                 src={img.url}
                                                                                 alt={img.name}
@@ -299,8 +292,8 @@ const ViewProgressProduct = (props: ViewProgressProductProps) => {
                                                                     ))}                                                                
                                                                 </Grid>
                                                             </Grid>
-                                                        )}
-                                                    </>
+                                                        )} 
+                                                    </Grid>
                                                 )
                                             })}
                                         </Grid>

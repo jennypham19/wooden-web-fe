@@ -114,7 +114,6 @@ console.log("listData: ", listData);
                                             onPageChange={handlePageChange}
                                         />
                                     </Box>
-                                    {listData.map((order) => order.products.every)}
                             </>
                         )}
                                        

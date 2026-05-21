@@ -4,6 +4,7 @@ import { ROLE } from "@/constants/roles";
 import ManagementOrderEmployee from "../Role/Employee/ManagementOrder";
 import ManagementOrderFactoryManager from "../Role/FactoryManager/ManagementOrder";
 import ManagementOrderCarpenter from "../Role/Carpenter/ManagementOrder";
+import AllListOrdersByManager from "./components/AllListOrdersByManager";
 
 
 const Orders = () => {
@@ -15,7 +16,8 @@ const Orders = () => {
                 <ManagementOrderEmployee/>
             )}
             {profile?.role === ROLE.FACTORY_MANAGER && (
-                <ManagementOrderFactoryManager/>
+                // <ManagementOrderFactoryManager/>
+                <AllListOrdersByManager/>
             )}
             {profile?.role === ROLE.CARPENTER && (
                 <ManagementOrderCarpenter/>

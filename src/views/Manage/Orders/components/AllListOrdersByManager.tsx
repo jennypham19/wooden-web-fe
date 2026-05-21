@@ -215,7 +215,7 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
     }
 
     const handleFetchData = () => {
-        fetchData(page, rowsPerPage)
+        fetchData(page, rowsPerPage, '', '', profile?.id)
     }
 
     return(
@@ -227,7 +227,7 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
                         onSearch={handleSearch}
                         placeholder="Tìm kiếm theo tên, mã đơn hàng..."
                     >
-                        {profile?.role === ROLE.EMPLOYEE && (
+                        {/* {profile?.role === ROLE.EMPLOYEE && profile.role === ROLE.FACTORY_MANAGER && ( */}
                             <Button
                                 variant="outlined"
                                 sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
@@ -236,7 +236,7 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
                             >
                                 Tạo đơn hàng
                             </Button>
-                        )}
+                        {/* )} */}
                     </SearchBox>
                     {(profile?.role === ROLE.EMPLOYEE || profile?.role === ROLE.FACTORY_MANAGER) && onBack && (
                         <NavigateBack

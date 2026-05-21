@@ -12,6 +12,7 @@ import { IProduct } from "@/types/product";
 import { getDetailWorkOrderByProduct } from "@/services/product-service";
 import { COLORS } from "@/constants/colors";
 import useAuth from "@/hooks/useAuth";
+import CommonImage from "@/components/Image/index";
 
 interface ViewOrderByCarpenterProps{
     onBack: () => void;
@@ -276,18 +277,16 @@ const ViewOrderByCarpenter = (props: ViewOrderByCarpenterProps) => {
                                                                 <Typography fontSize='14px'>Tên mốc {index + 1 }: </Typography>
                                                                 <Typography fontWeight={600} fontSize='14px'>{workMilestone.name}</Typography>
                                                             </Stack>
-                                                            <Grid container spacing={2}>
+                                                            <Grid container spacing={3}>
                                                                 {workMilestone.steps.map((step, idx) => {
                                                                     return(
                                                                         <>
-                                                                            <Grid size={{ xs: 12, md: 10 }}>
-                                                                                <Stack direction='row'>
-                                                                                    <Typography sx={{ whiteSpace: 'nowrap' }} fontSize='14px'>Bước {idx + 1}: </Typography>
-                                                                                    <Typography sx={{ whiteSpace: { xs: 'none', md: 'nowrap'} }} fontSize='14px'>{step.name} </Typography>
-                                                                                </Stack>
-                                                                            </Grid>
-                                                                            <Grid size={{ xs: 12, md: 2 }}>
-                                                                                <Box flexDirection='row' display='flex' justifyContent='space-between'>
+                                                                            <Grid key={idx} size={{ xs: 12, md: 6 }}>
+                                                                                <Box display='flex' flexDirection='row' justifyContent='space-between'>
+                                                                                    <Stack direction='row'>
+                                                                                        <Typography sx={{ whiteSpace: 'nowrap' }} fontSize='14px'>Bước {idx + 1}: </Typography>
+                                                                                        <Typography sx={{ whiteSpace: { xs: 'none', md: 'nowrap'} }} fontSize='14px'>{step.name} </Typography>
+                                                                                    </Stack>                                                                                    
                                                                                     <Stack direction='row'>
                                                                                         <Typography fontSize='14px'>Tiến độ: </Typography>
                                                                                         <Typography fontSize='14px'>{getProgressWorkOrderLabel(step.progress)}</Typography>
@@ -297,7 +296,23 @@ const ViewOrderByCarpenter = (props: ViewOrderByCarpenterProps) => {
                                                                                         color={getProccessWorkOrderColor(step.proccess).color}
                                                                                     />
                                                                                 </Box>
-                                                                            </Grid>                                                                            
+                                                                                {/* Hình ảnh của bước trong mốc */}
+                                                                                {step.images.length > 0 && (
+                                                                                    <Grid size={{ xs: 12}}>
+                                                                                        <Grid container spacing={1}>
+                                                                                            {step.images.map((img, imgIndex) => (
+                                                                                                <Grid key={imgIndex} size={{ xs: 12, md: 6 }}>
+                                                                                                    <CommonImage
+                                                                                                        src={img.url}
+                                                                                                        alt={img.name}
+                                                                                                        sx={{ height: 180, width: '100%' }}
+                                                                                                    />
+                                                                                                </Grid>
+                                                                                            ))}                                                                
+                                                                                        </Grid>
+                                                                                    </Grid>
+                                                                                )} 
+                                                                            </Grid>
                                                                         </>
                                                                     )
                                                                 })}
