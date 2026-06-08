@@ -249,7 +249,7 @@ const AllManagedAccount: React.FC<AllManagedAccountProps> = (props) => {
                                                     onDetail={handleOpenDetailAccount}
                                                 >
                                                     {account.isActive ? (
-                                                        <>
+                                                        <Box flexGrow={1} gap={1} display='flex' flexDirection='column'>
                                                             <Box display='flex' justifyContent='space-between' gap={2}>
                                                                 <Button
                                                                     fullWidth
@@ -297,7 +297,7 @@ const AllManagedAccount: React.FC<AllManagedAccountProps> = (props) => {
                                                                     Xóa
                                                                 </Button>
                                                             </Box>    
-                                                        </>
+                                                        </Box>
                                                     ) : (
                                                         <Button
                                                             fullWidth
