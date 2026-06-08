@@ -51,7 +51,7 @@ const ViewProductsInOrder = (props: ViewProductsInOrderProps) => {
         setProduct(null)
         setOpenViewProgressProduct(false)
     }
-
+    
     return(
         <Box>
             {!openViewProgressProduct && (
@@ -83,14 +83,19 @@ const ViewProductsInOrder = (props: ViewProductsInOrderProps) => {
                                                 />
                                             </Box>
                                             <Typography mt={1} fontSize='14px'>{product.description}</Typography>
-                                            <Button
-                                                variant="outlined"
-                                                fullWidth
-                                                sx={{ mt: 2, border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, borderRadius: 3 }}
-                                                onClick={() => product && handleOpenViewProgressProduct(product)}
-                                            >
-                                                Tiến độ sản phẩm
-                                            </Button>
+                                            {(product.isCreated && product.status !== 'completed') && (
+                                                <Button
+                                                    variant="outlined"
+                                                    fullWidth
+                                                    sx={{ mt: 2, border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, borderRadius: 3 }}
+                                                    onClick={() => product && handleOpenViewProgressProduct(product)}
+                                                >
+                                                    Tiến độ sản phẩm
+                                                </Button>                                                
+                                            )}
+                                            {!product.isCreated && (
+                                                <Typography mt={2} fontSize='14px' fontStyle='italic'>Sản phẩm chưa được tạo công việc. Vui lòng liên hệ quản lý.</Typography>
+                                            )}
                                         </CardContent>
                                     </Card>
                                 </Grid>

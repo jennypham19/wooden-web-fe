@@ -180,7 +180,7 @@ const UpdateOrder: React.FC<UpdateOrderProps> = ({ onBack, data }) => {
                                                 <Box mt={2}>
                                                     {openViewImageProductId !== product.id && (
                                                         <Grid container spacing={2}>
-                                                            {product.workOrder.workMilestones.map((wordMilestone, idx) => {
+                                                            {product.workOrder?.workMilestones.map((wordMilestone, idx) => {
                                                                 const bgcolor = wordMilestone.steps.every((el) => el.proccess === StatusOrder.PENDING) ? COLORS.STATUS.PENDING :
                                                                     wordMilestone.steps.every((el) => el.proccess === StatusOrder.COMPLETED) ? COLORS.STATUS.COMPLETED : COLORS.STATUS.IN_PROGRESS  
                                                                 return(
@@ -206,7 +206,8 @@ const UpdateOrder: React.FC<UpdateOrderProps> = ({ onBack, data }) => {
 
                                                                             </Grid>
                                                                         ) : (
-                                                                            <Grid sx={{ flex: 1, textAlign: 'center' }} key={idx}>
+                                                                            <Grid sx={{ flex: 1 }} key={idx}>
+                                                                                <Box display='flex' flexDirection='column' alignItems='center' justifyContent='center'>
                                                                                 <Button
                                                                                     sx={{ bgcolor: bgcolor, borderRadius: 2, mb: 1 }}
                                                                                 >
@@ -221,6 +222,7 @@ const UpdateOrder: React.FC<UpdateOrderProps> = ({ onBack, data }) => {
                                                                                         setTitle(`Mốc ${index + 1}${wordMilestone.name}`)
                                                                                     }}
                                                                                 />
+                                                                                </Box>
                                                                             </Grid>
                                                                         )}
                                                                     </>
