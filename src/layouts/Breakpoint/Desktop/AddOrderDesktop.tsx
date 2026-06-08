@@ -282,7 +282,6 @@ const AddOrderDesktop = (props: AddOrderDesktopProps) => {
                 createdBy: profile ? profile.id : null,
                 internalNote: formData.internalNote ? formData.internalNote : null
             }
-            console.log("payload: ", payload);
             const res = await createOrder(payload);
             notify({
                 message: res.message,
