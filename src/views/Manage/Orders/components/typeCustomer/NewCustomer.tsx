@@ -62,9 +62,9 @@ const NewCustomer = (props: NewCustomerProps) => {
                 />
             </Grid>
             <Grid size={{ xs: 12, md: 12 }}>
-                <Stack mb={2} gap={2} direction='row'>
+                <Stack mb={2} gap={{ xs: 0, md: 2 }} direction={{ xs: 'column', md: 'row'}}>
                     <Typography fontSize='15px' fontWeight={500}>Địa chỉ chi tiết</Typography>
-                    <FormGroup sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+                    <FormGroup sx={{ pl: { xs: 1, md: 0 }, display: 'flex', flexDirection: 'row', gap: 2 }}>
                         {DATA_ADDRESS.map((data, index) => (
                             <FormControlLabel
                                 key={index}

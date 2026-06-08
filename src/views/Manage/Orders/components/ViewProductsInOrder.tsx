@@ -11,6 +11,7 @@ import { getStatusProductColor, getStatusProductLabel } from "@/utils/labelEntoV
 import { COLORS } from "@/constants/colors";
 import ViewProgressProduct from "./ViewProgressProduct";
 import { getDetailOrder } from "@/services/order-service";
+import JobInOrder from "./JobInOrder";
 
 interface ViewProductsInOrderProps{
     onBack: () => void;
@@ -23,6 +24,7 @@ const ViewProductsInOrder = (props: ViewProductsInOrderProps) => {
     const [product, setProduct] = useState<IProduct | null>(null);
     const [order, setOrder] = useState<IOrder | null>(null);
     const [openViewProgressProduct, setOpenViewProgressProduct] = useState(false);
+    const [openAddJobOrder, setOpenAddJobOrder] = useState(false);
 
     const getOrder = async(id: string) => {
         const res = await getDetailOrder(id);
@@ -42,6 +44,7 @@ const ViewProductsInOrder = (props: ViewProductsInOrderProps) => {
         }
     }, [data])
 
+    // View progress product
     const handleOpenViewProgressProduct = (product: IProduct) => {
         setProduct(product)
         setOpenViewProgressProduct(true)
@@ -50,6 +53,15 @@ const ViewProductsInOrder = (props: ViewProductsInOrderProps) => {
     const handleCloseViewProgressProduct = () => {
         setProduct(null)
         setOpenViewProgressProduct(false)
+    }
+
+    // Add job order
+    const handleOpenAddJobOrder = () => {
+        setOpenAddJobOrder(true)
+    }
+
+    const handleCloseAddJobOrder = () => {
+        setOpenAddJobOrder(false);
     }
     
     return(
@@ -94,7 +106,14 @@ const ViewProductsInOrder = (props: ViewProductsInOrderProps) => {
                                                 </Button>                                                
                                             )}
                                             {!product.isCreated && (
-                                                <Typography mt={2} fontSize='14px' fontStyle='italic'>Sản phẩm chưa được tạo công việc. Vui lòng liên hệ quản lý.</Typography>
+                                                <Button
+                                                    variant="outlined"
+                                                    fullWidth
+                                                    sx={{ mt: 2, border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, borderRadius: 3 }}
+                                                    onClick={handleOpenAddJobOrder}
+                                                >
+                                                    Thêm công việc
+                                                </Button>
                                             )}
                                         </CardContent>
                                     </Card>
@@ -109,6 +128,12 @@ const ViewProductsInOrder = (props: ViewProductsInOrderProps) => {
                     order={order}
                     product={product}
                     onBack={handleCloseViewProgressProduct}
+                />
+            )}
+            {openAddJobOrder && data && (
+                <JobInOrder
+                    data={data}
+                    onClose={handleCloseAddJobOrder}  
                 />
             )}
         </Box>

@@ -56,7 +56,7 @@ const AddOrder: React.FC<AddOrderProps> = (props) => {
             <Typography mx={2} variant="subtitle2">Vui lòng điền đầy đủ các thông tin cần thiết để khởi tạo quy trình đơn hàng</Typography>
             <Box m={2}>
                 {md ? (
-                    <AddOrderMobile profile={profile}/>
+                    <AddOrderMobile profile={profile} onClose={handleClose} users={users}/>
                 ) : (
                     <AddOrderDesktop profile={profile} onClose={handleClose} users={users}/>
                 )}
