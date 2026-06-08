@@ -21,6 +21,7 @@ import CheckedOrder from "./CheckedOrder";
 import { ProccessOrder } from "@/constants/status";
 import ViewProductsInOrder from "./ViewProductsInOrder";
 import DialogListImageProduct from "./DialogListImageProduct";
+import AddOrder from "./AddOrder";
 
 
 interface AllListOrdersByManagerProps{
@@ -77,7 +78,7 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
 
     const handleCloseAddOrder = () => {
         setOpenOrder({ open: false, type: 'add' });
-        fetchData(page, rowsPerPage, '', viewMode)
+        fetchData(page, rowsPerPage, '', viewMode, profile?.id)
     }
 
     const handleOpenViewOrder = (order: IOrder) => {
@@ -284,7 +285,11 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
                 </>
             )}
             {openOrder.open && openOrder.type === 'add' && (
-                <DialogAddOrder
+                // <DialogAddOrder
+                //     open={openOrder.open}
+                //     onClose={handleCloseAddOrder}
+                // />
+                <AddOrder
                     open={openOrder.open}
                     onClose={handleCloseAddOrder}
                 />

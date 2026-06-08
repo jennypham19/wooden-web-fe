@@ -70,7 +70,6 @@ const ManagementJobCarpenter = () => {
       setOrder(null);
       setViewImageProducts(false)
     }
-console.log("listData: ", listData);
 
     return(
         <Box>
