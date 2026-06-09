@@ -106,14 +106,7 @@ const ViewProductsInOrder = (props: ViewProductsInOrderProps) => {
                                                 </Button>                                                
                                             )}
                                             {!product.isCreated && (
-                                                <Button
-                                                    variant="outlined"
-                                                    fullWidth
-                                                    sx={{ mt: 2, border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, borderRadius: 3 }}
-                                                    onClick={handleOpenAddJobOrder}
-                                                >
-                                                    Thêm công việc
-                                                </Button>
+                                                <Typography mt={2} variant="subtitle2" fontStyle='italic'>Sản phẩm chưa được tạo công việc</Typography>
                                             )}
                                         </CardContent>
                                     </Card>

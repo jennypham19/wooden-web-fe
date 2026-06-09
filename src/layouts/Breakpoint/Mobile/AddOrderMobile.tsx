@@ -1,3 +1,4 @@
+import Backdrop from "@/components/Backdrop";
 import InputSelect from "@/components/InputSelect";
 import InputText from "@/components/InputText";
 import { COLORS } from "@/constants/colors";
@@ -98,8 +99,8 @@ const AddOrderMobile = (props: AddOrderMobileProps) => {
                 setFormDataProduct(
                     Array.from({ length: valueNum }, () => ({
                         name: "",
-                        description: "",
-                        target: "",
+                        description: null,
+                        target: null,
                         proccess: "not_started_0%",
                         status: "pending",
                         managerId: "",
@@ -198,11 +199,11 @@ const AddOrderMobile = (props: AddOrderMobileProps) => {
         formDataProduct.forEach((product, idx) => {
             const pError: FormProductErrors = {};
             if (!product.name) pError.name = `Sản phẩm ${idx + 1}: Vui lòng nhập tên sản phẩm`;
-            if (!product.description) pError.description = `Sản phẩm ${idx + 1}: Vui lòng nhập mô tả`;
-            if (!product.lenghtProduct) pError.lenghtProduct = `Sản phẩm ${idx + 1}: Vui lòng nhập chiều dài`;
-            if (!product.widthProduct) pError.widthProduct = `Sản phẩm ${idx + 1}: Vui lòng nhập chiều rộng`;
-            if (!product.heightProduct) pError.heightProduct = `Sản phẩm ${idx + 1}: Vui lòng nhập chiều cao`;
-            if (!product.target) pError.target = `Sản phẩm ${idx + 1}: Vui lòng nhập mục tiêu sản xuất`;
+            // if (!product.description) pError.description = `Sản phẩm ${idx + 1}: Vui lòng nhập mô tả`;
+            // if (!product.lenghtProduct) pError.lenghtProduct = `Sản phẩm ${idx + 1}: Vui lòng nhập chiều dài`;
+            // if (!product.widthProduct) pError.widthProduct = `Sản phẩm ${idx + 1}: Vui lòng nhập chiều rộng`;
+            // if (!product.heightProduct) pError.heightProduct = `Sản phẩm ${idx + 1}: Vui lòng nhập chiều cao`;
+            // if (!product.target) pError.target = `Sản phẩm ${idx + 1}: Vui lòng nhập mục tiêu sản xuất`;
             newProductErrors.push(pError); 
         })
 
@@ -269,13 +270,13 @@ const AddOrderMobile = (props: AddOrderMobileProps) => {
                 requiredNote: formData.requiredNote ? formData.requiredNote : null,
                 products: formDataProduct.map((product) => ({
                     name: product.name,
-                    description: product.description,
-                    target: product.target,
+                    description: product.description ? product.description : null,
+                    target: product.target ? product.target : null,
                     proccess: product.proccess,
                     status: product.status,
-                    lenghtProduct: Number(product.lenghtProduct),
-                    widthProduct: Number(product.widthProduct),
-                    heightProduct: Number(product.heightProduct)
+                    lenghtProduct: Number(product.lenghtProduct) ?? null,
+                    widthProduct: Number(product.widthProduct) ?? null,
+                    heightProduct: Number(product.heightProduct) ?? null
                 })), 
                 inputFiles: files.length > 0 ? payloadInputFiles : [],
                 referenceLinks: referenceLinkSlots[0] === null ? [] : payloadReferenceLink,
@@ -306,7 +307,10 @@ const AddOrderMobile = (props: AddOrderMobileProps) => {
                         <Typography fontWeight={500}>1. Thông tin khách hàng</Typography>
                     </Box>
                     <Stack mb={2} direction='column'>
-                        <Typography variant="subtitle2">Chọn khách hàng</Typography>
+                        <Stack>
+                            <Typography variant="subtitle2">Chọn khách hàng</Typography>
+                            <Typography variant="subtitle2" color="error">(*)</Typography>
+                        </Stack>
                         <FormGroup sx={{ pl: 1, display: 'flex', flexDirection: 'row', gap: 5 }}>
                             {DATA_CUSTOMER.map((data, index) => (
                                 <FormControlLabel
@@ -347,7 +351,10 @@ const AddOrderMobile = (props: AddOrderMobileProps) => {
                     </Box>
                     <Grid container spacing={1}>
                         <Grid size={{ xs: 12 }}>
-                            <Typography fontSize='15px' fontWeight={500}>Tên đơn hàng</Typography>
+                            <Stack>
+                                <Typography fontSize='15px' fontWeight={500}>Tên đơn hàng</Typography>
+                                <Typography fontSize='15px' fontWeight={500} color="error">(*)</Typography>
+                            </Stack>
                             <InputText
                                 label=""
                                 name="name"
@@ -372,7 +379,10 @@ const AddOrderMobile = (props: AddOrderMobileProps) => {
                             />
                         </Grid>
                         <Grid size={{ xs: 12 }}>
+                            <Stack>
                             <Typography fontWeight={700} fontSize='15px'>Người quản lý</Typography>
+                            <Typography fontWeight={700} fontSize='15px' color="error">(*)</Typography>
+                            </Stack>
                             <InputSelect
                                 label=""
                                 name="managerId"
@@ -404,7 +414,10 @@ const AddOrderMobile = (props: AddOrderMobileProps) => {
                             />
                         </Grid>
                         <Grid size={{ xs: 12 }}>
+                            <Stack>
                             <Typography fontSize='15px' fontWeight={500}>Ngày giao dự kiến</Typography>
+                            <Typography fontSize='15px' fontWeight={500} color="error">(*)</Typography>
+                            </Stack>
                             <InputText
                                 label=""
                                 name="dateOfPayment"
@@ -443,6 +456,7 @@ const AddOrderMobile = (props: AddOrderMobileProps) => {
                                 helperText={errors.amount}
                             />
                             <Typography variant="subtitle2">sản phẩm </Typography>
+                            <Typography variant="subtitle2" color="error">(*)</Typography>
                         </Box>                       
                     </Box>
                     {amountProduct !== null && products.length > 0 && (
@@ -461,7 +475,10 @@ const AddOrderMobile = (props: AddOrderMobileProps) => {
                 <Paper sx={{ p: 2 }}>
                     <Box mb={2} display='flex' flexDirection='row' gap={1.5}>
                         <CloudUpload sx={{ color: COLORS.BUTTON }}/>
-                        <Typography fontWeight={500}>4. Tài liệu đính kèm</Typography>
+                        <Stack>
+                            <Typography fontWeight={500}>4. Tài liệu đính kèm</Typography>
+                            <Typography fontWeight={500} color="error">(*)</Typography>
+                        </Stack>
                     </Box>
                     <UploadFiles
                         onFilesSelect={handleFilesSelect}
@@ -595,6 +612,10 @@ const AddOrderMobile = (props: AddOrderMobileProps) => {
                     Hủy
                 </Button>
             </Grid>
+
+            {isSubmitting && (
+                <Backdrop open={isSubmitting} />
+            )}
         </Grid>
     )
 }
