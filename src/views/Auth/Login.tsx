@@ -199,14 +199,14 @@ export default function Login() {
               <LoadingButton sx={{ bgcolor: '#416327', borderRadius: 8, height: 50, my: 2}} loading={_loading} type='submit' variant='contained' fullWidth>
                 Đăng nhập
               </LoadingButton>
-              <Button
+              {/* <Button
                 fullWidth
                 variant='outlined'
                 sx={{color: '#416327', border: '1px solid #416327', borderRadius: 8, height: 50}}
               >
                 Đăng nhập với google
-              </Button>
-              <Box mt={5} display='flex' justifyContent='center' alignItems='center' flexWrap='wrap' gap={2}>
+              </Button> */}
+              {/* <Box mt={5} display='flex' justifyContent='center' alignItems='center' flexWrap='wrap' gap={2}>
                 <Typography>Bạn chưa có tài khoản?</Typography>
                 <Typography
                   to={`/${ROUTE_PATH.REGISTRATION}`}
@@ -215,7 +215,7 @@ export default function Login() {
                 >
                   Đăng ký tại đây
                 </Typography>
-              </Box>
+              </Box> */}
             </Box>
           </Box>
         </Grid>
