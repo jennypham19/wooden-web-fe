@@ -139,6 +139,8 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
 
     const renderActionButton = (order: IOrder) => {
         if(profile && profile.role !== ROLE.FACTORY_MANAGER) return null;
+        const isShownButtonAddJob = order.products.every(el => el.isCreated === true);
+        
         switch (order.proccess) {
             case ProccessOrder.NOT_START_0:
                 return (
@@ -156,17 +158,32 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
                 )
             case ProccessOrder.IN_PROGRESS_25:
                 return (
-                    <Button
-                        fullWidth
-                        variant="outlined"
-                        sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
-                        onClick={(e) => {
-                            e.stopPropagation()
-                            order && handleOpenCheckedOrder(order)
-                        }}
-                    >
-                        Kiểm soát đơn hàng
-                    </Button>
+                    <Box display='flex' justifyContent='space-between' gap={1}>
+                        <Button
+                            fullWidth
+                            variant="outlined"
+                            sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                order && handleOpenCheckedOrder(order)
+                            }}
+                        >
+                            Kiểm soát đơn hàng
+                        </Button>
+                        {!isShownButtonAddJob && (
+                            <Button
+                                fullWidth
+                                variant="outlined"
+                                sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    order && handleOpenJobOrder(order)
+                                }}
+                            >
+                                Thêm công việc
+                            </Button> 
+                        ) }
+                    </Box>
                 )
             case ProccessOrder.IN_PROGRESS_50:
                 return (

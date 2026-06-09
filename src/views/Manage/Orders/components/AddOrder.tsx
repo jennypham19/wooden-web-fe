@@ -54,6 +54,7 @@ const AddOrder: React.FC<AddOrderProps> = (props) => {
                 onBack={handleClose}
             />
             <Typography mx={2} variant="subtitle2">Vui lòng điền đầy đủ các thông tin cần thiết để khởi tạo quy trình đơn hàng</Typography>
+            <Typography mx={2} variant="subtitle2" fontStyle="italic">Các trường có dấu <span style={{ color: 'red' }}>(*)</span> là trường bắt buộc</Typography>
             <Box m={2}>
                 {md ? (
                     <AddOrderMobile profile={profile} onClose={handleClose} users={users}/>

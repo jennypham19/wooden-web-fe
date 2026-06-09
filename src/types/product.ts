@@ -5,8 +5,8 @@ import { IWorkOrder } from "./order";
 // Đầu vào
 export interface FormDataProducts{
     name: string,
-    description: string,
-    target: string
+    description: string | null,
+    target: string | null
     proccess: string,
     status: string,
     lenghtProduct: number | null,

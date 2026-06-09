@@ -36,7 +36,10 @@ const NewCustomer = (props: NewCustomerProps) => {
     return(
         <Grid container spacing={2}>
             <Grid size={{ xs: 12, md: 6 }}>
-                <Typography fontSize='15px' fontWeight={500}>Tên khách hàng</Typography>
+                <Stack>
+                    <Typography fontSize='15px' fontWeight={500}>Tên khách hàng</Typography>
+                    <Typography fontSize='15px' fontWeight={500} color="error">(*)</Typography>
+                </Stack>
                 <InputText
                     label=""
                     name="name"
@@ -49,7 +52,10 @@ const NewCustomer = (props: NewCustomerProps) => {
                 />
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
-                <Typography fontSize='15px' fontWeight={500}>Số điện thoại</Typography>
+                <Stack>
+                    <Typography fontSize='15px' fontWeight={500}>Số điện thoại</Typography>
+                    <Typography fontSize='15px' fontWeight={500} color="error">(*)</Typography>
+                </Stack>
                 <InputText
                     label=""
                     name="phone"
@@ -63,7 +69,7 @@ const NewCustomer = (props: NewCustomerProps) => {
             </Grid>
             <Grid size={{ xs: 12, md: 12 }}>
                 <Stack mb={2} gap={{ xs: 0, md: 2 }} direction={{ xs: 'column', md: 'row'}}>
-                    <Typography fontSize='15px' fontWeight={500}>Địa chỉ chi tiết</Typography>
+                    <Typography fontSize='15px' fontWeight={500}>Địa chỉ chi tiết <span style={{ color: 'red' }}>(*)</span></Typography>
                     <FormGroup sx={{ pl: { xs: 1, md: 0 }, display: 'flex', flexDirection: 'row', gap: 2 }}>
                         {DATA_ADDRESS.map((data, index) => (
                             <FormControlLabel

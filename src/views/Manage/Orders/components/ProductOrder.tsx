@@ -1,7 +1,7 @@
 import { FormDataProducts } from "@/types/product";
 import { IUser } from "@/types/user";
 import { getProccessOrderLabel, getStatusOrderLabel } from "@/utils/labelEntoVni";
-import { Box, InputAdornment, TextField, Typography } from "@mui/material";
+import { Box, InputAdornment, Stack, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { FormProductErrors } from "./DialogAddOrder";
 import InputSelect from "./InputSelect";
@@ -15,14 +15,19 @@ interface InputTextProps{
     helperText?: string;
     label: string;
     disabled?: boolean;
-    inputLabel?: string
+    inputLabel?: string;
+    placeholder?: string;
+    multiline?: boolean,
+    rows?: number
 }
 
 const InputText = (props: InputTextProps) => {
-    const { onInputChange, index, name, value, error, helperText, label, disabled, inputLabel } = props;
+    const { onInputChange, index, name, value, error, helperText, label, disabled, inputLabel, placeholder = "Nhập thông tin", multiline, rows } = props;
     return (
         <TextField
-            placeholder="Nhập thông tin"
+            multiline={multiline}
+            rows={rows}
+            placeholder={placeholder}
             label={label}
             name={name}
             type="text"
@@ -73,8 +78,11 @@ const ProductOrder = (props: ProductOrderProps) => {
                     Sản phẩm thứ {index}
                 </Typography>
                 <Grid container spacing={2}>
-                    <Grid size={{ xs: 12, md: 6}}>
-                        <Typography fontWeight={700} fontSize='15px'>Tên sản phẩm</Typography>
+                    <Grid size={{ xs: 12 }}>
+                        <Stack>
+                            <Typography fontWeight={700} fontSize='15px'>Tên sản phẩm</Typography>
+                            <Typography fontWeight={700} fontSize='15px' color="error">(*)</Typography>
+                        </Stack>
                         <InputText
                             index={index}
                             label=""
@@ -93,50 +101,13 @@ const ProductOrder = (props: ProductOrderProps) => {
                             index={index}
                             value={formData.description}
                             onInputChange={onInputChange}
-                            error={!!errors.description}
-                            helperText={errors.description}
+                            // error={!!errors.description}
+                            // helperText={errors.description}
+                            multiline
+                            rows={4}
                         />
                     </Grid>
-                    <Grid size={{ xs: 12, md: 4 }}>
-                        <Typography fontWeight={700} fontSize='15px'>Chiều dài</Typography>
-                        <InputText
-                            label=""
-                            name="lenghtProduct"
-                            index={index}
-                            value={formData.lenghtProduct}
-                            onInputChange={onInputChange}
-                            error={!!errors.lenghtProduct}
-                            helperText={errors.lenghtProduct}
-                            inputLabel='cm'
-                        />
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 4 }}>
-                        <Typography fontWeight={700} fontSize='15px'>Chiều rộng</Typography>
-                        <InputText
-                            label=""
-                            name="widthProduct"
-                            index={index}
-                            value={formData.widthProduct}
-                            onInputChange={onInputChange}
-                            error={!!errors.widthProduct}
-                            helperText={errors.widthProduct}
-                            inputLabel='cm'
-                        />
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 4 }}>
-                        <Typography fontWeight={700} fontSize='15px'>Chiều cao</Typography>
-                        <InputText
-                            label=""
-                            name="heightProduct"
-                            index={index}
-                            value={formData.heightProduct}
-                            onInputChange={onInputChange}
-                            error={!!errors.heightProduct}
-                            helperText={errors.heightProduct}
-                            inputLabel='cm'
-                        />
-                    </Grid>
-                    <Grid size={{ xs: 12 }}>
+                    <Grid size={{ xs: 12, md: 6 }}>
                         <Typography fontWeight={700} fontSize='15px'>Mục tiêu</Typography>
                         <InputText
                             label=""
@@ -144,11 +115,55 @@ const ProductOrder = (props: ProductOrderProps) => {
                             index={index}
                             value={formData.target}
                             onInputChange={onInputChange}
-                            error={!!errors.target}
-                            helperText={errors.target}
+                            // error={!!errors.target}
+                            // helperText={errors.target}
+                            multiline
+                            rows={4}
                         />
                     </Grid>
-                    <Grid size={{ xs: 12, md: 6 }}>
+                    <Grid size={{ xs: 4 }}>
+                        <Typography fontWeight={700} fontSize='15px'>Chiều dài</Typography>
+                        <InputText
+                            label=""
+                            name="lenghtProduct"
+                            index={index}
+                            value={formData.lenghtProduct}
+                            onInputChange={onInputChange}
+                            // error={!!errors.lenghtProduct}
+                            // helperText={errors.lenghtProduct}
+                            inputLabel='cm'
+                            placeholder="Số"
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 4 }}>
+                        <Typography fontWeight={700} fontSize='15px'>Chiều rộng</Typography>
+                        <InputText
+                            label=""
+                            name="widthProduct"
+                            index={index}
+                            value={formData.widthProduct}
+                            onInputChange={onInputChange}
+                            // error={!!errors.widthProduct}
+                            // helperText={errors.widthProduct}
+                            inputLabel='cm'
+                            placeholder="Số"
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 4 }}>
+                        <Typography fontWeight={700} fontSize='15px'>Chiều cao</Typography>
+                        <InputText
+                            label=""
+                            name="heightProduct"
+                            index={index}
+                            value={formData.heightProduct}
+                            onInputChange={onInputChange}
+                            // error={!!errors.heightProduct}
+                            // helperText={errors.heightProduct}
+                            inputLabel='cm'
+                            placeholder="Số"
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 6 }}>
                         <Typography fontWeight={700} fontSize='15px'>Tiến độ</Typography>
                         <InputText
                             label=""
@@ -159,7 +174,7 @@ const ProductOrder = (props: ProductOrderProps) => {
                             disabled
                         />
                     </Grid>
-                    <Grid size={{ xs: 12, md: 6 }}>
+                    <Grid size={{ xs: 6 }}>
                         <Typography fontWeight={700} fontSize='15px'>Trạng thái</Typography>
                         <InputText
                             label=""
