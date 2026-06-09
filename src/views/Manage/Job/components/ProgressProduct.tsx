@@ -320,6 +320,7 @@ const ProgressProduct = (props: ProgressProductProps) => {
 
     }
     
+    // Hoàn thành sản phẩm
     const handleFinish = async() => {
         if(imageProductFile === null) {
             setProductErrorImageFile('Vui lòng chọn ảnh')

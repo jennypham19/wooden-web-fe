@@ -46,7 +46,9 @@ const ViewOrderByCarpenter = (props: ViewOrderByCarpenterProps) => {
             const res = await getDetailWorkOrderByProduct(id);
             const data = res.data as any as IWorkOrder;
             setWorkOrder(data);
-            setWorkOrderError('');            
+            if(data === null) return setWorkOrderError("Sản phẩm chưa được tạo công việc. Vui lòng liên hệ quản lý.")
+            setWorkOrderError('');                
+            
         } catch (error: any) {
             setWorkOrderError(error.message)
         }

@@ -1,5 +1,5 @@
 import { Box, SxProps } from "@mui/material";
-import React, { ImgHTMLAttributes, useState } from "react";
+import React, { ImgHTMLAttributes, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 
@@ -24,6 +24,10 @@ const CommonImage: React.FC<CommonImageProps> = ({
 }) => {
     const navigate = useNavigate()
     const [imgSrc, setImgSrc] = useState(src);
+
+    useEffect(() => {
+        setImgSrc(src);
+    }, [src]);
 
     const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
         setImgSrc(fallbackSrc);
