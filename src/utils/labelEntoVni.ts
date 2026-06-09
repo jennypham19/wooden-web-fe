@@ -209,6 +209,26 @@ export const getNumber = (number: string) => {
       return 4
     case 'five':
       return 5
+    case 'six':
+      return 6
+    case 'seven':
+      return 7
+    case 'eight':
+      return 8
+    case 'nine':
+      return 9
+    case 'ten':
+      return 10
+    case 'eleven':
+      return 11
+    case 'twelve':
+      return 12
+    case 'thirteen':
+      return 13
+    case 'fourteen':
+      return 14
+    case 'fifteen':
+      return 15
     default:
       return 1;
   }
