@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 export const ROLE_DATA: {id: number, label: string, value: string}[] = [
     {
         id: 1,
@@ -119,3 +120,81 @@ export const STATUS_MACHINE_DATA: { id: number, label: string, value: string }[]
     { id: 5, label: 'Đang sửa chữa', value: 'under_repair' },
     { id: 6, label: 'Lỗi/ Hỏng', value: 'faulty' }
 ]
+
+export const DATA_WORK_MILESTONE: { id: string, label: string, value: string}[] = [
+    {
+        id: uuidv4(),
+        label: '1 mốc công việc',
+        value: 'one_milestone'
+    },
+    {
+        id: uuidv4(),
+        label: '2 mốc công việc',
+        value: 'two_milestones'
+    },
+    {
+        id: uuidv4(),
+        label: '3 mốc công việc',
+        value: 'three_milestones'
+    },
+    {
+        id: uuidv4(),
+        label: '4 mốc công việc',
+        value: 'four_milestones'
+    },
+    {
+        id: uuidv4(),
+        label: '5 mốc công việc',
+        value: 'five_milestones'
+    },
+    {
+        id: uuidv4(),
+        label: '6 mốc công việc',
+        value: 'six_milestones'
+    },
+    {
+        id: uuidv4(),
+        label: '7 mốc công việc',
+        value: 'seven_milestones'
+    },
+    {
+        id: uuidv4(),
+        label: '8 mốc công việc',
+        value: 'eight_milestones'
+    },
+    {
+        id: uuidv4(),
+        label: '9 mốc công việc',
+        value: 'nine_milestones'
+    },
+    {
+        id: uuidv4(),
+        label: '10 mốc công việc',
+        value: 'ten_milestones'
+    },
+    {
+        id: uuidv4(),
+        label: '11 mốc công việc',
+        value: 'eleven_milestones'
+    },
+    {
+        id: uuidv4(),
+        label: '12 mốc công việc',
+        value: 'twelve_milestones'
+    },
+    {
+        id: uuidv4(),
+        label: '13 mốc công việc',
+        value: 'thirteen_milestones'
+    },
+    {
+        id: uuidv4(),
+        label: '14 mốc công việc',
+        value: 'fourteen_milestones'
+    },
+    {
+        id: uuidv4(),
+        label: '15 mốc công việc',
+        value: 'fifteen_milestones'
+    },
+] 

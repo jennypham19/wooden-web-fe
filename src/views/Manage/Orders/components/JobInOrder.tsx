@@ -23,39 +23,12 @@ import { useFetchData } from "@/hooks/useFetchData";
 import { getListCapenter } from "@/services/user-service";
 import Backdrop from "@/components/Backdrop";
 import DialogListImageProduct from "./DialogListImageProduct";
+import { DATA_WORK_MILESTONE } from "@/constants/data";
 
 interface JobInOrderProps{
     data: IOrder,
     onClose: () => void;
 }
-
-const DATA_WORK_MILESTONE: { id: string, label: string, value: string}[] = [
-    {
-        id: uuidv4(),
-        label: '1 mốc công việc',
-        value: 'one_milestone'
-    },
-    {
-        id: uuidv4(),
-        label: '2 mốc công việc',
-        value: 'two_milestone'
-    },
-    {
-        id: uuidv4(),
-        label: '3 mốc công việc',
-        value: 'three_milestone'
-    },
-    {
-        id: uuidv4(),
-        label: '4 mốc công việc',
-        value: 'four_milestone'
-    },
-    {
-        id: uuidv4(),
-        label: '5 mốc công việc',
-        value: 'five_milestone'
-    }
-]
 
 const JobInOrder = (props: JobInOrderProps) => {
     const { data, onClose } = props;

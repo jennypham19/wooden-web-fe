@@ -49,6 +49,10 @@ const ManagementJobCarpenter = () => {
     
     const { error, fetchData, handlePageChange, handleSearch, listData, loading, page, rowsPerPage, searchTerm, total } = useFetchData<IOrder>(getOrdersByCarpenter, 8, viewMode, profile?.id);
 
+    const reloadOrders = async () => {
+        await fetchData(page, rowsPerPage, '', viewMode, profile?.id);
+    };
+
     const handleOpenViewOrder = (order: IOrder) => {
         setOrder(order);
         setOpenOrder({ open: true, type: 'view'})
@@ -122,6 +126,7 @@ const ManagementJobCarpenter = () => {
                 <UpdateOrder
                     data={order}
                     onBack={handleCloseViewOrder}
+                    fetchData={reloadOrders}
                 />
             )}
             {viewImageProducts && order && (

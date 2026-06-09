@@ -30,6 +30,7 @@ const DialogStepsAndStepImages = (props: DialogStepsAndStepImagesProps) => {
             getListStep(id)
         }
     }, [open, id])
+    
     return(
         <DialogComponent
             dialogKey={open}

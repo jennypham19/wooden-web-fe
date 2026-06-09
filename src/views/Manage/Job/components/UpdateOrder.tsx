@@ -17,13 +17,17 @@ import useBreakpoints from "@/hooks/useBreakpoints";
 import WorkMilestones from "../../components/WorkMilestones";
 import DialogStepsAndStepImages from "../../components/DialogStepsAndStepImages";
 import proccess from "@/assets/images/users/proccess.jfif"
+import Backdrop from "@/components/Backdrop";
+import useAuth from "@/hooks/useAuth";
 
 interface UpdateOrderProps{
     onBack: () => void;
     data: IOrder
+    fetchData: () => void;
 }
 
-const UpdateOrder: React.FC<UpdateOrderProps> = ({ onBack, data }) => {
+const UpdateOrder: React.FC<UpdateOrderProps> = ({ onBack, data, fetchData }) => {
+    const { profile } = useAuth();
     const notify = useNotification();
     const bp = useBreakpoints();
     const [products, setProducts] = useState<IProduct[]>([]);
@@ -34,12 +38,21 @@ const UpdateOrder: React.FC<UpdateOrderProps> = ({ onBack, data }) => {
     const [workMilestones, setWorkMilestones] = useState<IWorkMilestone[]>([]);
     const [openStepsAndImageSteps, setOpenStepsAndImageSteps] = useState(false);
     const [idWorkMilestone, setIdWorkMilestone] = useState<string | null>(null);
-    const [title, setTitle] = useState<string | null>(null)
+    const [title, setTitle] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const getProducts = async(id: string) => {
-        const res = await getProductsByOrderId(id);
-        const newProducts = res.data as any as IProduct[];
-        setProducts(newProducts)
+        setIsLoading(true)
+        try {
+            const res = await getProductsByOrderId(id);
+            const newProducts = res.data as any as IProduct[];
+            setProducts(newProducts)            
+        } catch (error) {
+
+        } finally{
+            setIsLoading(false)
+        }
+
     };    
 
     useEffect(() => {
@@ -53,22 +66,38 @@ const UpdateOrder: React.FC<UpdateOrderProps> = ({ onBack, data }) => {
         setOpenProgress(true)
     }
 
-    const handleCloseProgress = () => {
+    const handleCloseProgress = async() => {
         setProduct(null);
         setOpenProgress(false)
-        getProducts(data.id);
+        await getProducts(data.id);
+        await fetchData?.()
     }
 
-    const showButtonFinishedOrder = () => {
-        if(data === null) return;
-        const newData = data && data.products.every(s => s.status === 'completed');
-        if(!newData) {
-            return false
-        }
-        return true && data.proccess === ProccessOrder.IN_PROGRESS_75;
+    // const showButtonFinishedOrder = () => {
+    //     if(data === null) return;
+    //     const newData = data && data.products.every(s => s.status === 'completed');
+    //     if(!newData) {
+    //         return false
+    //     }
+    //     return true && data.proccess === ProccessOrder.IN_PROGRESS_75;
         
-    }
+    // }
 
+    // const showButtonFinishedOrder =
+    //     products.length > 0 &&
+    //     products.every(product => product.status === "completed") &&
+    //     data.proccess === ProccessOrder.IN_PROGRESS_75;
+
+    // Hiện nút hoàn thành đơn hàng
+    const showButtonFinishedOrder = () => {
+        if (!products.length) return false;
+
+        return (
+            products.every(product => product.status === "completed")
+        );
+    };
+
+    // Hoàn thành đơn hàng
     const handleFinished = async(id: string) => {
         try {
             const payload: { proccess: string } = {
@@ -104,7 +133,7 @@ const UpdateOrder: React.FC<UpdateOrderProps> = ({ onBack, data }) => {
                     <Grid sx={{ mx: 2 }} container spacing={2}>
                         {products.map((product, index) => {
                             return(
-                                <Grid key={index} size={{ xs: 12 }}>
+                                <Grid key={product.id} size={{ xs: 12 }}>
                                     <Card sx={{ borderRadius: 2 }}>
                                         <CommonImage
                                             sx={{ px: 2, pt: 2, objectFit: 'cover', height: 250, width: '100%' }}
@@ -284,6 +313,9 @@ const UpdateOrder: React.FC<UpdateOrderProps> = ({ onBack, data }) => {
                     data={product}
                     onBack={handleCloseProgress}
                 />
+            )}
+            {isLoading && (
+                <Backdrop open={isLoading}/>
             )}
         </Box>
     )

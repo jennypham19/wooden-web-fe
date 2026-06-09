@@ -135,7 +135,7 @@ const ManagementJobManager = () => {
                                         <Grid key={index} size={{ xs: 12 }}>
                                             <CardDataOrder
                                                 order={order}
-                                                onViewOrder={handleOpenViewOrder}
+                                                onViewOrder={() => {}}
                                                 onViewImageProducts={handleOpenViewImageProducts}
                                             >
                                                 <Grid container spacing={1}>
@@ -192,7 +192,7 @@ const ManagementJobManager = () => {
                                                                         <>
                                                                             {bp ? (
                                                                                 <Grid size={6} key={idx}>
-                                                                                    <Box display='flex' flexDirection='column' alignItems='center' justifyContent='center'>
+                                                                                    <Box display='flex' flexDirection='column' alignItems='center' justifyContent='center' mb={2}>
                                                                                         <Button
                                                                                             sx={{ bgcolor: bgcolor, borderRadius: 2, mb: 1 }}
                                                                                         >
@@ -213,21 +213,23 @@ const ManagementJobManager = () => {
                                                                                 </Grid>
                                                                             ) : (
                                                                                 <Grid sx={{ flex: 1, textAlign: 'center' }} key={idx}>
-                                                                                    <Button
-                                                                                        sx={{ bgcolor: bgcolor, borderRadius: 2, mb: 1 }}
-                                                                                    >
-                                                                                        Mốc {idx + 1}: {workMilestone.name}
-                                                                                    </Button>
-                                                                                    <CommonImage
-                                                                                        src={workMilestone.steps[0].images[0] ? workMilestone.steps[0].images[0].url : proccess}
-                                                                                        sx={{ width: 200, height: 150, borderRadius: 2 }}
-                                                                                        handleFunt={(e) => {
-                                                                                            e.stopPropagation();
-                                                                                            setOpenStepsAndImageSteps(true)
-                                                                                            setIdWorkMilestone(workMilestone.id)
-                                                                                            setTitle(`Mốc ${index + 1}${workMilestone.name}`)
-                                                                                        }}
-                                                                                    />
+                                                                                    <Box display='flex' flexDirection='column' alignItems='center' justifyContent='center' mb={2}>
+                                                                                        <Button
+                                                                                            sx={{ bgcolor: bgcolor, borderRadius: 2, mb: 1 }}
+                                                                                        >
+                                                                                            Mốc {idx + 1}: {workMilestone.name}
+                                                                                        </Button>
+                                                                                        <CommonImage
+                                                                                            src={workMilestone.steps[0].images[0] ? workMilestone.steps[0].images[0].url : proccess}
+                                                                                            sx={{ width: 200, height: 150, borderRadius: 2 }}
+                                                                                            handleFunt={(e) => {
+                                                                                                e.stopPropagation();
+                                                                                                setOpenStepsAndImageSteps(true)
+                                                                                                setIdWorkMilestone(workMilestone.id)
+                                                                                                setTitle(`Mốc ${index + 1}${workMilestone.name}`)
+                                                                                            }}
+                                                                                        />
+                                                                                    </Box>
                                                                                 </Grid>
                                                                             )}
                                                                         </>                                                                        
@@ -253,18 +255,18 @@ const ManagementJobManager = () => {
                                                                     </Box>
                                                                 )}
                                                             
-                                                                                                                {openStepsAndImageSteps && idWorkMilestone && title && (
-                                                                                                                    <DialogStepsAndStepImages
-                                                                                                                        open={openStepsAndImageSteps}
-                                                                                                                        id={idWorkMilestone}
-                                                                                                                        onClose={() => {
-                                                                                                                            setIdWorkMilestone(null);
-                                                                                                                            setOpenStepsAndImageSteps(false)
-                                                                                                                            setTitle(null)
-                                                                                                                        }}
-                                                                                                                        title={title}
-                                                                                                                    />
-                                                                                                                )}
+                                                                {openStepsAndImageSteps && idWorkMilestone && title && (
+                                                                    <DialogStepsAndStepImages
+                                                                        open={openStepsAndImageSteps}
+                                                                        id={idWorkMilestone}
+                                                                        onClose={() => {
+                                                                            setIdWorkMilestone(null);
+                                                                            setOpenStepsAndImageSteps(false)
+                                                                            setTitle(null)
+                                                                        }}
+                                                                        title={title}
+                                                                    />
+                                                                )}
                                                             </Grid>
                                                         )
                                                     })}
