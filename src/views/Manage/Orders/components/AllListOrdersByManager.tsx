@@ -22,6 +22,7 @@ import { ProccessOrder } from "@/constants/status";
 import ViewProductsInOrder from "./ViewProductsInOrder";
 import DialogListImageProduct from "./DialogListImageProduct";
 import AddOrder from "./AddOrder";
+import AddProduct from "./AddProduct";
 
 
 interface AllListOrdersByManagerProps{
@@ -91,6 +92,18 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
         setViewOrder(false)
     }
 
+    // Add product
+    const handleOpenAddProduct = (order: IOrder) => {
+        setOrder(order);
+        setOpenOrder({ open: true, type: 'add-product'})
+    }
+
+    const handleCloseAddProduct = () => {
+        setOrder(null);
+        setOpenOrder({ open: false, type: 'add-product' })
+        fetchData(page, rowsPerPage, '', viewMode, profile?.id)
+    }
+
     // Job order
     const handleOpenJobOrder = (order: IOrder) => {
         setOrder(order);
@@ -144,17 +157,30 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
         switch (order.proccess) {
             case ProccessOrder.NOT_START_0:
                 return (
-                    <Button
-                        fullWidth
-                        variant="outlined"
-                        sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
-                        onClick={(e) => {
-                            e.stopPropagation()
-                            order && handleOpenJobOrder(order)
-                        }}
-                    >
-                        Thêm công việc
-                    </Button> 
+                    <Box display='flex' justifyContent='space-between' gap={1}>
+                        <Button
+                            fullWidth
+                            variant="outlined"
+                            sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                order && handleOpenJobOrder(order)
+                            }}
+                        >
+                            Thêm công việc
+                        </Button>
+                        <Button
+                            fullWidth
+                            variant="outlined"
+                            sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                order && handleOpenAddProduct(order)
+                            }}
+                        >
+                            Thêm sản phẩm
+                        </Button>
+                    </Box>
                 )
             case ProccessOrder.IN_PROGRESS_25:
                 return (
@@ -309,6 +335,12 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
                 <AddOrder
                     open={openOrder.open}
                     onClose={handleCloseAddOrder}
+                />
+            )}
+            {openOrder.open && openOrder.type === 'add-product' && order && (
+                <AddProduct
+                    data={order}
+                    onClose={handleCloseAddProduct}
                 />
             )}
             {viewOrder && order && (

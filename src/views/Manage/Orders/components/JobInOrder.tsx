@@ -171,7 +171,7 @@ const JobInOrder = (props: JobInOrderProps) => {
             const mError: FormWorkMilestoneErrors = {};
             if (!mile.name) mError.name = `Mốc công việc ${idx + 1}: Vui lòng nhập tên mốc công việc`;
             if (!mile.step) mError.step = `Mốc công việc ${idx + 1}: Vui lòng nhập mốc công việc`;
-            if (!mile.target) mError.target = `Mốc công việc ${idx + 1}: Vui lòng nhập mục tiêu/ yêu cầu`;
+            // if (!mile.target) mError.target = `Mốc công việc ${idx + 1}: Vui lòng nhập mục tiêu/ yêu cầu`;
             newWorkMilestoneErrors.push(mError);
         });
 

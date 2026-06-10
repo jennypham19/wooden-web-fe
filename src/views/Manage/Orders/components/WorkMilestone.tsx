@@ -1,10 +1,11 @@
 import { Box, Button, TextField } from "@mui/material";
-import { FC, useState } from "react";
+import { FC, ReactNode, useState } from "react";
 import Grid from "@mui/material/Grid2";
 import LabeledStack from "@/components/LabeledStack";
 import { FormDataStep, FormDataWorkMilestone, FormStepErrors, FormWorkMilestoneErrors } from "@/types/order";
 import { COLORS } from "@/constants/colors";
 import Step from "./Step";
+import { renderAsterisk } from "../../components/common";
 
 interface InputTextProps{
     index: number,
@@ -13,11 +14,12 @@ interface InputTextProps{
     value: any;
     error?: boolean,
     helperText?: string;
-    label: string;
+    label: string | ReactNode;
     disabled?: boolean;
     onlyPositiveNumber?: boolean;
     placeholder?: string
 }
+
 
 const InputText = (props: InputTextProps) => {
     const { onInputChange, index, name, value, error, helperText, label, disabled, onlyPositiveNumber = false, placeholder = 'Nhập thông tin' } = props;
@@ -146,7 +148,7 @@ const WorkMilestone: FC<WorkMilestoneProps> = ({ formDataWorkMilestone, onInputC
                         <Grid container spacing={2}>
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputText
-                                    label="Tên mốc"
+                                    label={renderAsterisk('Tên mốc')}
                                     name="name"
                                     value={mile.name}
                                     index={index}
@@ -157,7 +159,7 @@ const WorkMilestone: FC<WorkMilestoneProps> = ({ formDataWorkMilestone, onInputC
                             </Grid>
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputText
-                                    label="Mốc công việc"
+                                    label={renderAsterisk('Mốc công việc')}
                                     name="step"
                                     value={mile.step}
                                     index={index}
@@ -170,13 +172,13 @@ const WorkMilestone: FC<WorkMilestoneProps> = ({ formDataWorkMilestone, onInputC
                             </Grid>
                             <Grid size={{ xs: 12 }}>
                                 <InputText
-                                    label="Mục tiêu/ yêu cầu"
+                                    label='Mục tiêu/ yêu cầu'
                                     name="target"
                                     value={mile.target}
                                     index={index}
                                     onInputChange={handleInputChangeWorkMilestone}
-                                    error={!!errors.target}
-                                    helperText={errors.target}
+                                    // error={!!errors.target}
+                                    // helperText={errors.target}
                                 />
                             </Grid>
                         </Grid>

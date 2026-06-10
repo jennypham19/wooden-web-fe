@@ -205,3 +205,25 @@ export const compressDocx = async (file: File): Promise<File> => {
 //   return new File([data.buffer], file.name, { type: "video/mp4" });
 // };
 
+// bắt validate số điện thoại 
+const phoneRegex = /^(0|\+84)(3[2-9]|5[6|8|9]|7[0|6-9]|8[1-5]|9[0-9])[0-9]{7}$/;
+export const checkPhoneRegext = (value: any ) => {
+  const phone = value.replace(/\s|-/g, '');
+  if(!/^\d+$/.test(phone)){
+    return 'Số điện thoại chỉ chứa số'
+  }
+
+  if(phone.startsWith('0') && phone.length !== 10){
+    return 'Số điện thoại phải có 10 chữ số (nếu bắt đầu bằng 0)'
+  }
+
+  if(phone.startsWith('+84') && (phone.length < 11 || phone.length > 12)){
+    return 'Số điện thoại phải có 11-12 chữ số (nếu bắt đầu bằng +84)'
+  }
+
+  if(!phoneRegex.test(phone)){
+    return 'Số điện thoại không đúng định dạng (bắt đầu từ +84|03|05|07|08|09)'
+  }
+
+  return '';
+}

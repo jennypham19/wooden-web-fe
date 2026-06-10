@@ -10,6 +10,7 @@ import { FormInfoNewCustomerErrors } from "@/types/error";
 import { FormDataInputFiles, FormDataInputOrders, FormDataReferenceLinks, OrderPayload } from "@/types/order";
 import { FormDataProducts } from "@/types/product";
 import { IUser } from "@/types/user";
+import { checkPhoneRegext } from "@/utils/common";
 import { FormErrors, FormProductErrors } from "@/views/Manage/Orders/components/AddOrder";
 import ProductOrder from "@/views/Manage/Orders/components/ProductOrder";
 import NewCustomer from "@/views/Manage/Orders/components/typeCustomer/NewCustomer";
@@ -148,8 +149,14 @@ const AddOrderMobile = (props: AddOrderMobileProps) => {
         setInforNewCustomer(prev => ({ ...prev, type: value }));
     }
 
+    const phoneRegex = /^(0|\+84)(3[2-9]|5[6|8|9]|7[0|6-9]|8[1-5]|9[0-9])[0-9]{7}$/;
     const handleChangeInfoNewCus = (name: string, value: any) => {
+        const validName = name as keyof ICustomerInput;
         setInforNewCustomer(prev => ({ ...prev, [name]: value }))
+        if(validName === 'phone' && typeof value === 'string'){
+            const phoneError = checkPhoneRegext(value);
+            setInfoNewCusErrors(prev => ({ ...prev, phone: phoneError }))
+        }
         // Xóa lỗi khi người dùng bắt đầu nhập
         if(infoNewCusErrors[name as keyof typeof infoNewCusErrors]){
             setInfoNewCusErrors(prev => ({ ...prev, [name]: undefined }))

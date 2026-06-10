@@ -54,7 +54,7 @@ export interface FormDataStep{
 export interface FormDataWorkMilestone{
     name: string,
     step: number | null | string,
-    target: string,
+    target?: string,
     steps: FormDataStep[]
 }
 

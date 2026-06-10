@@ -20,11 +20,20 @@ export interface FormDataRequestMilestone{
     reworkStartedAt: Dayjs | null
 }
 
+export interface FormDataDimesionProduct{
+    length: number | null,
+    width: number | null,
+    height: number | null
+}
+
 // Body
 export interface FormUpdateProduct{
     status: string,
     nameImage: string,
-    urlImage: string
+    urlImage: string,
+    length: number | null,
+    width: number | null,
+    height: number | null
 }
 
 export interface PayloadRequestMilestone{
