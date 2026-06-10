@@ -1,9 +1,10 @@
 import { IOrder } from "@/types/order";
-import { Box, Paper, Typography } from "@mui/material";
+import { Box, Paper, Stack, Typography } from "@mui/material";
 import NavigateBack from "../../components/NavigateBack";
 import { Inventory } from "@mui/icons-material";
 import { COLORS } from "@/constants/colors";
 import Grid from "@mui/material/Grid2";
+import InputText from "@/components/InputText";
 
 interface AddProductProps{
     data: IOrder;
@@ -30,6 +31,25 @@ const AddProduct = (props: AddProductProps) => {
                             <Inventory sx={{ color: COLORS.BUTTON }}/>
                             <Typography fontWeight={500}>Danh sách sản phẩm đã tồn tại</Typography>
                         </Box>
+                        {data.products.map((product) => {
+                            return(
+                                <Box mt={2} display='flex' flexDirection='column' gap={1.5} key={product.id}>
+                                    <Stack direction='row'>
+                                        <Typography variant="subtitle1" fontWeight={600}>Tên sản phẩm:</Typography>
+                                        <Typography variant="subtitle1">{product.name}</Typography>
+                                    </Stack>
+                                    <Stack direction='row'>
+                                        <Typography variant="subtitle1" fontWeight={600}>Mô tả/Yêu cầu:</Typography>
+                                        <Typography variant="subtitle1">{product.description}</Typography>
+                                    </Stack>
+                                    <Stack direction='row'>
+                                        <Typography variant="subtitle1" fontWeight={600}>Mục tiêu:</Typography>
+                                        <Typography variant="subtitle1">{product.target}</Typography>
+                                    </Stack>                                       
+                                </Box>
+                            )
+                        })}
+
                     </Paper>
                 </Grid>
 
@@ -40,6 +60,23 @@ const AddProduct = (props: AddProductProps) => {
                             <Box display='flex' flexDirection='row' gap={1.5}>
                                 <Inventory sx={{ color: COLORS.BUTTON }}/>
                                 <Typography fontWeight={500}>Danh sách sản phẩm thêm</Typography>
+                            </Box>
+                            <Box display='flex' flexDirection='row' gap={1.5} alignItems="baseline">
+                                <Typography variant="subtitle2">Số lượng:</Typography>
+                                <InputText
+                                    label=""
+                                    name="amount"
+                                    value={''}
+                                    sx={{ width: 40 }}
+                                    type="text"
+                                    onlyPositiveNumber={true}
+                                    onChange={() => {}}
+                                    placeholder=""
+                                    from="order-desktop"
+                                    variant="standard"
+                                />
+                                <Typography variant="subtitle2">sản phẩm </Typography>
+                                <Typography variant="subtitle2" color="error">(*)</Typography>
                             </Box>
                         </Box>
                     </Paper>                    

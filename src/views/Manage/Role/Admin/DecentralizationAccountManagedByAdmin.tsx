@@ -34,6 +34,7 @@ const DecentralizationAccountManagedByAdmin = () => {
     const handleCloseManagedAccount = () => {
         setShowAccount({ type: 'managed_account', open: false });
         setShowAll(false)
+        fetchData(1, rowsPerPage, 'all')
     }
 
     const handleOpenDecentralizedAccount = () => {
