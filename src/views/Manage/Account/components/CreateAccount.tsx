@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Typography } from "@mui/material";
+import { Avatar, Box, Button, Divider, Typography } from "@mui/material";
 import NavigateBack from "../../components/NavigateBack";
 import Grid from "@mui/material/Grid2";
 import { ChangeEvent, useRef, useState } from "react";
@@ -31,6 +31,7 @@ export interface FormDataUser{
     work: string[],
     address: string,
     department: string,
+    account: string,
 }
 
 type FormErrors = {
@@ -48,7 +49,7 @@ const CreateAccount = ( props: CreateAccountProps ) => {
     const [errors, setErrors] = useState<FormErrors>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState<FormDataUser>({
-        fullName: '', dob: null, role: '', email: '', password: '', gender: '', phone: '', work: [], address: '', department: ''
+        fullName: '', dob: null, role: '', email: '', password: '', gender: '', phone: '', work: [], address: '', department: '', account: ''
     })
     const [first, setFirst] = useState('');
     const [code, setCode] = useState('');
@@ -59,7 +60,7 @@ const CreateAccount = ( props: CreateAccountProps ) => {
         setErrorImage(null);
         setErrorCode(null);
         setErrors({});
-        setFormData({ fullName: '', dob: null, role: '', email: '', password: '', gender: '', phone: '', work: [], address: '', department: '' });
+        setFormData({ fullName: '', dob: null, role: '', email: '', password: '', gender: '', phone: '', work: [], address: '', department: '', account: '' });
         setCode('');
         setFirst('')
     }
@@ -149,6 +150,7 @@ const CreateAccount = ( props: CreateAccountProps ) => {
         if(!formData.phone) newErrors.phone = 'Vui lòng nhập số điện thoại';
         if(formData.work.length === 0) newErrors.work = 'Vui lòng chọn công việc';
         if(!formData.department) newErrors.department = 'Vui lòng chọn chức vụ để ra phòng ban';
+        if(!formData.account) newErrors.account = 'Vui lòng nhập tên đăng nhập';
         if(!imageFile){
             setErrorImage("Vui lòng tải lên hình ảnh")
         };
@@ -185,7 +187,8 @@ const CreateAccount = ( props: CreateAccountProps ) => {
                 department: formData.department,
                 address: formData.address ? formData.address : null,
                 avatarUrl: uploadResponse.data.file.imageUrl,
-                nameImage: uploadResponse.data.file.fileName
+                nameImage: uploadResponse.data.file.fileName,
+                account: formData.account,
             }
             const res = await createAccount(payload);
             notify({
@@ -211,6 +214,10 @@ const CreateAccount = ( props: CreateAccountProps ) => {
             />
             <Box borderRadius={2} m={2} p={1.5} bgcolor='#fff' boxShadow="0px 2px 1px 1px rgba(0, 0, 0, 0.2)">
                 <Grid container spacing={3}>
+                    <Grid size={{ xs: 12 }}>
+                        <Typography fontWeight={600}>1. Thông tin cá nhân </Typography>
+                        <Divider/>
+                    </Grid>
                     <Grid size={{ xs: 12}} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 2.5 }}>
                         <Box sx={{ position: 'relative', width: 120, height: 120}}>
                             <Avatar
@@ -239,7 +246,7 @@ const CreateAccount = ( props: CreateAccountProps ) => {
                             <Typography mt={1} fontSize='13px' color="error">{errorImage}</Typography>
                         )}
                     </Grid>
-                    <Grid size={{ xs: 12, md: 6}}>
+                    <Grid size={{ xs: 12, md: 4 }}>
                         <Typography fontWeight={700} fontSize='15px'>Họ tên</Typography>
                         <InputText
                             name="fullName"
@@ -252,7 +259,7 @@ const CreateAccount = ( props: CreateAccountProps ) => {
                             helperText={errors.fullName}
                         />
                     </Grid>
-                    <Grid size={{ xs: 12, md: 6}}>
+                    <Grid size={{ xs: 12, md: 4 }}>
                         <Typography fontWeight={700} fontSize='15px'>Ngày sinh</Typography>
                         <InputText
                             name="dob"
@@ -263,6 +270,25 @@ const CreateAccount = ( props: CreateAccountProps ) => {
                             margin="none"
                             error={!!errors.dob}
                             helperText={errors.dob}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                        <Typography fontWeight={700} fontSize='15px'>Giới tính</Typography>
+                        <InputSelect
+                            label=""
+                            value={formData.gender}
+                            onChange={handleInputChange}
+                            name="gender"
+                            options={GENDER}
+                            transformOptions={(data) => 
+                                data.map((item) => ({
+                                    label: item.label,
+                                    value: item.value
+                                }))
+                            }
+                            placeholder="Chọn giới tính"
+                            error={!!errors.gender}
+                            helperText={errors.gender}
                         />
                     </Grid>
                     <Grid size={{ xs: 12, md: 6 }}>
@@ -308,37 +334,6 @@ const CreateAccount = ( props: CreateAccountProps ) => {
                             name="email"
                             error={!!errors.email}
                             helperText={errors.email}
-                        />
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 6}}>
-                        <Typography fontWeight={700} fontSize='15px'>Mật khẩu</Typography>
-                        <InputText
-                            label=""
-                            name='password'
-                            value={formData.password}
-                            type="text"
-                            onChange={handleInputChange}
-                            error={!!errors.password}
-                            helperText={errors.password}
-                        />
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 6}}>
-                        <Typography fontWeight={700} fontSize='15px'>Giới tính</Typography>
-                        <InputSelect
-                            label=""
-                            value={formData.gender}
-                            onChange={handleInputChange}
-                            name="gender"
-                            options={GENDER}
-                            transformOptions={(data) => 
-                                data.map((item) => ({
-                                    label: item.label,
-                                    value: item.value
-                                }))
-                            }
-                            placeholder="Chọn giới tính"
-                            error={!!errors.gender}
-                            helperText={errors.gender}
                         />
                     </Grid>
                     <Grid size={{ xs: 12, md: 6}}>
@@ -396,6 +391,36 @@ const CreateAccount = ( props: CreateAccountProps ) => {
                             value={formData.address}
                             type="text"
                             onChange={handleInputChange}
+                            multiline
+                            rows={5}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12 }} sx={{ mt: 2 }}>
+                        <Typography fontWeight={600}>2. Thông tin tài khoản </Typography>
+                        <Divider/>
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 6}}>
+                        <Typography fontWeight={700} fontSize='15px'>Tên đăng nhập</Typography>
+                        <InputText
+                            label=""
+                            name='account'
+                            value={formData.account}
+                            type="text"
+                            onChange={handleInputChange}
+                            error={!!errors.account}
+                            helperText={errors.account}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 6}}>
+                        <Typography fontWeight={700} fontSize='15px'>Mật khẩu</Typography>
+                        <InputText
+                            label=""
+                            name='password'
+                            value={formData.password}
+                            type="text"
+                            onChange={handleInputChange}
+                            error={!!errors.password}
+                            helperText={errors.password}
                         />
                     </Grid>
                     <Grid size={{ xs: 12 }} sx={{ display: 'flex', justifyContent: 'flex-end'}}>

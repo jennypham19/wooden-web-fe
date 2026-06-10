@@ -19,7 +19,8 @@ interface UserPayloadRequest {
   address: string | null,
   department: string,
   avatarUrl: string,
-  nameImage: string
+  nameImage: string,
+  account: string
 }
 
 export interface GetParams{
