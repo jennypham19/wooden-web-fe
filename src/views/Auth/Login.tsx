@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 
-import { Email, Lock, Visibility, VisibilityOff } from '@mui/icons-material';
+import { Lock, Person, Visibility, VisibilityOff } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import {
   Alert,
@@ -37,7 +37,7 @@ import CommonImage from '@/components/Image/index';
 export const ID_USER = 'user_id'
 
 interface LoginFormInputs {
-  email: string;
+  account: string;
   password: string;
 }
 
@@ -61,14 +61,14 @@ export default function Login() {
   const [remember, setRemember] = useState(false);
 
   useEffect(() => {
-    setFocus('email');
+    setFocus('account');
   }, [setFocus]);
 
   const onSubmit = async (values: LoginFormInputs) => {
     setLoading.on();
     try {
       const respAuth = await signIn({
-        email: values.email,
+        account: values.account,
         password: values.password,
       });
       const accessToken = respAuth.data?.accessToken;
@@ -133,21 +133,21 @@ export default function Login() {
               }}
             >
               <Stack mb={2}>
-                <Typography fontWeight={600}>Email</Typography>
+                <Typography fontWeight={600}>Tên đăng nhập</Typography>
                 <ControllerTextField<LoginFormInputs>
                   controllerProps={{
-                    name: 'email',
+                    name: 'account',
                     defaultValue: '',
                     control: control,
                   }}
                   textFieldProps={{
-                    placeholder: 'Email',
+                    placeholder: 'Tên đăng nhập',
                     label: '',
-                    error: !!errors.email,
-                    helperText: errors.email?.message,
-                    sx: { ariaLabel: 'email' },
+                    error: !!errors.account,
+                    helperText: errors.account?.message,
+                    sx: { ariaLabel: 'account' },
                   }}
-                  prefixIcon={Email}
+                  prefixIcon={Person}
                 />                
               </Stack>
 

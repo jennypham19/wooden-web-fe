@@ -2,6 +2,7 @@ import { IMenu } from "./permission";
 
 export interface IUser{
     id: string,
+    account: string,
     email: string,
     password: string
     fullName: string,

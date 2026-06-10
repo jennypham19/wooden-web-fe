@@ -2,7 +2,7 @@ import { HttpResponse } from './common';
 import { IUser } from './user';
 
 export type LoginRequest = {
-  email: string;
+  account: string;
   password: string;
 };
 

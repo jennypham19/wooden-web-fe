@@ -47,8 +47,10 @@ const DetailAccount = (props: DetailAccountProps) => {
                         </Stack>
                         <Stack mb={1} display='flex' justifyContent='space-between'>
                             <Typography fontSize='15px'>{account.email}</Typography>
-                            {account.address && <Typography fontSize='15px'>{account.address}</Typography>}
+                            <Typography fontSize='15px'>{account.account}</Typography>
+                            
                         </Stack>
+                        {account.address && <Typography mt={1} fontSize='15px'>{account.address}</Typography>}
                         <Stack mb={1} display='flex' justifyContent='space-between'>
                             <Typography fontSize='15px'>{`Phòng: ${account.department}`}</Typography>
                             <Typography fontSize='15px'>{getRoleLabel(account.role)}</Typography>

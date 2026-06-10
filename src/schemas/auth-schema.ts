@@ -1,6 +1,6 @@
 import { object, ref, string } from 'yup';
 
-export const usernameValidateSchema = string().required('Email is required');
+export const usernameValidateSchema = string().required('Account is required');
 
 const passwordValidateSchema = string()
   .required('Password is required')
@@ -20,7 +20,7 @@ const passwordSchema = <T extends string>(label: T) =>
   });
 
 export const loginSchema = object().shape({
-  email: usernameValidateSchema,
+  account: usernameValidateSchema,
   password: string().required('Password is required'),
 });
 
