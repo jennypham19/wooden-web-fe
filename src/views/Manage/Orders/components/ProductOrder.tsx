@@ -21,7 +21,7 @@ interface InputTextProps{
     rows?: number
 }
 
-const InputText = (props: InputTextProps) => {
+export const InputText = (props: InputTextProps) => {
     const { onInputChange, index, name, value, error, helperText, label, disabled, inputLabel, placeholder = "Nhập thông tin", multiline, rows } = props;
     return (
         <TextField
