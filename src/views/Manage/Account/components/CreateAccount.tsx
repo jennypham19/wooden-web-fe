@@ -2,7 +2,7 @@ import { Avatar, Box, Button, Divider, Typography } from "@mui/material";
 import NavigateBack from "../../components/NavigateBack";
 import Grid from "@mui/material/Grid2";
 import { ChangeEvent, useRef, useState } from "react";
-import { resizeImage } from "@/utils/common";
+import { checkPhoneRegext, resizeImage } from "@/utils/common";
 import { PhotoCamera } from "@mui/icons-material";
 import { getRoleCode, getRoleDepartment } from "@/utils/labelEntoVni";
 import InputText from "@/components/InputText";
@@ -91,7 +91,6 @@ const CreateAccount = ( props: CreateAccountProps ) => {
     let finalDisplayAvatarSrc: string | undefined = undefined;
     if(avatarPreview) finalDisplayAvatarSrc = avatarPreview; 
 
-    const phoneRegex = /^(0|\+84)(3[2-9]|5[6|8|9]|7[0|6-9]|8[1-5]|9[0-9])[0-9]{7}$/;
     const handleInputChange = (name: string, value: any) => {
         const validName = name as keyof FormDataUser;
         setFormData(prev => ({ ...prev, [name]: value}));
@@ -112,25 +111,8 @@ const CreateAccount = ( props: CreateAccountProps ) => {
             setErrors(prev => ({ ...prev, department: undefined, work: undefined }))
         }
         if(validName === 'phone' && typeof value === 'string'){
-            const phone = value.replace(/\s|-/g, '');
-            if(!/^\d+$/.test(phone)){
-                setErrors(prev => ({...prev, phone: 'Số điện thoại chỉ chứa số'}));
-                return
-            }
-
-            if(phone.startsWith('0') && phone.length !== 10){
-                setErrors(prev => ({...prev, phone: 'Số điện thoại phải có 10 chữ số (nếu bắt đầu bằng 0)'}));
-                return
-            }
-
-            if(phone.startsWith('+84') && (phone.length < 11 || phone.length > 12)){
-                setErrors(prev => ({...prev, phone: 'Số điện thoại phải có 11-12 chữ số (nếu bắt đầu bằng +84)'}));
-                return
-            }
-
-            if(!phoneRegex.test(phone)){
-                setErrors(prev => ({...prev, phone: 'Số điện thoại không đúng định dạng (bắt đầu từ +84|03|05|07|08|09)'}))
-            }
+            const phoneError = checkPhoneRegext(value);
+            setErrors(prev => ({...prev, phone: phoneError }));
         }
 
         if(errors[name as keyof typeof errors]){

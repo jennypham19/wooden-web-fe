@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextField, TextFieldProps } from '@mui/material';
+import { InputAdornment, TextField, TextFieldProps, Typography } from '@mui/material';
 import { SxProps, Theme } from '@mui/material/styles';
 import {
   DatePicker,
@@ -60,7 +60,8 @@ interface CustomInputProps {
   from?: string;
   startAdornment?: React.ReactNode;
   endAdornment?: React.ReactNode;
-  mt?: any
+  mt?: any,
+  inputLabel?: string
 }
 
 const InputText: React.FC<CustomInputProps> = ({
@@ -88,7 +89,8 @@ const InputText: React.FC<CustomInputProps> = ({
   from,
   startAdornment,
   endAdornment,
-  mt
+  mt,
+  inputLabel
 }) => {
 
   const commonSlotTextFieldProps = {
@@ -254,6 +256,12 @@ const InputText: React.FC<CustomInputProps> = ({
           sx: {
             fontSize: "14px",
             color: '#aaa'
+          }
+        }}
+        slotProps={{
+          input: {
+            endAdornment: <InputAdornment position="end"><Typography variant='caption'>{inputLabel}</Typography></InputAdornment>,
+                    
           }
         }}
         sx={{

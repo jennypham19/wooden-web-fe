@@ -3,6 +3,8 @@ import { TextField } from "@mui/material";
 import Grid from "@mui/material/Grid2"
 import InputSelect from "./InputSelect";
 import { v4 as uuidv4} from "uuid"
+import { ReactNode } from "react";
+import { renderAsterisk } from "../../components/common";
 
 export const DATA_PROCCESS: { id: string, label: string, value: string}[] = [
     {
@@ -62,7 +64,7 @@ interface InputTextProps{
     value: string;
     error?: boolean,
     helperText?: string;
-    label: string;
+    label: string | ReactNode;
     disabled?: boolean
 }
 
@@ -123,7 +125,7 @@ const Step = (props: StepProps) => {
             <Grid size={{ xs: 12, md: 4 }}>
                 <InputText
                     index={index} // Giữ nguyên index
-                    label={`Bước ${index + 1}`}
+                    label={renderAsterisk(`Bước ${index + 1}`)}
                     name="name"
                     value={formData.name}
                     onInputChange={onInputChange}

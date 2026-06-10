@@ -20,10 +20,12 @@ import { createStep, deletedStepAdded, updateStep } from "@/services/order-servi
 import { getDetailWorkOrderByProduct, updateImageAndStatusProduct } from "@/services/product-service";
 import { uploadImage, uploadImages } from "@/services/upload-service";
 import { IWorkMilestone, IWorkOrder, StepPayload, StepsPayload } from "@/types/order";
-import { FormUpdateProduct, IProduct } from "@/types/product";
+import { FormDataDimesionProduct, FormUpdateProduct, IProduct } from "@/types/product";
 import { resizeImage } from "@/utils/common";
 import { getEvaluatedStatusWorkMilestoneColor, getEvaluatedStatusWorkMilestoneLabel, getNumber, getProccessWorkOrderColor, getProccessWorkOrderLabel, getProgressWorkOrderLabel, getStatusProductLabel } from "@/utils/labelEntoVni";
 import { EvaluatedStatusWorkMilestone } from "@/constants/status";
+import { renderTextWithAsterisk } from "../../components/common";
+import { FormDataDimesionProductErrors } from "@/types/error";
 
 
 interface ProgressProductProps{
@@ -57,11 +59,21 @@ const ProgressProduct = (props: ProgressProductProps) => {
     const [imageFiles, setImageFiles] = useState<File[]>([]);
     const [imagesUrl, setImagesUrl] = useState<string[]>([]);
 
+    // Tiến độ các mốc
     const [formDataProgress, setFormDataProgress] = useState<FormDataProgress>({
         proccess: '',
         progress: ''
     })
     const [progressErrors, setProgressErrors] = useState<ProgressErrors>({});
+
+    // Kích thước sản phẩm
+    const [formDataDimensionProduct, setFormDataDimensionProduct] = useState<FormDataDimesionProduct>({
+        length: null,
+        width: null,
+        height: null
+    })
+    const [dimensionProductErrors, setDimensionProductErrors] = useState<FormDataDimesionProductErrors>({})
+
     const [milestoneIndex, setMilestoneIndex] = useState<number | null>(null);
     const [nameStep, setNameStep] = useState('');
     const [nameStepError, setNameStepError] = useState('');
@@ -240,6 +252,14 @@ const ProgressProduct = (props: ProgressProductProps) => {
         }
     }
 
+    // Kích thước sản phẩm
+    const handleInputChangeDimensionProduct = (name: string, value: any) => {
+        setFormDataDimensionProduct((prev) => ({ ...prev, [name]: value}));
+        if(dimensionProductErrors[name as keyof typeof dimensionProductErrors]) {
+            setDimensionProductErrors(prev => ({ ...prev, [name]: undefined}))
+        }
+    }
+
     const validateForm = (): boolean => {
         const newErrors: ProgressErrors = {};
         if(!formDataProgress.proccess) newErrors.proccess = "Vui lòng chọn trạng thái";
@@ -249,6 +269,19 @@ const ProgressProduct = (props: ProgressProductProps) => {
         }
         setProgressErrors(newErrors);
         return Object.keys(newErrors).length === 0 && imageFiles.length > 0;
+    }
+
+    // Validate kích thước sản phẩm
+    const validateFormDimensionProduct = (): boolean => {
+        const newErrors: FormDataDimesionProductErrors = {};
+        if(!formDataDimensionProduct.length) newErrors.length = "Vui lòng nhập chiều dài";
+        if(!formDataDimensionProduct.width) newErrors.width = "Vui lòng nhập chiều rộng";
+        if(!formDataDimensionProduct.height) newErrors.height = "Vui lòng nhập chiều cao";
+        if(imageProductFile === null) {
+            setProductErrorImageFile('Vui lòng chọn ảnh')
+        }
+        setDimensionProductErrors(newErrors);
+        return Object.keys(newErrors).length === 0 && imageProductFile !== null
     }
 
     const handleSave = async(id: string, workMilestoneId: string) => {
@@ -322,8 +355,7 @@ const ProgressProduct = (props: ProgressProductProps) => {
     
     // Hoàn thành sản phẩm
     const handleFinish = async() => {
-        if(imageProductFile === null) {
-            setProductErrorImageFile('Vui lòng chọn ảnh')
+        if(!validateFormDimensionProduct()) {
             return;
         }
         setIsSubmitting(true);
@@ -337,7 +369,10 @@ const ProgressProduct = (props: ProgressProductProps) => {
             const payload: FormUpdateProduct = {
                 status: 'completed',
                 nameImage: uploadResponse.data.file.originalname,
-                urlImage: uploadResponse.data.file.imageUrl
+                urlImage: uploadResponse.data.file.imageUrl,
+                length: formDataDimensionProduct.length,
+                width: formDataDimensionProduct.width,
+                height: formDataDimensionProduct.height
             }
             const res = await updateImageAndStatusProduct(data.id, payload);
             notify({
@@ -788,7 +823,7 @@ const ProgressProduct = (props: ProgressProductProps) => {
                 )}
                 {workOrder?.evaluatedStatus === 'approved' && (
                     <>
-                        <Typography fontSize='15px'>Hình ảnh sản phẩm</Typography>
+                        <Typography fontSize='15px' fontWeight={600}>Hình ảnh sản phẩm</Typography>
                         {imageProductUrl ? (
                             <Box
                                 sx={{
@@ -843,15 +878,59 @@ const ProgressProduct = (props: ProgressProductProps) => {
                                 >
                                     <Box sx={{ margin: 'auto 0'}}>
                                         <CameraAlt sx={{ fontSize: 48, color: 'text.secondary' }} />
-                                        <Typography fontSize='14px'>{isSmall ? 'Tải lên hình ảnh trực tiếp.' : 'Tải lên dữ liệu files ảnh trong thư viện.'}</Typography>
-                                        <Typography fontSize='14px'>{isSmall ? 'Chụp ảnh từ camera của bạn.' : 'JPG, JPEG, PNG, MOV,...'}</Typography>
+                                        <Typography fontSize='14px'>{isSmall ? 'Chụp ảnh từ camera của bạn.' : 'Tải lên dữ liệu files ảnh trong thư viện.'}</Typography>
+                                        <Typography fontSize='14px'>'JPG, JPEG, PNG, MOV,...'</Typography>
                                     </Box>
                                 </Box>
-                            </Box>
+                             </Box>
                         )}
                         {errorProductImageFile && (
-                            <Typography align="center" fontSize='14px' mt={1} color="error">{errorProductImageFile}</Typography>
-                        )}
+                            <Typography my={1} align="center" fontSize='14px' color="error">{errorProductImageFile}</Typography>
+                        )} 
+                        <Grid container spacing={2}>
+                            <Grid size={{ xs: 4 }}>
+                                {renderTextWithAsterisk('Chiều dài')}
+                                <InputText
+                                    type="text"
+                                    label=""
+                                    name="length"
+                                    value={formDataDimensionProduct.length}
+                                    onChange={handleInputChangeDimensionProduct}
+                                    error={!!dimensionProductErrors.length}
+                                    helperText={dimensionProductErrors.length}
+                                    inputLabel='cm'
+                                    placeholder="Số"
+                                />
+                            </Grid>
+                            <Grid size={{ xs: 4 }}>
+                                {renderTextWithAsterisk('Chiều rộng')}
+                                <InputText
+                                    type="text"
+                                    label=""
+                                    name="width"
+                                    value={formDataDimensionProduct.width}
+                                    onChange={handleInputChangeDimensionProduct}
+                                    error={!!dimensionProductErrors.width}
+                                    helperText={dimensionProductErrors.width}
+                                    inputLabel='cm'
+                                    placeholder="Số"
+                                />
+                            </Grid>
+                            <Grid size={{ xs: 4 }}>
+                                {renderTextWithAsterisk('Chiều cao')}
+                                <InputText
+                                    type="text"
+                                    label=""
+                                    name="height"
+                                    value={formDataDimensionProduct.height}
+                                    onChange={handleInputChangeDimensionProduct}
+                                    error={!!dimensionProductErrors.height}
+                                    helperText={dimensionProductErrors.height}
+                                    inputLabel='cm'
+                                    placeholder="Số"
+                                />
+                            </Grid>
+                        </Grid>
                         <Button
                             fullWidth
                             sx={{ bgcolor: COLORS.BUTTON, mt: 2, borderRadius: 3 }}
