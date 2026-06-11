@@ -25,6 +25,7 @@ import AddOrder from "./AddOrder";
 import AddProduct from "./AddProduct";
 import DialogConfirm from "../../components/DialogConfirm";
 import useNotification from "@/hooks/useNotification";
+import EditOrder from "./EditOrder";
 
 
 interface AllListOrdersByManagerProps{
@@ -77,6 +78,7 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
     
     const { error, fetchData, handlePageChange, handleSearch, listData, loading, page, rowsPerPage, searchTerm, total, setLoading } = useFetchData<IOrder>(getOrdersByIdManager, 8, viewMode, profile?.id);
 
+    // Thêm đơn hàng
     const handleOpenAddOrder = () => {
         setOpenOrder({ open: true, type: 'add' })
     }
@@ -86,6 +88,7 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
         fetchData(page, rowsPerPage, '', viewMode, profile?.id)
     }
 
+    // Xem chi tiết đơn hàng
     const handleOpenViewOrder = (order: IOrder) => {
         setOrder(order);
         setViewOrder(true)
@@ -94,6 +97,17 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
     const handleCloseViewOrder = () => {
         setOrder(null);
         setViewOrder(false)
+    }
+
+    // Chỉnh sửa đơn hàng
+    const handleOpenEditOrder = (order: IOrder) => {
+        setOrder(order);
+        setOpenOrder({ open: true, type: 'edit' })
+    }
+
+    const handleCloseEditOrder = () => {
+        setOrder(null);
+        setOpenOrder({ open: false, type: 'edit' })
     }
 
     // Add product
@@ -156,7 +170,6 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
 
     const renderActionButton = (order: IOrder) => {
         if(profile && profile.role !== ROLE.FACTORY_MANAGER) return null;
-        const isShownButtonAddJob = order.products.every(el => el.isCreated === true);
         
         switch (order.proccess) {
             case ProccessOrder.NOT_START_0:
@@ -179,7 +192,7 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
                             sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
                             onClick={(e) => {
                                 e.stopPropagation()
-                                order && handleOpenAddProduct(order)
+                                order && handleOpenEditOrder(order)
                             }}
                         >
                             Chỉnh sửa
@@ -200,19 +213,18 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
                         >
                             Kiểm soát đơn hàng
                         </Button>
-                        {!isShownButtonAddJob && (
-                            <Button
-                                fullWidth
-                                variant="outlined"
-                                sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
-                                onClick={(e) => {
-                                    e.stopPropagation()
-                                    order && handleOpenJobOrder(order)
-                                }}
-                            >
-                                Thêm công việc
-                            </Button> 
-                        ) }
+                        <Button
+                            fullWidth
+                            variant="outlined"
+                            sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON }}
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                order && handleOpenEditOrder(order)
+                            }}
+                        >
+                            Chỉnh sửa
+                        </Button> 
+
                     </Box>
                 )
             case ProccessOrder.IN_PROGRESS_50:
@@ -275,7 +287,6 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
     const handleCloseDialogDeleteOrder = () => {
         setOpenDialogDeleteOrder(false);
         setOrder(null);
-        handleFetchData()
     }
 
     const handleAgree = async() => {
@@ -286,7 +297,8 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
                 message: res.message,
                 severity: 'success'
             });
-            handleCloseDialogDeleteOrder()
+            handleCloseDialogDeleteOrder();
+            handleFetchData()
         } catch (error: any) {
             notify({
                 message: error.message,
@@ -371,6 +383,12 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
                 <AddOrder
                     open={openOrder.open}
                     onClose={handleCloseAddOrder}
+                />
+            )}
+            {openOrder.open && openOrder.type === 'edit' && order && (
+                <EditOrder
+                    order={order}
+                    onClose={handleCloseEditOrder}
                 />
             )}
             {openOrder.open && openOrder.type === 'add-product' && order && (

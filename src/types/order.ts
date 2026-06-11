@@ -122,7 +122,10 @@ export interface IOrder{
     id: string,
     customer: {
         id: string,
-        name: string
+        name: string,
+        phone: string,
+        address: string,
+        type: string
     },
     codeOrder: string,
     name: string,
