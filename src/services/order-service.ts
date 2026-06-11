@@ -181,3 +181,9 @@ export const getOrdersWithWorkByIdManager = async(getParams: GetParams): Promise
         throw new Error(response.message || 'Failed to fetch list orders')
     }
 }
+
+
+// Xóa đơn hàng
+export const deletedOrder = async(id: string) => {
+    return HttpClient.delete(`${prefix}/order-added-deleted/${id}`)
+}

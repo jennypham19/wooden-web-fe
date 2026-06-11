@@ -1,5 +1,5 @@
 import { useFetchData } from "@/hooks/useFetchData";
-import { getOrdersByIdManager } from "@/services/order-service";
+import { deletedOrder, getOrdersByIdManager } from "@/services/order-service";
 import { IOrder } from "@/types/order";
 import { Alert, Box, Button, Typography } from "@mui/material";
 import React, { useState } from "react";
@@ -23,6 +23,8 @@ import ViewProductsInOrder from "./ViewProductsInOrder";
 import DialogListImageProduct from "./DialogListImageProduct";
 import AddOrder from "./AddOrder";
 import AddProduct from "./AddProduct";
+import DialogConfirm from "../../components/DialogConfirm";
+import useNotification from "@/hooks/useNotification";
 
 
 interface AllListOrdersByManagerProps{
@@ -61,6 +63,7 @@ const DataStatus: {id: number, value: string, label: string, icon: React.ReactNo
 
 const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) => {
     const { onBack } = props;
+    const notify = useNotification();
     const { profile } = useAuth();
     const [viewMode, setViewMode] = useState<'all' | 'pending' | 'in_progress' | 'completed'>('all')
     const [openOrder, setOpenOrder] = useState<{ open: boolean, type: string}>({
@@ -70,8 +73,9 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
     const [viewOrder, setViewOrder] = useState(false);
     const [viewImageProducts, setViewImageProducts] = useState(false);
     const [order, setOrder] = useState<IOrder | null>(null);
+    const [openDialogDeleteOrder, setOpenDialogDeleteOrder] = useState(false);
     
-    const { error, fetchData, handlePageChange, handleSearch, listData, loading, page, rowsPerPage, searchTerm, total } = useFetchData<IOrder>(getOrdersByIdManager, 8, viewMode, profile?.id);
+    const { error, fetchData, handlePageChange, handleSearch, listData, loading, page, rowsPerPage, searchTerm, total, setLoading } = useFetchData<IOrder>(getOrdersByIdManager, 8, viewMode, profile?.id);
 
     const handleOpenAddOrder = () => {
         setOpenOrder({ open: true, type: 'add' })
@@ -178,7 +182,7 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
                                 order && handleOpenAddProduct(order)
                             }}
                         >
-                            Thêm sản phẩm
+                            Chỉnh sửa
                         </Button>
                     </Box>
                 )
@@ -262,6 +266,37 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
         fetchData(page, rowsPerPage, '', '', profile?.id)
     }
 
+    // Xóa đơn hàng
+    const handleOpenDialogDeleteOrder = (order: IOrder) => {
+        setOrder(order)
+        setOpenDialogDeleteOrder(true)
+    }
+
+    const handleCloseDialogDeleteOrder = () => {
+        setOpenDialogDeleteOrder(false);
+        setOrder(null);
+        handleFetchData()
+    }
+
+    const handleAgree = async() => {
+        setLoading(true)
+        try {
+            const res = order &&  await deletedOrder(order.id);
+            notify({
+                message: res.message,
+                severity: 'success'
+            });
+            handleCloseDialogDeleteOrder()
+        } catch (error: any) {
+            notify({
+                message: error.message,
+                severity: "error"
+            })
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return(
         <Box>
             {!openOrder.open && (
@@ -302,11 +337,12 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
                                             <Typography p={2} fontWeight={700}>Không tồn tại bản ghi nào</Typography>
                                         ) : (
                                             listData.map((order, index) => (
-                                                <Grid key={index} size={{ xs: 12, md: 4 }}>
+                                                <Grid key={index} size={{ xs: 12, md: 6, lg: 4 }}>
                                                     <CardDataOrder
                                                         order={order}
                                                         onViewOrder={handleOpenViewOrder}
                                                         onViewImageProducts={handleOpenViewImageProducts}
+                                                        onDeleteOrder={handleOpenDialogDeleteOrder}
                                                     >
                                                         {renderActionButton(order)}
                                                     </CardDataOrder>
@@ -374,6 +410,14 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
                     order={order}
                     onClose={handleCloseViewImageProducts}
                     open={viewImageProducts}
+                />
+            )}
+            {openDialogDeleteOrder && (
+                <DialogConfirm
+                    open={openDialogDeleteOrder}
+                    onAgree={handleAgree}
+                    onClose={handleCloseDialogDeleteOrder}
+                    title="Bạn thực sự muốn xóa đơn hàng? Sau khi xóa thì đơn hàng sẽ không tồn tại trên hệ thống."
                 />
             )}
         </Box>
