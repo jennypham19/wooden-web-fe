@@ -1,11 +1,11 @@
 import { IOrder } from "@/types/order";
-import { Avatar, Box, Card, CardContent, Chip, IconButton, Stack, Typography } from "@mui/material";
+import { Avatar, Box, Card, CardContent, Chip, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import React from "react";
 import avatar from "@/assets/images/users/default-avatar.jpg";
 import { getProccessOrderLabel, getStatusOrderColor, getStatusOrderLabel } from "@/utils/labelEntoVni";
 import DateTime from "@/utils/DateTime";
-import { StatusProduct } from "@/constants/status";
-import { Visibility } from "@mui/icons-material";
+import { ProccessOrder, StatusOrder, StatusProduct } from "@/constants/status";
+import { Delete, Visibility } from "@mui/icons-material";
 import { IProduct } from "@/types/product";
 
 
@@ -14,10 +14,11 @@ interface CardDataOrderProps{
     onViewOrder: (data: IOrder) => void;
     children?: React.ReactNode;
     onViewImageProducts: (data: IOrder) => void;
+    onDeleteOrder?: (data: IOrder) => void;
 }
 
 const CardDataOrder = (props: CardDataOrderProps) => {
-    const { order, onViewOrder, children, onViewImageProducts } = props;
+    const { order, onViewOrder, children, onViewImageProducts, onDeleteOrder } = props;
     return(
         <Card
             sx={{ m: 1, boxShadow: "0px 2px 1px 1px rgba(0, 0, 0, 0.2)", borderRadius: 4 }}
@@ -38,6 +39,20 @@ const CardDataOrder = (props: CardDataOrderProps) => {
                     <Box margin='auto 0'>
                         <Chip label={getStatusOrderLabel(order.status)} color={getStatusOrderColor(order.status).color}/>
                     </Box>
+                    {(order.status === StatusOrder.PENDING ||order.proccess === ProccessOrder.IN_PROGRESS_25) && (
+                        <Box>
+                            <Tooltip title="Xóa">
+                                <IconButton
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        order && onDeleteOrder && onDeleteOrder(order)
+                                    }}
+                                >
+                                    <Delete/>
+                                </IconButton>
+                            </Tooltip>
+                        </Box>
+                    )}
                 </Box>
                 <Stack mt={1} display='flex' justifyContent='space-between'>
                     <Typography fontSize='15px'><b>Đơn hàng:</b> {order.name}</Typography>
