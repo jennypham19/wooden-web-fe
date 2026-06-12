@@ -118,9 +118,15 @@ const ProgressProduct = (props: ProgressProductProps) => {
         if(!workOrder) return false;
 
         // 1. Kiểm tra các mốc trước đã hoàn thành và được đánh giá là đạt chưa
+        // for(let i = 0; i < milestoneIndex; i++){
+        //     const milestone = workOrder.workMilestones[i];
+        //     const allStepsDone = milestone.steps.every(s => s.proccess === 'completed') && milestone.evaluatedStatus === 'approved';
+        //     if(!allStepsDone) return false;
+        // }
+
         for(let i = 0; i < milestoneIndex; i++){
             const milestone = workOrder.workMilestones[i];
-            const allStepsDone = milestone.steps.every(s => s.proccess === 'completed') && milestone.evaluatedStatus === 'approved';
+            const allStepsDone = milestone.steps.every(s => s.proccess === 'completed');
             if(!allStepsDone) return false;
         }
 
@@ -155,8 +161,11 @@ const ProgressProduct = (props: ProgressProductProps) => {
         const milestone = workOrder.workMilestones[milestoneIndex];
 
         // Tất cả step đã hoàn thành
+        // if(milestone.steps.length - 1 === stepIndex){
+        //     return milestone.steps.every(step => step.proccess === 'completed') && milestone.evaluatedStatus !== 'approved'
+        // }
         if(milestone.steps.length - 1 === stepIndex){
-            return milestone.steps.every(step => step.proccess === 'completed') && milestone.evaluatedStatus !== 'approved'
+            return milestone.steps.every(step => step.proccess === 'completed')
         }
     }
 
@@ -513,10 +522,10 @@ const ProgressProduct = (props: ProgressProductProps) => {
                                             {workMilestone.evaluatedStatus === EvaluatedStatusWorkMilestone.REWORK && workMilestone.reworkReason !== null && (
                                                 <Typography fontSize='15px'>{`( Lý do phải làm lại: ${workMilestone.reworkReason})`}</Typography>
                                             )}
-                                            <Chip
+                                            {/* <Chip
                                                 label={getEvaluatedStatusWorkMilestoneLabel(workMilestone.evaluatedStatus)}
                                                 color={getEvaluatedStatusWorkMilestoneColor(workMilestone.evaluatedStatus).color}
-                                            />
+                                            /> */}
                                         </Stack>
                                         <Stack my={1.5} direction='row'>
                                             <Typography fontSize='14px'>Tên mốc {index + 1 }: </Typography>
@@ -582,11 +591,11 @@ const ProgressProduct = (props: ProgressProductProps) => {
                                                                         </Tooltip>
                                                                     )}
                                                                     {/* Hiển thị icon khóa */}
-                                                                    {isStepLocked(index, idx) && (
+                                                                    {/* {isStepLocked(index, idx) && (
                                                                         <Tooltip title="Cần hoàn thành các bước trước và chờ đánh giá">
                                                                             <Lock sx={{ color: 'gray'}}/>
                                                                         </Tooltip>
-                                                                    )}
+                                                                    )} */}
                                                                 </Box>
                                                             </Box>
                                                         </Grid>
@@ -821,7 +830,7 @@ const ProgressProduct = (props: ProgressProductProps) => {
                         </Grid>      
                     </>
                 )}
-                {workOrder?.evaluatedStatus === 'approved' && (
+                {workOrder?.workMilestones.map(el => el.steps.every(step => step.proccess === 'completed')) && (
                     <>
                         <Typography fontSize='15px' fontWeight={600}>Hình ảnh sản phẩm</Typography>
                         {imageProductUrl ? (
@@ -887,7 +896,7 @@ const ProgressProduct = (props: ProgressProductProps) => {
                         {errorProductImageFile && (
                             <Typography my={1} align="center" fontSize='14px' color="error">{errorProductImageFile}</Typography>
                         )} 
-                        <Grid container spacing={2}>
+                        <Grid container spacing={2} sx={{ mt: 1 }}>
                             <Grid size={{ xs: 4 }}>
                                 {renderTextWithAsterisk('Chiều dài')}
                                 <InputText
