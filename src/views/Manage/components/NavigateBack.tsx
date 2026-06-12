@@ -1,9 +1,10 @@
 import IconButton from "@/components/IconButton/IconButton";
 import { NavigateBefore } from "@mui/icons-material";
 import { Stack, Typography } from "@mui/material";
+import { ReactNode } from "react";
 
 interface NavigateBackProps{
-    title: string;
+    title: string | ReactNode;
     onBack: () => void;
 }
 
