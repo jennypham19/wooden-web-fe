@@ -116,6 +116,10 @@ export interface StepPayload{
     progress: string,
 }
 
+export interface ImagesStepAgainPayload{
+    images: { name: string, url: string }[]
+}
+
 
 // đầu ra
 export interface IOrder{

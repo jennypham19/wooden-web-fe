@@ -43,6 +43,9 @@ const ImagesStepUpload = (props: ImagesStepUploadProps) => {
                     <Typography fontSize='14px'>{'JPG, JPEG, PNG, MOV,...'}</Typography>
                 </Box>
             </Box>
+            {errorImageFiles && (
+                <Typography textAlign='center' mt={1} fontStyle='italic' color="error">{errorImageFiles}</Typography>
+            )}
         </Box>
     )
 }

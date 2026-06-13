@@ -16,10 +16,10 @@ import InputText from "@/components/InputText";
 
 import { COLORS } from "@/constants/colors";
 import useNotification from "@/hooks/useNotification";
-import { createStep, deletedStepAdded, updateStep } from "@/services/order-service";
+import { createStep, deletedStepAdded, updateImagesStepAgain, updateStep } from "@/services/order-service";
 import { deleteImageStep, getDetailWorkOrderByProduct, updateImageAndStatusProduct } from "@/services/product-service";
 import { uploadImage, uploadImages } from "@/services/upload-service";
-import { IWorkMilestone, IWorkOrder, StepPayload, StepsPayload } from "@/types/order";
+import { ImagesStepAgainPayload, IWorkMilestone, IWorkOrder, StepPayload, StepsPayload } from "@/types/order";
 import { FormDataDimesionProduct, FormUpdateProduct, IProduct } from "@/types/product";
 import { resizeImage } from "@/utils/common";
 import { getEvaluatedStatusWorkMilestoneColor, getEvaluatedStatusWorkMilestoneLabel, getNumber, getProccessWorkOrderColor, getProccessWorkOrderLabel, getProgressWorkOrderLabel, getStatusProductLabel } from "@/utils/labelEntoVni";
@@ -56,10 +56,17 @@ const ProgressProduct = (props: ProgressProductProps) => {
     const [imageProductFile, setImageProductFile] = useState<File | null>(null);
     const [imageProductUrl, setImageProductUrl] = useState<string>('');
 
+    // Hình ảnh upload lúc đầu
     const [errorImageFiles, setErrorImageFiles] = useState('');
     const fileInputImageRef = useRef<HTMLInputElement | null>(null);
     const [imageFiles, setImageFiles] = useState<File[]>([]);
     const [imagesUrl, setImagesUrl] = useState<string[]>([]);
+
+    // Hình ảnh upload lại
+    const [errorImageFilesAgain, setErrorImageFilesAgain] = useState('');
+    const fileInputImageAgainRef = useRef<HTMLInputElement | null>(null);
+    const [imageFilesAgain, setImageFilesAgain] = useState<File[]>([]);
+    const [imagesAgainUrl, setImagesAgainUrl] = useState<string[]>([]);
 
     // Tiến độ các mốc
     const [formDataProgress, setFormDataProgress] = useState<FormDataProgress>({
@@ -86,6 +93,7 @@ const ProgressProduct = (props: ProgressProductProps) => {
     const [openAddStep, setOpenAddStep] = useState(false);
     const [openDeleteImage, setOpenDeleteImage] = useState(false);
     const [uploadImageStepAgain, setUploadImageStepAgain] = useState(false);
+    const [stepId, setStepId] = useState<string | null>(null)
 
     const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
     
@@ -118,6 +126,9 @@ const ProgressProduct = (props: ProgressProductProps) => {
         setImageProductUrl('');
         setProductErrorImageFile('');
         setImageId(null);
+        setImageFilesAgain([]);
+        setErrorImageFilesAgain('');
+        setImagesAgainUrl([])
     }
 
     // Mở dialog xóa ảnh
@@ -152,20 +163,76 @@ const ProgressProduct = (props: ProgressProductProps) => {
     }
 
     // upload ảnh thay thế ảnh bị sai trong mốc
-    const handleOpenUploadImageStepAgain = () => {
-        setUploadImageStepAgain(true)
+    const handleOpenUploadImageStepAgain = (id: string) => {
+        setUploadImageStepAgain(true);
+        setStepId(id)
     }
 
     const handleCloseUploadImageStepAgain = () => {
-        setUploadImageStepAgain(false)
+        setUploadImageStepAgain(false);
+        setStepId(null);
+        setImageFilesAgain([]);
+        setImagesAgainUrl([])
+    }
+
+    const handleBoxClickAgain = () => {
+        fileInputImageAgainRef.current?.click();
+    };
+    
+    const handleChangeImagesAgain = async(event: ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+        if(!files) return;
+        const resized = await Promise.all(
+            Array.from(files).map(async(file) => {
+                return resizeImage(file, 800)
+            })
+        )
+
+        const resizedFiles = resized.map((r) => new File([r.blob], r.name!, { type: "image/*" })) 
+        setImageFilesAgain(prev => [...prev, ...resizedFiles]);
+        const urls = resized.map((file) => file.previewUrl);
+        setImagesAgainUrl((prev) => [...prev, ...urls]);
+        setErrorImageFilesAgain('')
+        // reset input để có thể chọn lại cùng 1 file
+        event.target.value = "";
+    }
+
+    const handleRemoveAgain = (index: number) => {
+        setImagesAgainUrl((prev) => prev.filter((_, i) => i !== index));
+        setImageFilesAgain((prev) => prev.filter((_, i) => i !== index));
     }
 
     const handleSaveImageStepAgain = async() => {
+        if(imageFilesAgain.length === 0){
+            setErrorImageFilesAgain('Vui lòng chọn ảnh');
+            return
+        }
         setIsSubmitting(true);
         try {
-            
+            let uploadResponses: any;
+            uploadResponses = await uploadImages(imageFilesAgain!, 'order/product/work-order/milestones/steps');
+            if(!uploadResponses.success || !uploadResponses.data.files){
+                throw new Error('Upload ảnh thất bại hoặc không nhận được URL ảnh'); 
+            }
+            const payloadImages = uploadResponses.data.files.map((img: any) => ({
+                name: img.originalname,
+                url: img.url
+            })) 
+            const payload: ImagesStepAgainPayload = {
+                images: payloadImages,
+            }  
+            const res = stepId && await updateImagesStepAgain(stepId, payload);
+            notify({
+                message: res.message,
+                severity: 'success'
+            });
+            handleCloseUploadImageStepAgain();
+            getWorkOrderByIdProduct(data.id);
         } catch (error: any) {
-            
+            notify({
+                message: error.message,
+                severity: 'error'
+            })
         } finally {
             setIsSubmitting(false)
         }
@@ -262,12 +329,11 @@ const ProgressProduct = (props: ProgressProductProps) => {
         }
 
         const milestone = workOrder.workMilestones[milestoneIndex];
+        // if(milestone.steps.length - 1 === stepIndex){
+        //     return milestone.steps.some(step => step.proccess === 'completed') && milestone.evaluatedStatus === 'not_reviewed'
+        // }
         if(milestone.steps.length - 1 === stepIndex){
-            return milestone.steps.some(step => step.proccess === 'completed') && milestone.evaluatedStatus === 'not_reviewed'
-        }
-        if(milestone.steps.length - 1 === stepIndex){
-            // return milestone.steps.some(step => step.proccess === 'completed')
-            return milestone.steps[stepIndex].proccess !== 'completed'
+            return milestone.steps.every(step => step.proccess === 'completed')
         }
     }
 
@@ -509,6 +575,8 @@ const ProgressProduct = (props: ProgressProductProps) => {
             })
         }
     }
+    console.log("data: ", workOrder?.workMilestones.map(el => el.steps.every(step => step.proccess === 'completed')));
+    
     return(
         <Box>
             <NavigateBack
@@ -667,7 +735,7 @@ const ProgressProduct = (props: ProgressProductProps) => {
                                                                         <Tooltip
                                                                             title= "Cập nhật lại hình ảnh"
                                                                         >
-                                                                            <IconButton onClick={handleOpenUploadImageStepAgain}>
+                                                                            <IconButton onClick={() => step && handleOpenUploadImageStepAgain(step.id)}>
                                                                                 <AddPhotoAlternate sx={{ color: COLORS.BUTTON }}/>
                                                                             </IconButton>
                                                                         </Tooltip>
@@ -778,19 +846,70 @@ const ProgressProduct = (props: ProgressProductProps) => {
                                                                 </Grid>
                                                             </Grid>
                                                         )}
+
+                                                        {/* Hiển thị ảnh khi đc cập nhật lại */}
+                                                        {uploadImageStepAgain && stepId === step.id && (
+                                                            <Grid size={{ xs: 12}}>
+                                                                <Grid container spacing={1}>
+                                                                    {imagesAgainUrl.map((img, imgAgainIndex) => (
+                                                                        <Box
+                                                                            sx={{
+                                                                                position: "relative",
+                                                                                overflow: "hidden"
+                                                                            }}
+                                                                        >  
+                                                                            <img
+                                                                                src={img}
+                                                                                alt={`upload-${imgAgainIndex}`}
+                                                                                style={{ width: "100%", height: 200, objectFit: "fill" }}
+                                                                            />
+                                                                            <IconButton
+                                                                                onClick={() => handleRemoveAgain(imgAgainIndex)}
+                                                                                sx={{
+                                                                                    position: 'absolute',
+                                                                                    top: 4,
+                                                                                    right: 4,
+                                                                                    bgcolor: 'rgba(0,0,0,0.5)',
+                                                                                    color: 'white',
+                                                                                    "&:hover": { bgcolor: "rgba(0,0,0,0.7)" },
+                                                                                }}
+                                                                                size="small"
+                                                                            >
+                                                                                <Delete fontSize="small"/>
+                                                                            </IconButton>
+                                                                        </Box>
+                                                                    ))}                                                                
+                                                                </Grid>
+                                                            </Grid>
+                                                        )}
                                                         {/* Hình ảnh được up lại để thay thế ảnh cũ */}
-                                                        {uploadImageStepAgain && (
+                                                        {uploadImageStepAgain && stepId === step.id && (
                                                             <Grid size={{ xs: 12 }}>
-                                                                <Paper elevation={2}>
+                                                                <Paper elevation={1}>
                                                                     <Grid container spacing={2}>
                                                                         <Grid size={{ xs: 12 }}>
                                                                             <ImagesStepUpload
-                                                                                fileInputImageRef={fileInputImageRef}
-                                                                                onChangeImages={handleChangeImages}
-                                                                                onBoxClick={handleBoxClick}
-                                                                                errorImageFiles={errorImageFiles}
+                                                                                fileInputImageRef={fileInputImageAgainRef}
+                                                                                onChangeImages={handleChangeImagesAgain}
+                                                                                onBoxClick={handleBoxClickAgain}
+                                                                                errorImageFiles={errorImageFilesAgain}
                                                                                 isSmall={isSmall}
                                                                             />
+                                                                        </Grid>
+                                                                        <Grid size={{ xs: 12 }} sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 2 }}>
+                                                                            <Button
+                                                                                sx={{ bgcolor: COLORS.BUTTON, width: { md: 150 } }}
+                                                                                onClick={handleSaveImageStepAgain}
+                                                                            >
+                                                                                Lưu
+                                                                            </Button>
+                                                                            <Button
+                                                                                variant="outlined"
+                                                                                sx={{ border: `1px solid ${COLORS.BUTTON}`, color: COLORS.BUTTON, width: { md: 150} }}
+                                                                                onClick={handleCloseUploadImageStepAgain}
+                                                                            >
+                                                                                Hủy
+                                                                            </Button>
                                                                         </Grid>
                                                                     </Grid>
                                                                 </Paper>
@@ -950,7 +1069,7 @@ const ProgressProduct = (props: ProgressProductProps) => {
                         </Grid>      
                     </>
                 )}
-                {workOrder?.workMilestones.map(el => el.steps.every(step => step.proccess === 'completed')) && (
+                {!workOrder?.workMilestones.map(el => el.steps.every(step => step.proccess === 'completed')) && (
                     <>
                         <Typography fontSize='15px' fontWeight={600}>Hình ảnh sản phẩm</Typography>
                         {imageProductUrl ? (

@@ -1,7 +1,7 @@
 import { HttpResponse } from "@/types/common";
 import HttpClient from "@/utils/HttpClient";
 import { GetParams, PaginatedResponse } from "./base-service";
-import { IOrder, OrderPayload, OrderPayloadRequest, StepPayload, StepsPayload, WorkOderPayload } from "@/types/order";
+import { ImagesStepAgainPayload, IOrder, OrderPayload, OrderPayloadRequest, StepPayload, StepsPayload, WorkOderPayload } from "@/types/order";
 import { IUser } from "@/types/user";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'; 
 const prefix = `${API_BASE_URL}/api/orders`;
@@ -83,6 +83,11 @@ export const getOrdersByCarpenter = async(getParams: GetParams): Promise<HttpRes
 // update tiến độ và trạng thái của step
 export const updateStep = async(id: string, payload: StepsPayload) => {
     return HttpClient.put(`${prefix}/step-updated/${id}`, payload as any)
+}
+
+// update lại hình ảnh của step đó
+export const updateImagesStepAgain = async(id: string, payload: ImagesStepAgainPayload) => {
+    return HttpClient.put(`${prefix}/image-step-again-updated/${id}`, payload as any)
 }
 
 // thêm mới step
