@@ -78,3 +78,8 @@ export const getListCompletedProducts = async(getParams: GetParams): Promise<Htt
 export const getListStepsByIdWorkMilestone = (id: string) => {
     return HttpClient.get<any, HttpResponse<IStep>>(`${prefix}/list-step-by-id-workmilestone/${id}`)
 }
+
+// Xóa ảnh đã cập nhật rồi nhưng bị sai
+export const deleteImageStep = (id: string) => {
+    return HttpClient.delete(`${prefix}/delete-image-step/${id}`)
+}
