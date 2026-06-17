@@ -33,8 +33,12 @@ const ManagementOrderFactoryManager = () => {
     const [viewImageProducts, setViewImageProducts] = useState(false);
     const [order, setOrder] = useState<IOrder | null>(null);
 
-    const { error: errorOrders, fetchData: fetchOrders, listData: orders, loading: loadingOrder, page: pageOrders, rowsPerPage: rowsPerPageOrders } = useFetchData<IOrder>(getOrdersByIdManager, 10, '', profile?.id);
+    const { error: errorOrders, fetchData: fetchOrders, listData: orders, loading: loadingOrder, page: pageOrders, rowsPerPage: rowsPerPageOrders } = useFetchData<IOrder>(getOrdersByIdManager, 10, '', false, profile?.id);
     const { error: errorOrderWithProccess, fetchData: fetchOrdersWithProccess, listData: ordersWithProccess, loading: loadingOrdersWithProccess, page: pageOrdersWithProccess, rowsPerPage: rowsPerPageOrdersWithProccess} = useFetchOrdersWithProccess<IOrder>(getOrdersWithProccess);
+
+    const handleLoadData = () => {
+        fetchOrders(pageOrders, rowsPerPageOrders, '', '', false, profile?.id) 
+    }
 
     {/* Danh sách đơn hàng */}
     const handleOpenShowAllListOrders = () => {
@@ -45,7 +49,7 @@ const ManagementOrderFactoryManager = () => {
     const handleCloseShowAllListOrders = () => {
         setShowAll(false);
         setShowOrders({ open: false, type: 'list-orders'})
-        fetchOrders(pageOrders, rowsPerPageOrders, '', '', profile?.id)
+        handleLoadData();
     }
 
     {/* Đánh giá đơn hàng */}

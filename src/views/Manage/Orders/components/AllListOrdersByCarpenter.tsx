@@ -54,7 +54,7 @@ const AllListOrdersByCarpenter: React.FC<AllListOrdersByCarpenterProps> = (props
     const [order, setOrder] = useState<IOrder | null>(null);
     const [viewImageProducts, setViewImageProducts] = useState(false);
     
-    const { error, fetchData, handlePageChange, handleSearch, listData, loading, page, rowsPerPage, searchTerm, total } = useFetchData<IOrder>(getOrdersByCarpenter, 8, viewMode, profile?.id);
+    const { error, fetchData, handlePageChange, handleSearch, listData, loading, page, rowsPerPage, searchTerm, total } = useFetchData<IOrder>(getOrdersByCarpenter, 8, viewMode, false, profile?.id);
 
     const handleOpenViewOrder = (order: IOrder) => {
         setOrder(order);

@@ -58,6 +58,16 @@ export interface FormDataWorkMilestone{
     steps: FormDataStep[]
 }
 
+export interface FormDataStorageOrder{
+    reasonStorage: string | null,
+    dateStorage: Dayjs
+}
+
+export interface FormDataDeletedImageStep{
+    reasonDeletedImageStep: string | null,
+    dateDeletedImageStep: Dayjs
+}
+
 // body
 export interface OrderPayloadRequest{
     customerId: string,
@@ -120,6 +130,24 @@ export interface ImagesStepAgainPayload{
     images: { name: string, url: string }[]
 }
 
+export interface StorageOrderPayload{
+    reasonStorage: string | null,
+    dateStorage: Dayjs | string
+}
+
+export interface ManagerDeletedAllImagesStepPayload{
+    reasonDeletedImageStep: string | null,
+    dateDeletedImageStep: Dayjs | string;
+    managerDeletedId: string | undefined,
+}
+
+export interface ManagerDeletedImageStepPayload{
+    reasonDeletedImageStep: string | null,
+    dateDeletedImageStep: Dayjs | string;
+    managerDeletedId: string | undefined,
+    stepId: string,
+}
+
 
 // đầu ra
 export interface IOrder{
@@ -147,7 +175,10 @@ export interface IOrder{
     products: IProduct[],
     inputFiles: IInputFile[],
     referenceLinks: IReferenceLink[],
-    feedbackStatus: string
+    feedbackStatus: string,
+    isStored: boolean,
+    reasonStorage: string,
+    dateStorage: string,
 }
 
 interface IImage{
@@ -165,6 +196,8 @@ export interface IStep{
     progress: ProgressWorkOrder | null,
     createdAt: string,
     updatedAt: string,
+    reasonDeletedImageStep: string,
+    dateDeletedImageStep: string,
     images: IImage[]
 }
 

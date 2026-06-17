@@ -1,7 +1,7 @@
 import { HttpResponse } from "@/types/common";
 import HttpClient from "@/utils/HttpClient";
 import { GetParams, PaginatedResponse } from "./base-service";
-import { ImagesStepAgainPayload, IOrder, OrderPayload, OrderPayloadRequest, StepPayload, StepsPayload, WorkOderPayload } from "@/types/order";
+import { ImagesStepAgainPayload, IOrder, ManagerDeletedAllImagesStepPayload, ManagerDeletedImageStepPayload, OrderPayload, OrderPayloadRequest, StepPayload, StepsPayload, StorageOrderPayload, WorkOderPayload } from "@/types/order";
 import { IUser } from "@/types/user";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'; 
 const prefix = `${API_BASE_URL}/api/orders`;
@@ -142,11 +142,12 @@ export const getOrdersByIdManager = async(getParams: GetParams): Promise<HttpRes
         page: getParams.page,
         limit: getParams.limit,
         id: getParams.id,
+        isStored: getParams.isStored ?? false,
     }
     if(getParams.searchTerm && getParams.searchTerm.trim()){
         params.searchTerm = getParams.searchTerm
     }
-    if(getParams.status !== 'all'){
+    if(!getParams.isStored && getParams.status && getParams.status !== 'all'){
         params.status = getParams.status
     };
     const response = await HttpClient.get<{
@@ -191,4 +192,19 @@ export const getOrdersWithWorkByIdManager = async(getParams: GetParams): Promise
 // Xóa đơn hàng
 export const deletedOrder = async(id: string) => {
     return HttpClient.delete(`${prefix}/order-added-deleted/${id}`)
+}
+
+// Lưu trữ đơn hàng
+export const updateStorageOrder = async(id: string, payload: StorageOrderPayload) => {
+    return HttpClient.put(`${prefix}/order-storage/${id}`, payload as any)
+}
+
+// Xóa tất cả ảnh bởi quản lý
+export const deletedImagesStepWithReasonByManager = async(id: string, payload: ManagerDeletedAllImagesStepPayload) => {
+    return HttpClient.put(`${prefix}/images-step-deleted-by-manager/${id}`, payload as any)
+}
+
+// Xóa ảnh bởi quản lý
+export const deletedImageStepWithReasonByManager = async(id: string, payload: ManagerDeletedImageStepPayload) => {
+    return HttpClient.put(`${prefix}/image-step-deleted-by-manager/${id}`, payload as any)
 }

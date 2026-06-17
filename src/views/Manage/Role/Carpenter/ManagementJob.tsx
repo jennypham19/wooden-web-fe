@@ -47,10 +47,10 @@ const ManagementJobCarpenter = () => {
     const [order, setOrder] = useState<IOrder | null>(null);
     const [viewImageProducts, setViewImageProducts] = useState(false);
     
-    const { error, fetchData, handlePageChange, handleSearch, listData, loading, page, rowsPerPage, searchTerm, total } = useFetchData<IOrder>(getOrdersByCarpenter, 8, viewMode, profile?.id);
+    const { error, fetchData, handlePageChange, handleSearch, listData, loading, page, rowsPerPage, searchTerm, total } = useFetchData<IOrder>(getOrdersByCarpenter, 8, viewMode, false, profile?.id);
 
     const reloadOrders = async () => {
-        await fetchData(page, rowsPerPage, '', viewMode, profile?.id);
+        await fetchData(page, rowsPerPage, '', viewMode, false, profile?.id);
     };
 
     const handleOpenViewOrder = (order: IOrder) => {
@@ -61,7 +61,7 @@ const ManagementJobCarpenter = () => {
     const handleCloseViewOrder = () => {
         setOrder(null);
         setOpenOrder({ open: false, type: 'view'});
-        fetchData(page, rowsPerPage, '', viewMode, profile?.id)
+        reloadOrders()
     }
 
     // view image products

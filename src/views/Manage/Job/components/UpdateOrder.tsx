@@ -93,7 +93,7 @@ const UpdateOrder: React.FC<UpdateOrderProps> = ({ onBack, data, fetchData }) =>
         if (!products.length) return false;
 
         return (
-            products.every(product => product.status === "completed")
+            products.every(product => product.status === "completed") && data.proccess !== ProccessOrder.COMPLETED_100
         );
     };
 

@@ -717,6 +717,14 @@ const ProgressProduct = (props: ProgressProductProps) => {
                                                                 >
                                                                     {step.name} 
                                                                 </Typography>
+                                                                {step.reasonDeletedImageStep && (
+                                                                    <Typography 
+                                                                        sx={{ whiteSpace: { xs: 'none', md: 'nowrap'} }}
+                                                                        fontSize='14px'
+                                                                        fontStyle='italic'
+                                                                        color="primary"
+                                                                    >{`(Lý do xóa: ${step.reasonDeletedImageStep})`}</Typography>
+                                                                )}
                                                             </Stack>
                                                         </Grid>
                                                         <Grid size={{ xs: 12, md: 3 }}>
