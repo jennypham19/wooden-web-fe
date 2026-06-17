@@ -5,7 +5,7 @@ import { Alert, Box, Button, Typography } from "@mui/material";
 import React, { useState } from "react";
 import SearchBox from "../../components/SearchBox";
 import { COLORS } from "@/constants/colors";
-import { Add, AllInbox, Autorenew, CheckCircle,  Schedule } from "@mui/icons-material";
+import { Add, AllInbox, Autorenew, CheckCircle,  Schedule, Storage } from "@mui/icons-material";
 import NavigateBack from "../../components/NavigateBack";
 import Backdrop from "@/components/Backdrop";
 import Grid from "@mui/material/Grid2";
@@ -26,13 +26,14 @@ import AddProduct from "./AddProduct";
 import DialogConfirm from "../../components/DialogConfirm";
 import useNotification from "@/hooks/useNotification";
 import EditOrder from "./EditOrder";
+import DialogStorageOrder from "./DialogStorageOrder";
 
 
 interface AllListOrdersByManagerProps{
     onBack?: () => void;
 }
 
-const DataStatus: {id: number, value: string, label: string, icon: React.ReactNode}[] = [
+const DataStatus: {id: number, value: any, label: string, icon: React.ReactNode}[] = [
     {
         id: 1,
         value: 'all',
@@ -58,6 +59,12 @@ const DataStatus: {id: number, value: string, label: string, icon: React.ReactNo
         label: 'Đơn hàng hoàn thành',
         icon: <CheckCircle/>
 
+    },
+    {
+        id: 5,
+        value: 'stored',
+        label: 'Lưu trữ',
+        icon: <Storage/>
     }
 ]
 
@@ -66,7 +73,7 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
     const { onBack } = props;
     const notify = useNotification();
     const { profile } = useAuth();
-    const [viewMode, setViewMode] = useState<'all' | 'pending' | 'in_progress' | 'completed'>('all')
+    const [viewMode, setViewMode] = useState<'all' | 'pending' | 'in_progress' | 'completed' | 'stored'>('all')
     const [openOrder, setOpenOrder] = useState<{ open: boolean, type: string}>({
         open: false,
         type: ''
@@ -75,8 +82,16 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
     const [viewImageProducts, setViewImageProducts] = useState(false);
     const [order, setOrder] = useState<IOrder | null>(null);
     const [openDialogDeleteOrder, setOpenDialogDeleteOrder] = useState(false);
+    const [openDialogStorageOrder, setOpenDialogStorageOrder] = useState(false);
+
+    const statusParam = viewMode === 'stored' ? 'completed' : viewMode;
+    const isStoredParam = viewMode === 'stored';
     
-    const { error, fetchData, handlePageChange, handleSearch, listData, loading, page, rowsPerPage, searchTerm, total, setLoading } = useFetchData<IOrder>(getOrdersByIdManager, 8, viewMode, profile?.id);
+    const { error, fetchData, handlePageChange, handleSearch, listData, loading, page, rowsPerPage, searchTerm, total, setLoading } = useFetchData<IOrder>(getOrdersByIdManager, 8, statusParam, isStoredParam, profile?.id);
+
+    const handleLoadData = () => {
+        fetchData(page, rowsPerPage, '', statusParam, isStoredParam, profile?.id) 
+    }
 
     // Thêm đơn hàng
     const handleOpenAddOrder = () => {
@@ -85,7 +100,7 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
 
     const handleCloseAddOrder = () => {
         setOpenOrder({ open: false, type: 'add' });
-        fetchData(page, rowsPerPage, '', viewMode, profile?.id)
+        handleLoadData()
     }
 
     // Xem chi tiết đơn hàng
@@ -119,7 +134,7 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
     const handleCloseAddProduct = () => {
         setOrder(null);
         setOpenOrder({ open: false, type: 'add-product' })
-        fetchData(page, rowsPerPage, '', viewMode, profile?.id)
+        handleLoadData()
     }
 
     // Job order
@@ -131,7 +146,7 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
     const handleCloseJobOrder = () => {
         setOrder(null);
         setOpenOrder({ open: false, type: 'job-order' });
-        fetchData(page, rowsPerPage, '', viewMode, profile?.id)
+        handleLoadData()
     }
 
     {/* Checked order */}
@@ -143,7 +158,7 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
     const handleCloseCheckedOrder = () => {
         setOrder(null);
         setOpenOrder({ open: false, type: 'checked-order' });
-        fetchData(page, rowsPerPage, '', viewMode, profile?.id)
+        handleLoadData()
     };
 
     {/* View order */}
@@ -275,7 +290,7 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
     }
 
     const handleFetchData = () => {
-        fetchData(page, rowsPerPage, '', '', profile?.id)
+        fetchData(page, rowsPerPage, '', '', isStoredParam, profile?.id)
     }
 
     // Xóa đơn hàng
@@ -307,6 +322,17 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
         } finally {
             setLoading(false)
         }
+    }
+
+    // Lưu trữ đơn hàng
+    const handleOpenDialogStorageOrder = (order: IOrder) => {
+        setOrder(order);
+        setOpenDialogStorageOrder(true)
+    }
+
+    const handleCloseDialogStorageOrder = () => {
+        setOrder(null);
+        setOpenDialogStorageOrder(false)
     }
 
     return(
@@ -355,6 +381,7 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
                                                         onViewOrder={handleOpenViewOrder}
                                                         onViewImageProducts={handleOpenViewImageProducts}
                                                         onDeleteOrder={handleOpenDialogDeleteOrder}
+                                                        onStorageOrder={handleOpenDialogStorageOrder}
                                                     >
                                                         {renderActionButton(order)}
                                                     </CardDataOrder>
@@ -436,6 +463,14 @@ const AllListOrdersByManager: React.FC<AllListOrdersByManagerProps> = (props) =>
                     onAgree={handleAgree}
                     onClose={handleCloseDialogDeleteOrder}
                     title="Bạn thực sự muốn xóa đơn hàng? Sau khi xóa thì đơn hàng sẽ không tồn tại trên hệ thống."
+                />
+            )}
+            {openDialogStorageOrder && order && (
+                <DialogStorageOrder
+                    open={openDialogStorageOrder}
+                    order={order}
+                    onClose={handleCloseDialogStorageOrder}
+                    onLoadData={handleLoadData}
                 />
             )}
         </Box>

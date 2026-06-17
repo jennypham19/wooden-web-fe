@@ -1,14 +1,17 @@
 import { IProduct } from "@/types/product";
-import { Avatar, Box, Chip, Paper, Stack, Tooltip, Typography } from "@mui/material";
+import { Avatar, Box, Chip, IconButton, Paper, Stack, Tooltip, Typography } from "@mui/material";
 import NavigateBack from "../../components/NavigateBack";
 import { useEffect, useState } from "react";
-import { IOrder, IWorkOrder } from "@/types/order";
+import { IOrder, IStep, IWorkOrder } from "@/types/order";
 import { getDetailWorkOrderByProduct } from "@/services/product-service";
 import Grid from "@mui/material/Grid2";
 import avatar from "@/assets/images/users/avatar-1.png";
 import DateTime from "@/utils/DateTime";
-import { getNumber, getProccessWorkOrderColor, getProccessWorkOrderLabel, getProgressWorkOrderLabel, getStatusOrderLabel, getStatusProductLabel } from "@/utils/labelEntoVni";
+import { getNumber, getProccessWorkOrderColor, getProccessWorkOrderLabel, getProgressWorkOrderLabel, getStatusOrderColor, getStatusOrderLabel, getStatusProductLabel } from "@/utils/labelEntoVni";
 import CommonImage from "@/components/Image/index";
+import { Delete } from "@mui/icons-material";
+import { ProccessWorkOrder, StatusOrder } from "@/constants/status";
+import DialogDeleteImageStep from "./Steps/DialogDeleteImageStep";
 
 interface ViewProgressProductProps{
     order: IOrder;
@@ -20,6 +23,9 @@ const ViewProgressProduct = (props: ViewProgressProductProps) => {
     const { product, onBack, order } = props;
     const [workOrder, setWorkOrder] = useState<IWorkOrder | null>(null);
     const [workOrderError, setWorkOrderError] = useState<string>('');
+    const [openDeletedImageStep, setOpenDeletedImageStep] = useState<{open: boolean, type: string}>({ open: false, type: '' });
+    const [step, setStep] = useState<IStep | null>(null);
+    const [imageId, setImageId] = useState<string | null>(null)
     
 
     const getWorkOrderByIdProduct = async(id: string) => {
@@ -36,6 +42,33 @@ const ViewProgressProduct = (props: ViewProgressProductProps) => {
     useEffect(() => {
         getWorkOrderByIdProduct(product.id)
     }, [product]);
+
+    const handleLoadData = () => {
+        getWorkOrderByIdProduct(product.id)
+    }
+
+    // Xóa hết ảnh
+    const handleOpenDeletedAllImagesStep = (step: IStep) => {
+        setOpenDeletedImageStep({ open: true, type: 'all' });
+        setStep(step)
+    }
+
+    const handleCloseDeletedAllImagesStep = () => {
+        setOpenDeletedImageStep({ open: false, type: "all" });
+        setStep(null)
+    }
+
+    // Xóa 1 ảnh
+    const handleOpenDeletedImageStep = (step: IStep, imgId: string) => {
+        setOpenDeletedImageStep({ open: true, type: 'one' });
+        setStep(step);
+        setImageId(imgId)
+    }
+
+    const handleCloseDeletedImageStep = () => {
+        setOpenDeletedImageStep({ open: false, type: "one" });
+        setStep(null)
+    }
 
     return(
         <Box>
@@ -95,7 +128,10 @@ const ViewProgressProduct = (props: ViewProgressProductProps) => {
                             <Grid sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' }, alignItems: { xs: 'flex-start', md: 'flex-end' } }} size={{ xs: 12, md: 4 }}>
                                 <Stack direction='row'>
                                     <Typography fontSize='15px'>Trạng thái: </Typography>
-                                    <Typography fontSize='15px'>{getStatusOrderLabel(order?.status)}</Typography>
+                                    <Chip
+                                        label={getStatusOrderLabel(order.status)}
+                                        color={getStatusOrderColor(order.status).color}
+                                    />
                                 </Stack>
                             </Grid>
                             <Grid size={{ xs: 12 }}>
@@ -276,6 +312,15 @@ const ViewProgressProduct = (props: ViewProgressProductProps) => {
                                                                 label={getProccessWorkOrderLabel(step.proccess)}
                                                                 color={getProccessWorkOrderColor(step.proccess).color}
                                                             />
+                                                            {step.proccess === ProccessWorkOrder.COMPLETED && (
+                                                                <Tooltip title="Xóa hết tất cả ảnh">
+                                                                    <IconButton
+                                                                        onClick={() => step && handleOpenDeletedAllImagesStep(step)}
+                                                                    >
+                                                                        <Delete/>
+                                                                    </IconButton>
+                                                                </Tooltip>                                                                
+                                                            )}
                                                         </Box>
                                                         {/* Hình ảnh của bước trong mốc */}
                                                         {step.images.length > 0 && (
@@ -283,11 +328,31 @@ const ViewProgressProduct = (props: ViewProgressProductProps) => {
                                                                 <Grid container spacing={1}>
                                                                     {step.images.map((img, imgIndex) => (
                                                                         <Grid key={imgIndex} size={{ xs: 12, md: 6}}>
-                                                                            <CommonImage
-                                                                                src={img.url}
-                                                                                alt={img.name}
-                                                                                sx={{ height: 180, width: '100%' }}
-                                                                            />
+                                                                            <Box
+                                                                                sx={{ position: 'relative', overflow: "hidden"}}
+                                                                            >
+                                                                                <CommonImage
+                                                                                    src={img.url}
+                                                                                    alt={img.name}
+                                                                                    sx={{ height: 180, width: '100%' }}
+                                                                                />
+                                                                                {order.status !== StatusOrder.COMPLETED && (
+                                                                                    <IconButton
+                                                                                        onClick={() => step && handleOpenDeletedImageStep(step, img.id)}
+                                                                                        sx={{
+                                                                                            position: 'absolute',
+                                                                                            top: 4,
+                                                                                            right: 4,
+                                                                                            bgcolor: 'rgba(0,0,0,0.5)',
+                                                                                            color: 'white',
+                                                                                            "&:hover": { bgcolor: "rgba(0,0,0,0.7)" },  
+                                                                                        }}
+                                                                                        size="small"
+                                                                                    >
+                                                                                        <Delete fontSize="small"/>
+                                                                                    </IconButton>
+                                                                                )}
+                                                                            </Box>
                                                                         </Grid>
                                                                     ))}                                                                
                                                                 </Grid>
@@ -304,6 +369,25 @@ const ViewProgressProduct = (props: ViewProgressProductProps) => {
                     </Grid>
                 </Grid>
             </Paper>
+            {openDeletedImageStep.open && openDeletedImageStep.type === 'all' && step && (
+                <DialogDeleteImageStep
+                    type={openDeletedImageStep.type}
+                    open={openDeletedImageStep.open}
+                    step={step}
+                    onClose={handleCloseDeletedAllImagesStep}
+                    onLoadData={handleLoadData}
+                />
+            )}
+            {openDeletedImageStep.open && openDeletedImageStep.type === 'one' && step && imageId && (
+                <DialogDeleteImageStep
+                    type={openDeletedImageStep.type}
+                    open={openDeletedImageStep.open}
+                    step={step}
+                    onClose={handleCloseDeletedImageStep}
+                    imgId={imageId}
+                    onLoadData={handleLoadData}
+                />
+            )}
         </Box>
     )
 }

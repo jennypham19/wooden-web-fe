@@ -95,7 +95,7 @@ const ViewProductsInOrder = (props: ViewProductsInOrderProps) => {
                                                 />
                                             </Box>
                                             <Typography mt={1} fontSize='14px'>{product.description}</Typography>
-                                            {(product.isCreated && product.status !== 'completed') && (
+                                            {(product.isCreated) && (
                                                 <Button
                                                     variant="outlined"
                                                     fullWidth

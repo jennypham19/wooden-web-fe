@@ -5,8 +5,10 @@ import avatar from "@/assets/images/users/default-avatar.jpg";
 import { getProccessOrderLabel, getStatusOrderColor, getStatusOrderLabel } from "@/utils/labelEntoVni";
 import DateTime from "@/utils/DateTime";
 import { ProccessOrder, StatusOrder, StatusProduct } from "@/constants/status";
-import { Delete, Visibility } from "@mui/icons-material";
+import { Delete, Storage, Visibility } from "@mui/icons-material";
 import { IProduct } from "@/types/product";
+import useAuth from "@/hooks/useAuth";
+import { ROLE } from "@/constants/roles";
 
 
 interface CardDataOrderProps{
@@ -15,10 +17,12 @@ interface CardDataOrderProps{
     children?: React.ReactNode;
     onViewImageProducts: (data: IOrder) => void;
     onDeleteOrder?: (data: IOrder) => void;
+    onStorageOrder?: (data: IOrder) => void;
 }
 
 const CardDataOrder = (props: CardDataOrderProps) => {
-    const { order, onViewOrder, children, onViewImageProducts, onDeleteOrder } = props;
+    const { order, onViewOrder, children, onViewImageProducts, onDeleteOrder, onStorageOrder } = props;
+    const { profile } = useAuth();
     return(
         <Card
             sx={{ m: 1, boxShadow: "0px 2px 1px 1px rgba(0, 0, 0, 0.2)", borderRadius: 4 }}
@@ -39,7 +43,7 @@ const CardDataOrder = (props: CardDataOrderProps) => {
                     <Box margin='auto 0'>
                         <Chip label={getStatusOrderLabel(order.status)} color={getStatusOrderColor(order.status).color}/>
                     </Box>
-                    {(order.status === StatusOrder.PENDING ||order.proccess === ProccessOrder.IN_PROGRESS_25) && (
+                    {(order.status === StatusOrder.PENDING ||order.proccess === ProccessOrder.IN_PROGRESS_25) && profile?.role === ROLE.ADMIN && (
                         <Box>
                             <Tooltip title="Xóa">
                                 <IconButton
@@ -49,6 +53,20 @@ const CardDataOrder = (props: CardDataOrderProps) => {
                                     }}
                                 >
                                     <Delete/>
+                                </IconButton>
+                            </Tooltip>
+                        </Box>
+                    )}
+                    {order.status === StatusOrder.COMPLETED && profile?.role === ROLE.ADMIN && (
+                        <Box>
+                            <Tooltip title="Lưu trữ">
+                                <IconButton
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        order && onStorageOrder && onStorageOrder(order)
+                                    }}
+                                >
+                                    <Storage/>
                                 </IconButton>
                             </Tooltip>
                         </Box>

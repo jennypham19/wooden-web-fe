@@ -65,7 +65,7 @@ const ManagementJobManager = () => {
     const [idWorkMilestone, setIdWorkMilestone] = useState<string | null>(null);
     const [title, setTitle] = useState<string | null>(null)
     
-    const { rowsPerPage, page, total, listData, loading, error, searchTerm, handlePageChange, handleSearch, fetchData } = useFetchData<IOrder>(getOrdersWithWorkByIdManager, 8, viewMode, profile?.id)
+    const { rowsPerPage, page, total, listData, loading, error, searchTerm, handlePageChange, handleSearch, fetchData } = useFetchData<IOrder>(getOrdersWithWorkByIdManager, 8, viewMode, false, profile?.id)
 
     const handleOpenViewOrder = (order: IOrder) => {
         setOrder(order);
@@ -86,7 +86,7 @@ const ManagementJobManager = () => {
     const handleCloseViewProductsInOrder = () => {
         setOrder(null);
         setViewProductsInOrder(false);
-        fetchData(page, rowsPerPage, '', viewMode, profile?.id)
+        fetchData(page, rowsPerPage, '', viewMode, false, profile?.id)
     }
 
     // view image products
@@ -101,7 +101,7 @@ const ManagementJobManager = () => {
     }
 
     const handleLoadData = () => {
-        fetchData(page, rowsPerPage, '', viewMode, profile?.id)
+        fetchData(page, rowsPerPage, '', viewMode, false, profile?.id)
     }
 
     const handleViewAllImageMilestone = (productId: string, workMilestones: IWorkMilestone[]) => {

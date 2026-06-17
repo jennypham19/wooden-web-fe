@@ -112,6 +112,8 @@ export const getProccessWorkOrderColor = (status: string | null) => {
       return { color: 'success' as const };
     case 'in_progress':
       return { color: 'warning' as const };
+    case 'retake_required':
+      return { color: 'warning' as const};
     case 'pending':
     default:
       return { color: 'error' as const };

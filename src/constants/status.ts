@@ -209,14 +209,16 @@ export const ProccessWorkOrder = {
     PENDING: 'pending',
     IN_PROGRESS: 'in_progress',
     COMPLETED: 'completed',
+    RETAKE_REQUIRED: 'retake_required',
 }
 
 export type ProccessWorkOrder = typeof ProccessWorkOrder[keyof typeof ProccessWorkOrder];
 
 export const PROCCESS_WORK_ORDER_LABELS: { [key in ProccessWorkOrder]: string } = {
-    [StatusProduct.PENDING]: 'Chưa hoạt động',
-    [StatusProduct.IN_PROGRESS]: 'Đang hoạt động',
-    [StatusProduct.COMPLETED]: 'Hoàn thành',
+    [ProccessWorkOrder.PENDING]: 'Chưa hoạt động',
+    [ProccessWorkOrder.IN_PROGRESS]: 'Đang hoạt động',
+    [ProccessWorkOrder.COMPLETED]: 'Hoàn thành',
+    [ProccessWorkOrder.RETAKE_REQUIRED]: 'Cần chụp lại'
 }
 
 export const EvaluatedStatusWorkOrder = {

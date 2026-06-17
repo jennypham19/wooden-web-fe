@@ -10,5 +10,6 @@ export interface GetParams {
     limit: number,
     searchTerm?: string,
     status?: string,
+    isStored?: boolean,
     id?: string
 }
