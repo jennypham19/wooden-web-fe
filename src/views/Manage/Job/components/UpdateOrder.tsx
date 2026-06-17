@@ -212,7 +212,10 @@ const UpdateOrder: React.FC<UpdateOrderProps> = ({ onBack, data, fetchData }) =>
                                                             {product.workOrder?.workMilestones.map((wordMilestone, idx) => {
                                                                 const bgcolor = wordMilestone.steps.every((el) => el.proccess === StatusOrder.PENDING) ? COLORS.STATUS.PENDING :
                                                                     wordMilestone.steps.every((el) => el.proccess === StatusOrder.COMPLETED) ? COLORS.STATUS.COMPLETED : COLORS.STATUS.IN_PROGRESS  
-                                                                return(
+                                                                    console.log("wordMilestone.steps[0].images.length: ", wordMilestone.steps[0].images.length);
+                                                                    console.log("wordMilestone.steps[1].images.length: ", wordMilestone.steps[1].images.length);
+                                                                    
+                                                                    return(
                                                                     <>
                                                                         {bp ? (
                                                                             <Grid size={6} key={idx}>
