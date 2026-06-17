@@ -210,10 +210,10 @@ const UpdateOrder: React.FC<UpdateOrderProps> = ({ onBack, data, fetchData }) =>
                                                     {openViewImageProductId !== product.id && (
                                                         <Grid container spacing={2}>
                                                             {product.workOrder?.workMilestones.map((wordMilestone, idx) => {
-                                                                const bgcolor = wordMilestone.steps.every((el) => el.proccess === StatusOrder.PENDING) ? COLORS.STATUS.PENDING :
-                                                                    wordMilestone.steps.every((el) => el.proccess === StatusOrder.COMPLETED) ? COLORS.STATUS.COMPLETED : COLORS.STATUS.IN_PROGRESS  
-                                                                    console.log("wordMilestone.steps[0].images.length: ", wordMilestone.steps[0].images.length);
-                                                                    console.log("wordMilestone.steps[1].images.length: ", wordMilestone.steps[1].images.length);
+                                                                const steps = wordMilestone.steps || [];
+                                                                const bgcolor = steps.every((el) => el.proccess === StatusOrder.PENDING) ? COLORS.STATUS.PENDING :
+                                                                    steps.every((el) => el.proccess === StatusOrder.COMPLETED) ? COLORS.STATUS.COMPLETED : COLORS.STATUS.IN_PROGRESS  
+                                                                const firstImage = wordMilestone?.steps?.[0]?.images?.[0]?.url || proccess;
                                                                     
                                                                     return(
                                                                     <>
@@ -226,12 +226,12 @@ const UpdateOrder: React.FC<UpdateOrderProps> = ({ onBack, data, fetchData }) =>
                                                                                         Mốc {idx + 1}: {wordMilestone.name}
                                                                                     </Button>
                                                                                     <CommonImage
-                                                                                        src={wordMilestone.steps[0].images.length === 0 ? proccess : wordMilestone.steps[0].images[0].url}
+                                                                                        src={firstImage}
                                                                                         sx={{ width: 200, height: '100%', borderRadius: 2 }}
                                                                                         handleFunt={() => {
                                                                                             setOpenStepsAndImageSteps(true)
                                                                                             setIdWorkMilestone(wordMilestone.id)
-                                                                                            setTitle(`Mốc ${index + 1}${wordMilestone.name}`)
+                                                                                            setTitle(`Mốc ${idx + 1}${wordMilestone.name}`)
                                                                                         }}
                                                                                     />                                                                                
                                                                                 </Box>
@@ -246,12 +246,12 @@ const UpdateOrder: React.FC<UpdateOrderProps> = ({ onBack, data, fetchData }) =>
                                                                                     Mốc {idx + 1}: {wordMilestone.name}
                                                                                 </Button>
                                                                                 <CommonImage
-                                                                                    src={wordMilestone.steps[0].images.length === 0 ? proccess : wordMilestone.steps[0].images[0].url}
+                                                                                    src={firstImage}
                                                                                     sx={{ width: 200, height: 150, borderRadius: 2 }}
                                                                                     handleFunt={() => {
                                                                                         setOpenStepsAndImageSteps(true)
                                                                                         setIdWorkMilestone(wordMilestone.id)
-                                                                                        setTitle(`Mốc ${index + 1}${wordMilestone.name}`)
+                                                                                        setTitle(`Mốc ${idx + 1}${wordMilestone.name}`)
                                                                                     }}
                                                                                 />
                                                                                 </Box>
