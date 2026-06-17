@@ -36,6 +36,8 @@ const ViewOrderByCarpenter = (props: ViewOrderByCarpenterProps) => {
             };
 
             getOrder();
+            console.log("data.products[0]: ",data.products);
+            
             handleChangeId(data.products[0].id)
             setCurrentTab(0)
         }

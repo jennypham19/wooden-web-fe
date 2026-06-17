@@ -279,18 +279,7 @@ const UpdateOrder: React.FC<UpdateOrderProps> = ({ onBack, data, fetchData }) =>
                                                             </Box>
                                                         </Box>
                                                     )}
-                                                    {openStepsAndImageSteps && idWorkMilestone && title && (
-                                                        <DialogStepsAndStepImages
-                                                            open={openStepsAndImageSteps}
-                                                            id={idWorkMilestone}
-                                                            onClose={() => {
-                                                                setIdWorkMilestone(null);
-                                                                setOpenStepsAndImageSteps(false)
-                                                                setTitle(null)
-                                                            }}
-                                                            title={title}
-                                                        />
-                                                    )}
+
                                                 </Box>
                                             {/* )} */}
                                         </CardContent>
@@ -298,6 +287,18 @@ const UpdateOrder: React.FC<UpdateOrderProps> = ({ onBack, data, fetchData }) =>
                                 </Grid>
                             )
                         })}
+                        {openStepsAndImageSteps && idWorkMilestone && title && (
+                            <DialogStepsAndStepImages
+                                open={openStepsAndImageSteps}
+                                id={idWorkMilestone}
+                                onClose={() => {
+                                    setIdWorkMilestone(null);
+                                    setOpenStepsAndImageSteps(false)
+                                    setTitle(null)
+                                }}
+                                title={title}
+                            />
+                        )}
                     </Grid>
                     {showButtonFinishedOrder() &&  (
                         <Box display='flex' justifyContent='center'>

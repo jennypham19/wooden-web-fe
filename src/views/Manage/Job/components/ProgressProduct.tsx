@@ -280,7 +280,6 @@ const ProgressProduct = (props: ProgressProductProps) => {
 
         // 2. Kiểm tra các bước trước trong cùng mốc
         const currentMilestone = workOrder.workMilestones[milestoneIndex];
-        console.log("currentMilestone: ", currentMilestone);
         
         for(let j = 0; j < stepIndex; j++) {
             if(currentMilestone.steps[j].proccess === 'pending'){
@@ -329,11 +328,8 @@ const ProgressProduct = (props: ProgressProductProps) => {
         }
 
         const milestone = workOrder.workMilestones[milestoneIndex];
-        // if(milestone.steps.length - 1 === stepIndex){
-        //     return milestone.steps.some(step => step.proccess === 'completed') && milestone.evaluatedStatus === 'not_reviewed'
-        // }
         if(milestone.steps.length - 1 === stepIndex){
-            return milestone.steps.every(step => step.proccess === 'completed')
+            return milestone.steps.some(step => step.proccess === 'completed') && milestone.evaluatedStatus === 'not_reviewed'
         }
     }
 
@@ -575,7 +571,9 @@ const ProgressProduct = (props: ProgressProductProps) => {
             })
         }
     }
-    console.log("data: ", workOrder?.workMilestones.map(el => el.steps.every(step => step.proccess === 'completed')));
+
+    // show ra form upload hình ảnh sản phẩm khi tất cả các bước trong mốc đều hoàn thành
+    const isAllCompleted = workOrder?.workMilestones.every(milestone => milestone.steps.every(step => step.proccess === "completed"))
     
     return(
         <Box>
@@ -1077,7 +1075,7 @@ const ProgressProduct = (props: ProgressProductProps) => {
                         </Grid>      
                     </>
                 )}
-                {!workOrder?.workMilestones.map(el => el.steps.every(step => step.proccess === 'completed')) && (
+                {isAllCompleted && (
                     <>
                         <Typography fontSize='15px' fontWeight={600}>Hình ảnh sản phẩm</Typography>
                         {imageProductUrl ? (
