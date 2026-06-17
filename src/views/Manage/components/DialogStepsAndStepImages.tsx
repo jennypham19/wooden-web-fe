@@ -21,14 +21,13 @@ const DialogStepsAndStepImages = (props: DialogStepsAndStepImagesProps) => {
     const [steps, setSteps] = useState<IStep[]>([]);
 
     useEffect(() => {
-        if(open && id){
-            const getListStep = async(id: string) => {
-                const res = await getListStepsByIdWorkMilestone(id);
-                const data = res.data as any as IStep[];
-                setSteps(data)
-            }
-            getListStep(id)
+        if (!open || !id) return;
+        const getListStep = async(id: string) => {
+            const res = await getListStepsByIdWorkMilestone(id);
+            const data = res.data as any as IStep[];
+            setSteps(data)
         }
+        getListStep(id)
     }, [open, id])
     
     return(

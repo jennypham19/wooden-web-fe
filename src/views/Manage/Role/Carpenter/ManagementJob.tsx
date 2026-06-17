@@ -13,6 +13,7 @@ import Tabs from "../../components/Tabs";
 import CardDataOrder from "../../Orders/components/CardDataOrder";
 import UpdateOrder from "../../Job/components/UpdateOrder";
 import DialogListImageProduct from "../../Orders/components/DialogListImageProduct";
+import { useQueryData } from "@/hooks/useQueryData";
 
 
 const DataStatus: {id: number, value: string, label: string, icon: React.ReactNode}[] = [
@@ -47,10 +48,10 @@ const ManagementJobCarpenter = () => {
     const [order, setOrder] = useState<IOrder | null>(null);
     const [viewImageProducts, setViewImageProducts] = useState(false);
     
-    const { error, fetchData, handlePageChange, handleSearch, listData, loading, page, rowsPerPage, searchTerm, total } = useFetchData<IOrder>(getOrdersByCarpenter, 8, viewMode, false, profile?.id);
+    const { error, fetchData, handlePageChange, handleSearch, listData, loading, page, rowsPerPage, searchTerm, total } = useQueryData<IOrder>(getOrdersByCarpenter, 8, viewMode, profile?.id);
 
     const reloadOrders = async () => {
-        await fetchData(page, rowsPerPage, '', viewMode, false, profile?.id);
+        await fetchData(page, rowsPerPage, '', viewMode, profile?.id);
     };
 
     const handleOpenViewOrder = (order: IOrder) => {
