@@ -223,7 +223,7 @@ const UpdateOrder: React.FC<UpdateOrderProps> = ({ onBack, data, fetchData }) =>
                                                                                         Mốc {idx + 1}: {wordMilestone.name}
                                                                                     </Button>
                                                                                     <CommonImage
-                                                                                        src={wordMilestone.steps[0].images[0] ? wordMilestone.steps[0].images[0].url : proccess}
+                                                                                        src={wordMilestone.steps[0].images.length > 0 ? wordMilestone.steps[0].images[0].url : proccess}
                                                                                         sx={{ width: 200, height: '100%', borderRadius: 2 }}
                                                                                         handleFunt={() => {
                                                                                             setOpenStepsAndImageSteps(true)
@@ -243,7 +243,7 @@ const UpdateOrder: React.FC<UpdateOrderProps> = ({ onBack, data, fetchData }) =>
                                                                                     Mốc {idx + 1}: {wordMilestone.name}
                                                                                 </Button>
                                                                                 <CommonImage
-                                                                                    src={wordMilestone.steps[0].images[0] ? wordMilestone.steps[0].images[0].url : proccess}
+                                                                                    src={wordMilestone.steps[0].images.length > 0 ? wordMilestone.steps[0].images[0].url : proccess}
                                                                                     sx={{ width: 200, height: 150, borderRadius: 2 }}
                                                                                     handleFunt={() => {
                                                                                         setOpenStepsAndImageSteps(true)
