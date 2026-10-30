@@ -28,6 +28,15 @@ const NotificationsReminders = Loadable(lazy(() => import('@/views/Manage/Additi
 const DocumentsGuides = Loadable(lazy(() => import('@/views/Manage/AdditionalSupport/DocumentsGuides/index')));    // Tài liệu & hướng dẫn
 const FeedbackCustomer = Loadable(lazy(() => import('@/views/Manage/Feedback/index'))); // Phản hồi của khách hàng
 const AdminitrativeBoundaries = Loadable(lazy(() => import('@/views/Manage/AdministrativeBoundaries/index'))); // Địa giới hành chính
+const ListOfSupplies = Loadable(lazy(() => import('@/views/Manage/ListOfSupplies/index'))); // Danh mục vật tư
+const Import = Loadable(lazy(() => import('@/views/Manage/Import/index'))); // Nhập kho
+const Export = Loadable(lazy(() => import('@/views/Manage/Export/index'))); // Xuất kho
+const InventoryAlert = Loadable(lazy(() => import('@/views/Manage/InventoryAlert/index'))) // Tồn kho & Cảnh báo
+const WarehouseInventory = Loadable(lazy(() => import('@/views/Manage/WarehouseInventory/index'))) // Kiểm kê kho
+const FeeOfSupplies = Loadable(lazy(() => import('@/views/Manage/FeeOfSupplies/index')))  // Chi phí vật tư theo đơn hàng
+const RevenueExpenditure = Loadable(lazy(() => import('@/views/Manage/RevenueExpenditure/index'))) // Quản lý thu chi
+const Supplier = Loadable(lazy(() => import('@/views/Manage/Suppiler/index')))  // Quản lý nhà cung cấp
+const ReportsStatistics = Loadable(lazy(() => import('@/views/Manage/ReportsStatistics/index'))) // Báo cáo & thống kê
 
 
 const manageRoutes: RouteObject[] = [
@@ -57,6 +66,19 @@ const manageRoutes: RouteObject[] = [
     { path: ROUTE_PATH.MANAGE_DOCUMENTS_GUIDES, element: <DocumentsGuides/> },
     { path: ROUTE_PATH.MANAGE_FEEDBACK_CUSTOMER, element: <FeedbackCustomer/> },
     { path: ROUTE_PATH.MANAGE_ADMINISTRATIVE_BOUNDARIES, element: <AdminitrativeBoundaries/> },
+
+    // chức năng cho role kế toán
+    { path: ROUTE_PATH.MANAGE_LIST_OF_SUPPLIES, element: <ListOfSupplies/> },
+    { path: ROUTE_PATH.MANAGE_IMPORT, element: <Import/> },
+    { path: ROUTE_PATH.MANAGE_EXPORT, element: <Export/> },
+    { path: ROUTE_PATH.MANAGE_INVENTORY_ALERT, element: <InventoryAlert/> },
+    { path: ROUTE_PATH.MANAGE_WAREHOUSE_INVENTORY, element: <WarehouseInventory/> },
+    { path: ROUTE_PATH.MANAGE_FEE_OF_SUPPLIES, element: <FeeOfSupplies/> },
+    { path: ROUTE_PATH.MANAGE_REVENUE_EXPENDITURE, element: <RevenueExpenditure/> },
+    { path: ROUTE_PATH.MANAGE_SUPPLIER, element: <Supplier/> },
+    { path: ROUTE_PATH.MANAGE_REPORTS_STATISTICS, element: <ReportsStatistics/> },
+
+
 ];
 
 export default manageRoutes;

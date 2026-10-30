@@ -18,6 +18,10 @@ export const COLORS = {
   STATUS: {
     COMPLETED: '#17A34A',
     PENDING: '#BA1B1C',
-    IN_PROGRESS: '#E7A22F'
-  }
+    IN_PROGRESS: '#E7A22F',
+    WARNING: '#D9822B',
+    ERROR: '#BA1A1A'
+  },
+  BASIC: '#E6F2DE',
+  TEXT: '#2D8A4E',
 };

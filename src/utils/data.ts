@@ -1,7 +1,7 @@
 import { SectionItem } from "@/layouts/Dashboard/Sidebar/Sections";
 import { ICustomer, ICustomerInFuni } from "@/types/customer";
 import { IMenu, IPermission } from "@/types/permission";
-import { AccountCircle, Analytics, Assessment, Assignment, Build, BuildCircle, Construction, ContentPaste, DashboardCustomize, DrawOutlined, EventNote, Group, HomeOutlined, Hub, InventoryOutlined, List, ListAlt, LockOutlined, Map, MenuBook, MenuBookOutlined, Notifications, PrecisionManufacturing, Settings, SupportAgent, SvgIconComponent, Timeline, TrackChanges, WorkOutline } from "@mui/icons-material";
+import { AccountBalanceWallet, AccountCircle, Analytics, Assessment, Assignment, Build, BuildCircle, Construction, ContentPaste, DashboardCustomize, DrawOutlined, EventNote, FactCheck, Group, HomeOutlined, Hub, Inventory, Inventory2, InventoryOutlined, List, ListAlt, LocalShipping, LockOutlined, Map, MenuBook, MenuBookOutlined, MoveToInbox, Notifications, Outbound, PrecisionManufacturing, QueryStats, RequestQuote, Settings, SupportAgent, SvgIconComponent, Timeline, TrackChanges, WorkOutline } from "@mui/icons-material";
 
 export const iconMap: Record<string, SvgIconComponent> = {
     HomeOutlined,
@@ -25,13 +25,23 @@ export const iconMap: Record<string, SvgIconComponent> = {
     TrackChanges,
     Hub,
     BuildCircle,
-    Assessment,
+    Assessment,         // Báo cáo & thống kê, .....
     Timeline,
     Analytics,
     SupportAgent,
     Notifications,
     MenuBook,
-    Map
+    Map,
+    Inventory2,          // Danh mục vật tư
+    MoveToInbox,          // Nhập kho
+    Outbound,              // Xuất kho
+    Inventory,              // Tồn kho & Cảnh báo
+    FactCheck,              // Kiểm kê kho
+    RequestQuote,           // Chi phí vật tư theo đơn hàng
+    AccountBalanceWallet,    // Quản lý thu-chi
+    LocalShipping,           // Quản lý nhà cung cấp
+    QueryStats              // Báo cáo & thống kê
+              
 }
 
 export const mapMenuToSectionItems = (menus: IMenu[]): SectionItem[] => {

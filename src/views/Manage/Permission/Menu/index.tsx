@@ -215,6 +215,7 @@ const Menus = () => {
                     onSearch={handleSearch}
                     placeholder="Tìm kiếm theo mã, tên"
                 >
+                    {!openMenu.open && (
                     <Button
                         sx={{ border: COLORS.BUTTON, bgcolor: COLORS.BUTTON}}
                         endIcon={<Add/>}
@@ -222,7 +223,9 @@ const Menus = () => {
                     >
                         Thêm chức năng
                     </Button>
+                    )}
                 </SearchBox>
+                
                 {!openMenu.open && (
                     <>
                         {loading && (
@@ -237,7 +240,7 @@ const Menus = () => {
                             <Box my={2}>
                                 <TableData
                                     label="menu"
-                                    array={['STT', 'Mã', 'Tên chức năng', 'Chức năng cha', 'Thao tác']}
+                                    array={['STT', 'Mã', 'Tên chức năng', 'Chức năng cha', 'Thứ tự hiển thị', 'Thao tác']}
                                     colSpan={5}
                                     data={listData}
                                     renderRow={(menu, index) => (
@@ -246,6 +249,7 @@ const Menus = () => {
                                             <TableCell align="center">{menu.code}</TableCell>
                                             <TableCell align="center">{menu.name}</TableCell>
                                             <TableCell align="center">{menu.parentName || ''}</TableCell>
+                                            <TableCell align="center">{menu.sortOrder}</TableCell>
                                             <TableCell align="center">
                                                 <IconButton
                                                     handleFunt={() => menu && handleOpenAddMenuChildren(menu)}
@@ -451,7 +455,7 @@ const Menus = () => {
                                     <Box my={3} mr={3}>
                                         <TableData
                                             label="menu"
-                                            array={['STT', 'Mã', 'Tên chức năng', 'Chức năng cha', 'Thao tác']}
+                                            array={['STT', 'Mã', 'Tên chức năng', 'Chức năng cha', 'Thứ tự hiển thị', 'Thao tác']}
                                             colSpan={5}
                                             data={listData}
                                             renderRow={(menu, index) => (
@@ -460,6 +464,7 @@ const Menus = () => {
                                                     <TableCell align="center">{menu.code}</TableCell>
                                                     <TableCell align="center">{menu.name}</TableCell>
                                                     <TableCell align="center">{menu.parentName || ''}</TableCell>
+                                                    <TableCell align="center">{menu.sortOrder}</TableCell>
                                                     <TableCell align="center">
                                                         <IconButton
                                                             handleFunt={() => menu && handleOpenAddMenuChildren(menu)}
