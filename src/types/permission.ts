@@ -18,7 +18,8 @@ export interface IMenu {
     updatedAt?: string,
     actions?: IAction[],
     children?: IMenu[],
-    isActived: boolean
+    isActived: boolean,
+    sortOrder: number,
 }
 
 export interface IPermission {
