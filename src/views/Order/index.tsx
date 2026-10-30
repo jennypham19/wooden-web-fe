@@ -54,40 +54,40 @@ const OrderLink = () => {
                     {/* Form nhập sản phẩm */}
                     <Paper sx={{ mx: { xs: 3, md: 0 }, p: 2, mb: 2.5 }}>
                         {mdUp ? (
-                        <Stack
-                            direction='column'
-                            spacing={1}
-                            sx={{
-                            mb: 2,
-                            width: '100%'
-                            }}
-                        >
-                            {DataProductViewMode.map((category, idx) => (
-                            <Box
-                                key={idx}
-                                onClick={() => category.value && handleActiveCategory(category.value)}
+                            <Stack
+                                direction='column'
+                                spacing={1}
                                 sx={{
-                                    px: 2,
-                                    py: 1,
-                                    borderRadius: 2,
-                                    cursor: 'pointer',
-                                    textAlign: 'left',
-                                    bgcolor: activeCategory === category.value ? `${COLORS.BUTTON}` : 'transparent',
-                                    color: activeCategory === category.value ? '#fff' : '#000',
-                                    fontWeight: activeCategory === category.value ? 700 : 400,
-                                    border: '1px solid #000',
-                                    transition: '0.3s',
-                                    "&:hover": {
-                                        bgcolor: activeCategory === category.value ? "#fff" : 'rgba(255,255,255,0.1)'
-                                    },
-                                    fontSize: '14px',
-                                     
+                                mb: 2,
+                                width: '100%'
                                 }}
                             >
-                                {category.label}
-                            </Box>
-                            ))}
-                        </Stack>
+                                {DataProductViewMode.map((category, idx) => (
+                                <Box
+                                    key={idx}
+                                    onClick={() => category.value && handleActiveCategory(category.value)}
+                                    sx={{
+                                        px: 2,
+                                        py: 1,
+                                        borderRadius: 2,
+                                        cursor: 'pointer',
+                                        textAlign: 'left',
+                                        bgcolor: activeCategory === category.value ? `${COLORS.BUTTON}` : 'transparent',
+                                        color: activeCategory === category.value ? '#fff' : '#000',
+                                        fontWeight: activeCategory === category.value ? 700 : 400,
+                                        border: '1px solid #000',
+                                        transition: '0.3s',
+                                        "&:hover": {
+                                            bgcolor: activeCategory === category.value ? "#fff" : 'rgba(255,255,255,0.1)'
+                                        },
+                                        fontSize: '14px',
+                                        
+                                    }}
+                                >
+                                    {category.label}
+                                </Box>
+                                ))}
+                            </Stack>
                         ) : (
                             <TabProduct DataViewMode={DataProductViewMode} viewMode={activeCategory} onChange={handleActiveCategory}/>
                         )}
