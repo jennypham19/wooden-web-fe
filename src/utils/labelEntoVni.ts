@@ -1,4 +1,4 @@
-import { EVALUATED_STATUS_WORK_MILESTONE_LABELS, EVALUATED_STATUS_WORK_ORDER_LABELS, EvaluatedStatusWorkMilestone, EvaluatedStatusWorkOrder, PRIORITY_DESIGN_REQUEST_LABELS, PriorityDesignRequest, PROCCESS_ORDER_LABELS, PROCCESS_PRODUCT_LABELS, PROCCESS_WORK_ORDER_LABELS, ProccessOrder, ProccessProduct, ProccessWorkOrder, PROGRESS_WORK_ORDER_LABELS, ProgressWorkOrder, RENDER_LABELS, RenderUser, ROLE_CODES, ROLE_DEPARTMENT, ROLE_LABELS, RoleUser, STATUS_DESIGN_REQUEST_LABELS, STATUS_MACHINE_LABELS, STATUS_ORDER_LABELS, STATUS_PRODUCT_LABELS, StatusDesignRequest, StatusMachine, StatusOrder, StatusProduct } from "@/constants/status";
+import { EVALUATED_STATUS_WORK_MILESTONE_LABELS, EVALUATED_STATUS_WORK_ORDER_LABELS, EvaluatedStatusWorkMilestone, EvaluatedStatusWorkOrder, PRIORITY_DESIGN_REQUEST_LABELS, PriorityDesignRequest, PROCCESS_ORDER_LABELS, PROCCESS_PRODUCT_LABELS, PROCCESS_WORK_ORDER_LABELS, ProccessOrder, ProccessProduct, ProccessWorkOrder, PROGRESS_WORK_ORDER_LABELS, ProgressWorkOrder, RENDER_LABELS, RenderUser, ROLE_CODES, ROLE_DEPARTMENT, ROLE_LABELS, RoleUser, STATUS_DESIGN_REQUEST_LABELS, STATUS_MACHINE_LABELS, STATUS_ORDER_LABELS, STATUS_PRODUCT_LABELS, StatusDesignRequest, StatusMachine, StatusOrder, StatusProduct, STOCK_STATUS_LABELS, StockStatus, URGENCY_LEVEL_LABELS, UrgencyLevel } from "@/constants/status";
 
 export const getRoleLabel = (role: RoleUser | null | undefined) : string => {
     if(!role) return "Chưa xác định";
@@ -247,3 +247,42 @@ export const getStatusFeedback = (status: string) => {
       return { label: 'Đã xác nhận' };
   }
 };
+
+// accounting
+export const getUrgencyLevelLabel = (urgencyLevel: UrgencyLevel | null | undefined): string => {
+  if(!urgencyLevel) return 'Chưa xác định';
+  return URGENCY_LEVEL_LABELS[urgencyLevel] || urgencyLevel;
+}
+
+export const getUrgencyLevelColor = (urgencyLevel: string | null) => {
+  switch (urgencyLevel) {
+    case 'high':
+      return { color: 'error' as const };
+    case 'medium':
+      return { color: 'warning' as const };
+    case 'low':
+      return { color: 'success' as const };
+    default:
+      return { color: 'default' as const };
+  }
+}
+
+export const getStockStatusLabel = (stockStatus: StockStatus | string | null | undefined): string => {
+  if(!stockStatus) return 'Chưa xác định';
+  return STOCK_STATUS_LABELS[stockStatus] || stockStatus;
+}
+
+export const getStockStatusColor = (stockStatus: string | null) => {
+  switch (stockStatus) {
+    case 'in_stock':
+      return { color: 'success' as const }; 
+    case 'low_stock':
+      return { color: 'error' as const }; 
+    case 'low_in_stock':  
+      return { color: 'warning' as const };
+    case 'out_of_stock':
+      return { color: 'error' as const }; 
+    default:
+      return { color: 'default' as const };
+  }
+}

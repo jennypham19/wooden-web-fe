@@ -1,11 +1,15 @@
 import Page from "@/components/Page";
 import { COLORS } from "@/constants/colors";
-import { Add, Download, EditNoteOutlined, FilterAltOutlined, ForestOutlined, HandymanOutlined, PaletteOutlined, PrintOutlined, QrCodeScanner, ScienceOutlined, SquareFootOutlined, SvgIconComponent, TrendingUp, UploadFile } from "@mui/icons-material";
-import { Box, Button, Checkbox, Chip, Stack, TableRow, Typography } from "@mui/material";
+import { Add, Delete, Download, Edit, EditNoteOutlined, FilterAltOutlined, ForestOutlined, HandymanOutlined, History, PaletteOutlined, PrintOutlined, QrCodeScanner, ScienceOutlined, SquareFootOutlined, SvgIconComponent, TrendingUp, UploadFile } from "@mui/icons-material";
+import { Box, Button, Checkbox, Chip, Stack, Tab, TableCell, TableRow, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { StorageDonutChart } from "./components/Chart";
 import SearchBox from "./components/SearchBox";
 import TableData from "./components/TableData";
+import { MOCK_DATA } from "./constants";
+import { getStockStatusColor, getStockStatusLabel, getUrgencyLevelLabel } from "@/utils/labelEntoVni";
+import IconButton from "@/components/IconButton/IconButton";
+import { StockStatus } from "@/constants/status";
 
 interface FilterItemProps{
     icon: any,
@@ -222,10 +226,106 @@ const ListOfSupplies = () => {
                     label="supplies"
                     array={['', 'MÃ VẬT TƯ', 'TÊN VẬT TƯ & QUY CÁCH KỸ THUẬT', 'PHÂN NHÓM', 'ĐVT', 'TỒN TỐI THIỂU', 'TỒN THỰC TẾ', 'GIÁ NHẬP GẦN NHẤT', 'NHÀ CUNG CẤP CHÍNH', 'TRẠNG THÁI', 'THAO TÁC']}
                     colSpan={11}
-                    data={[]}
+                    data={MOCK_DATA}
                     renderRow={(supplies, index) => (
                         <TableRow key={index}>
-
+                            <TableCell>
+                                <Checkbox/>
+                            </TableCell>
+                            <TableCell>
+                                <Typography variant="subtitle2" fontWeight={600}>{supplies.materialCode}</Typography>
+                                {supplies.urgencyLevel === 'high' ? (
+                                    <Typography variant="caption" color="error" fontWeight={600}>{getUrgencyLevelLabel(supplies.urgencyLevel)}</Typography>
+                                ) : (
+                                    <Typography variant="caption">{supplies.batchCode}</Typography>
+                                )}
+                            </TableCell>
+                            <TableCell>
+                                <Typography variant="subtitle2" fontWeight={600}>{supplies.materialName}</Typography>
+                                <Grid container spacing={2}>
+                                    <Grid size={{ xs: 6}}>
+                                        <Typography variant="caption">{supplies.technicalSpecifications}</Typography>
+                                    </Grid>
+                                    <Grid size={{ xs: 6}} sx={{ display: 'flex', justifyContent: 'flex-end'}}>
+                                        {supplies.urgencyLevel === 'high' ? (
+                                            <Box margin="auto 0" bgcolor="#f8a2af" p={0.5}>
+                                                <Typography variant="caption" color="error" fontWeight={600}>
+                                                    {supplies.alertMessage}
+                                                </Typography>
+                                            </Box>
+                                        ) : supplies.urgencyLevel === 'medium' ? (
+                                            <Box margin="auto 0" bgcolor="#f8eba2" p={0.5}>
+                                                <Typography variant="caption" color="warning" fontWeight={600}>
+                                                    {supplies.alertMessage}
+                                                </Typography>
+                                            </Box>
+                                        ) : (
+                                            <Box margin="auto 0" bgcolor={COLORS.BASIC} p={0.5}>
+                                                <Typography variant="caption" fontWeight={600}>
+                                                    {supplies.materialStandard}
+                                                </Typography>
+                                            </Box>
+                                        )}                                        
+                                    </Grid>
+                                </Grid>
+                            </TableCell>
+                            <TableCell>
+                                <Chip
+                                    label={supplies.categoryName}
+                                    sx={{ bgcolor: COLORS.BASIC, fontWeight: 600 }}
+                                />
+                            </TableCell>
+                            <TableCell>
+                                <Typography variant="subtitle2">{supplies.unitName}</Typography>
+                            </TableCell>
+                            <TableCell>
+                                <Typography variant="subtitle2">{supplies.minimumStock}</Typography>
+                            </TableCell>
+                            <TableCell>
+                                {supplies.stockStatus === StockStatus.IN_STOCK ? (
+                                    <Typography variant="subtitle2" fontWeight={600} color="success">{supplies.actualStock}</Typography>
+                                ) : supplies.stockStatus === StockStatus.LOW_IN_STOCK ? (
+                                    <Typography variant="subtitle2" fontWeight={600} color="warning">{supplies.actualStock}</Typography>
+                                ) : (
+                                    <Typography variant="subtitle2" fontWeight={600} color="error">{supplies.actualStock}</Typography>
+                                )}
+                            </TableCell>
+                            <TableCell>
+                                <Typography variant="subtitle2">{`${supplies.lastPurchasePrice}.000đ/${supplies.unitName.toLowerCase()}`}</Typography>
+                            </TableCell>
+                            <TableCell>
+                                <Typography variant="subtitle2" fontWeight={600}>{supplies.primarySupplier?.supplierName}</Typography>
+                                <Typography variant="caption">{supplies.primarySupplier?.address || supplies.primarySupplier?.description || supplies.primarySupplier?.supplierCode}</Typography>
+                            </TableCell>
+                            <TableCell>
+                                <Chip
+                                    label={getStockStatusLabel(supplies.stockStatus)}
+                                    color={getStockStatusColor(supplies.stockStatus).color}
+                                />
+                            </TableCell>
+                            <TableCell>
+                                <IconButton
+                                    tooltip="Chỉnh sửa vật tư"
+                                    handleFunt={() => console.log('Chỉnh sửa vật tư')}
+                                    icon={<Edit/>}
+                                    height={15}
+                                    width={20}
+                                />
+                                <IconButton
+                                    tooltip="Thẻ kho & biến động"
+                                    handleFunt={() => console.log('Thẻ kho & biến động')}
+                                    icon={<History/>}
+                                    height={15}
+                                    width={20}
+                                />
+                                <IconButton
+                                    tooltip="Xóa"
+                                    handleFunt={() => console.log('Xóa')}
+                                    icon={<Delete/>}
+                                    height={15}
+                                    width={20}
+                                />
+                            </TableCell>
                         </TableRow>
                     )}
                 />
