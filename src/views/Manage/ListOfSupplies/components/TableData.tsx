@@ -23,7 +23,7 @@ const TableData = <T,>({
                 <TableHead>
                     <TableRow sx={{ height: height}}>
                         {array.map((header, index) => (
-                            <TableCell key={index} align="center" sx={{ fontWeight: 700, bgcolor: '#F4F6F0'}}>{header}</TableCell>
+                            <TableCell key={index} sx={{ fontWeight: 700, bgcolor: '#F4F6F0'}}>{header}</TableCell>
                         ))}
                     </TableRow>
                 </TableHead>

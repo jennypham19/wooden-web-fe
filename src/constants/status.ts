@@ -253,3 +253,34 @@ export const EVALUATED_STATUS_WORK_MILESTONE_LABELS: { [key in EvaluatedStatusWo
     [EvaluatedStatusWorkMilestone.APPROVED]: 'Đạt',
     [EvaluatedStatusWorkMilestone.OVERDUE]: 'Quá hạn',
 }
+
+// accounting
+export const UrgencyLevel = {
+    HIGH: 'high',
+    MEDIUM: 'medium',
+    LOW: 'low'
+}
+
+export type UrgencyLevel = typeof UrgencyLevel[keyof typeof UrgencyLevel];
+
+export const URGENCY_LEVEL_LABELS: { [key in UrgencyLevel]: string } = {
+    [UrgencyLevel.HIGH]: 'Khẩn cấp',
+    [UrgencyLevel.MEDIUM]: 'Trung bình',
+    [UrgencyLevel.LOW]: 'Thấp',
+}
+
+export const StockStatus = {
+    IN_STOCK: 'in_stock',
+    LOW_STOCK: 'low_stock',
+    LOW_IN_STOCK: 'low_in_stock',
+    OUT_OF_STOCK: 'out_of_stock'
+}
+
+export type StockStatus = typeof StockStatus[keyof typeof StockStatus];
+
+export const STOCK_STATUS_LABELS: { [key in StockStatus]: string } = {
+    [StockStatus.IN_STOCK]: 'Còn hàng',
+    [StockStatus.LOW_STOCK]: 'Hàng sắp hết',
+    [StockStatus.LOW_IN_STOCK]: 'Hàng còn ít',
+    [StockStatus.OUT_OF_STOCK]: 'Hết hàng',
+}
