@@ -1,15 +1,18 @@
 import Page from "@/components/Page";
 import { COLORS } from "@/constants/colors";
-import { Add, Delete, Download, Edit, EditNoteOutlined, FilterAltOutlined, ForestOutlined, HandymanOutlined, History, PaletteOutlined, PrintOutlined, QrCodeScanner, ScienceOutlined, SquareFootOutlined, SvgIconComponent, TrendingUp, UploadFile } from "@mui/icons-material";
-import { Box, Button, Checkbox, Chip, Stack, Tab, TableCell, TableRow, Typography } from "@mui/material";
+import { Add, Delete, Download, Edit, EditNoteOutlined, FilterAltOutlined, ForestOutlined, HandymanOutlined, History, PaletteOutlined, PrintOutlined, QrCodeScanner, ScienceOutlined, SquareFootOutlined, TrendingUp, UploadFile } from "@mui/icons-material";
+import { Box, Button, Checkbox, Chip, MenuItem, Pagination, Select, Stack, TableCell, TableRow, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
+import { useState } from "react";
 import { StorageDonutChart } from "./components/Chart";
 import SearchBox from "./components/SearchBox";
 import TableData from "./components/TableData";
+import DetailDrawer from "./components/DetailDrawer";
 import { MOCK_DATA } from "./constants";
 import { getStockStatusColor, getStockStatusLabel, getUrgencyLevelLabel } from "@/utils/labelEntoVni";
 import IconButton from "@/components/IconButton/IconButton";
 import { StockStatus } from "@/constants/status";
+import { Material } from "@/constants/material";
 
 interface FilterItemProps{
     icon: any,
@@ -44,16 +47,19 @@ const data: FilterItemProps[] = [
 ]
 
 const ListOfSupplies = () => {
+    const [selected, setSelected] = useState<Material | null>(null);
+
     return(
         <Page title="Danh mục vật tư">
-            <Grid container spacing={2} sx={{ mx: 2, mt: 3 }}>
+            <Box px={2} mt={3}>
+            <Grid container spacing={2}>
                 <Grid size={{ xs: 12, md: 8 }}>
                     <Box p={2} bgcolor="#fff">
-                        <Typography variant="h5" fontWeight={600}>Quản lý Danh mục Vật tư Xưởng Mộc</Typography>
+                        <Typography variant="h5" fontWeight={600} sx={{ fontSize: { xs: '1.4rem', md: '1.5rem' } }}>Quản lý Danh mục Vật tư Xưởng Mộc</Typography>
                         <Typography variant="subtitle2">
                             Tổng số: <b>348</b> loại vật tư tiêu chuẩn • <b>06</b> nhóm định mức phân xưởng
                         </Typography>
-                        <Box my={2} display='flex' flexDirection='row' gap={2}>
+                        <Box my={2} display='flex' flexDirection='row' flexWrap='wrap' gap={2}>
                             <Button
                                 sx={{ bgcolor: COLORS.BASIC, color: COLORS.BUTTON }}
                                 startIcon={<UploadFile/>}
@@ -80,30 +86,30 @@ const ListOfSupplies = () => {
                             </Button>
                         </Box>
                         <Box p={2} bgcolor={COLORS.BASIC}>
-                            <Grid container>
-                                <Grid size={{ xs: 12, md: 3 }}>
+                            <Grid container spacing={2} rowSpacing={2}>
+                                <Grid size={{ xs: 6, md: 3 }}>
                                     <Typography variant="subtitle2">Tổng giá trị lưu kho</Typography>
                                     <Typography variant="subtitle1" fontWeight={600} sx={{ color: COLORS.BUTTON }}>1,842,500,000 đ</Typography>
-                                    <Stack sx={{ color: COLORS.TEXT }} direction='row'>
-                                        <TrendingUp/>
-                                        <Typography variant="subtitle2">+3.8% so với  tháng trước</Typography>
+                                    <Stack sx={{ color: COLORS.TEXT }} direction='row' alignItems='center' gap={0.5}>
+                                        <TrendingUp fontSize="small"/>
+                                        <Typography variant="subtitle2">+3.8% so với tháng trước</Typography>
                                     </Stack>
                                 </Grid>
-                                <Grid size={{ xs: 12, md: 3 }}>
+                                <Grid size={{ xs: 6, md: 3 }}>
                                     <Typography variant="subtitle2">Vật tư đạt định mức</Typography>
                                     <Typography variant="subtitle1" sx={{ color: COLORS.BUTTON }}>
                                         <b>312</b> / 348 loại
                                     </Typography>
                                     <Typography variant="subtitle2" sx={{ color: COLORS.TEXT }}>89.6% an toàn sản xuất</Typography>
                                 </Grid>
-                                <Grid size={{ xs: 12, md: 3 }}>
+                                <Grid size={{ xs: 6, md: 3 }}>
                                     <Typography variant="subtitle2">Cảnh báo sắp hết</Typography>
                                     <Typography variant="subtitle1" sx={{ color: COLORS.STATUS.WARNING, fontWeight: 600 }}>
                                         28 loại
                                     </Typography>
                                     <Typography variant="subtitle2" sx={{ color: COLORS.STATUS.WARNING }}>Cần lập lệnh mua mới</Typography>
                                 </Grid>
-                                <Grid size={{ xs: 12, md: 3 }}>
+                                <Grid size={{ xs: 6, md: 3 }}>
                                     <Typography variant="subtitle2">Hết hàng nghiêm trọng</Typography>
                                     <Typography variant="subtitle1" sx={{ color: COLORS.STATUS.ERROR, fontWeight: 600 }}>
                                         08 loại
@@ -132,13 +138,14 @@ const ListOfSupplies = () => {
                     </Box>
                 </Grid>
             </Grid>
+            </Box>
             <Box p={2} my={3} mx={2} bgcolor='#fff'>
                 <SearchBox
                     initialValue=""
                     onSearch={() => {}}
                     placeholder="Tìm nhanh theo mã VT, tên loại gỗ, quy cách độ ẩm, nhà cung ứng..."
                 >
-                    <Box margin='auto 0' display='flex' flexDirection='row' gap={2}>
+                    <Box margin='auto 0' mt={{ xs: 2, md: 0 }} display='flex' flexDirection='row' flexWrap='wrap' gap={2}>
                         <Stack bgcolor={COLORS.BUTTON} p={1}>
                             <Typography variant="subtitle2">Tất cả tồn kho</Typography>
                             <Typography variant="subtitle2">348</Typography>
@@ -181,31 +188,39 @@ const ListOfSupplies = () => {
                         </Stack>
                     </Box>
                 </SearchBox>
-                <Box mt={3} display='flex' flexDirection='row' gap={2}>
-                    <Stack>
+                <Box mt={3} display='flex' flexDirection='row' flexWrap='wrap' alignItems='center' gap={2}>
+                    <Stack direction='row' alignItems='center' gap={0.5}>
                         <FilterAltOutlined/>
-                        <Typography variant="subtitle2">PHÂN NHÓM:</Typography>
+                        <Typography variant="subtitle2" noWrap>PHÂN NHÓM:</Typography>
                     </Stack>
                     <Chip
                         sx={{ bgcolor: COLORS.BUTTON, px: 2 }}
                         label='Tất cả (6)'
                     />
                     {data.map((item, index) => (
-                        <Stack bgcolor={COLORS.BASIC} px={2} margin='auto 0' py={0.5} borderRadius={30} key={index}>
+                        <Stack direction='row' alignItems='center' bgcolor={COLORS.BASIC} px={2} py={0.5} gap={0.5} borderRadius={30} key={index}>
                             {item.icon}
-                            <Typography variant="subtitle2">{item.label}</Typography>
+                            <Typography variant="subtitle2" noWrap>{item.label}</Typography>
                         </Stack>
                     ))}
                 </Box>
             </Box>
             <Box mt={3} mx={2}>
-                <Box p={2} bgcolor={COLORS.BASIC} display='flex' justifyContent='space-between'>
-                    <Stack margin='auto 0'>
+                <Box
+                    p={2}
+                    bgcolor={COLORS.BASIC}
+                    display='flex'
+                    flexDirection={{ xs: 'column', md: 'row' }}
+                    justifyContent='space-between'
+                    alignItems={{ xs: 'flex-start', md: 'center' }}
+                    gap={2}
+                >
+                    <Stack direction='row' alignItems='center' flexWrap='wrap' gap={0.5}>
                         <Checkbox/>
                         <Typography variant="subtitle2" fontWeight={600}>Chọn tất cả vật tư trang 1</Typography>
                         <Typography variant="subtitle2">• Hiển thị 6 trên 348 loại</Typography>
                     </Stack>
-                    <Stack>
+                    <Stack direction='row' flexWrap='wrap' gap={1}>
                         <Button
                             startIcon={<PrintOutlined/>}
                             sx={{ bgcolor: '#e4e0e0', color: '#000'}}
@@ -226,10 +241,16 @@ const ListOfSupplies = () => {
                     label="supplies"
                     array={['', 'MÃ VẬT TƯ', 'TÊN VẬT TƯ & QUY CÁCH KỸ THUẬT', 'PHÂN NHÓM', 'ĐVT', 'TỒN TỐI THIỂU', 'TỒN THỰC TẾ', 'GIÁ NHẬP GẦN NHẤT', 'NHÀ CUNG CẤP CHÍNH', 'TRẠNG THÁI', 'THAO TÁC']}
                     colSpan={11}
+                    minWidth={1100}
                     data={MOCK_DATA}
                     renderRow={(supplies, index) => (
-                        <TableRow key={index}>
-                            <TableCell>
+                        <TableRow
+                            key={index}
+                            hover
+                            onClick={() => setSelected(supplies)}
+                            sx={{ cursor: 'pointer' }}
+                        >
+                            <TableCell onClick={(e) => e.stopPropagation()}>
                                 <Checkbox/>
                             </TableCell>
                             <TableCell>
@@ -303,7 +324,7 @@ const ListOfSupplies = () => {
                                     color={getStockStatusColor(supplies.stockStatus).color}
                                 />
                             </TableCell>
-                            <TableCell>
+                            <TableCell onClick={(e) => e.stopPropagation()}>
                                 <IconButton
                                     tooltip="Chỉnh sửa vật tư"
                                     handleFunt={() => console.log('Chỉnh sửa vật tư')}
@@ -329,7 +350,44 @@ const ListOfSupplies = () => {
                         </TableRow>
                     )}
                 />
-            </Box>            
+                <Grid sx={{ bgcolor:  "#fff", p: 2 }} container spacing={2}>
+                    <Grid size={{ xs: 12, md: 8 }}>
+                        <Stack direction="row" alignItems="center" gap={1}>
+                            <Typography variant="subtitle2">Hiển thị</Typography>
+                            <Select size="small" value={20} sx={{ width: 150 }}>
+                                <MenuItem value={20}>20 dòng / trang</MenuItem>
+                                <MenuItem value={50}>50 dòng / trang</MenuItem>
+                                <MenuItem value={100}>100 dòng / trang</MenuItem>
+                            </Select>
+                            <Typography variant="subtitle2" color="text.secondary">
+                                từ 1 đến 6 trong tổng <b>348</b> mục
+                            </Typography>
+                        </Stack>
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                        <Box display='flex' justifyContent='flex-end'>
+                            <Pagination
+                                count={24}
+                                defaultPage={1}
+                                shape="rounded"
+                                siblingCount={1}
+                                boundaryCount={1}
+                                sx={{
+                                    '& .Mui-selected': {
+                                        bgcolor: `${COLORS.BUTTON} !important`,
+                                        color: '#fff',
+                                    },
+                                }}
+                        />
+                        </Box>
+                    </Grid>
+                </Grid>
+            </Box>
+            <DetailDrawer
+                open={Boolean(selected)}
+                material={selected}
+                onClose={() => setSelected(null)}
+            />
         </Page>
     )
 }

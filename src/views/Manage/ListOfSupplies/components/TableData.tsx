@@ -7,19 +7,21 @@ interface TableProps<T> {
     data: T[],
     renderRow: (item: T, index: number) => React.ReactNode;
     colSpan: number,
+    minWidth?: number,
 }
 
-const TableData = <T,>({ 
-    label, 
+const TableData = <T,>({
+    label,
     height = 50,
     array,
     data,
     renderRow,
-    colSpan
+    colSpan,
+    minWidth
 } : TableProps<T>) => {
     return (
-        <TableContainer component={Paper}>
-            <Table stickyHeader aria-label={label}>
+        <TableContainer sx={{ overflowX: "auto" }} component={Paper}>
+            <Table stickyHeader aria-label={label} sx={{ minWidth }}>
                 <TableHead>
                     <TableRow sx={{ height: height}}>
                         {array.map((header, index) => (

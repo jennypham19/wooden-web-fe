@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
@@ -17,7 +18,7 @@ const data: ChartDataItem[] = [
 
 export const StorageDonutChart: React.FC = () => {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
+    <Box sx={{ display: 'flex', flexDirection: { xs: "column", sm: "row" }, alignItems: 'center', gap: '30px' }}>
       
       {/* KHU VỰC VẼ BIỂU ĐỒ DONUT */}
       <div style={{ width: '160px', height: '160px', position: 'relative' }}>
@@ -75,6 +76,6 @@ export const StorageDonutChart: React.FC = () => {
         ))}
       </div>
 
-    </div>
+    </Box>
   );
 };
