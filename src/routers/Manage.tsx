@@ -37,6 +37,7 @@ const FeeOfSupplies = Loadable(lazy(() => import('@/views/Manage/FeeOfSupplies/i
 const RevenueExpenditure = Loadable(lazy(() => import('@/views/Manage/RevenueExpenditure/index'))) // Quản lý thu chi
 const Supplier = Loadable(lazy(() => import('@/views/Manage/Suppiler/index')))  // Quản lý nhà cung cấp
 const ReportsStatistics = Loadable(lazy(() => import('@/views/Manage/ReportsStatistics/index'))) // Báo cáo & thống kê
+const UpdateMaterials = Loadable(lazy(() => import('@/views/Manage/UpdateMaterials/index'))) // Cập nhật vật tư
 
 
 const manageRoutes: RouteObject[] = [
@@ -77,7 +78,7 @@ const manageRoutes: RouteObject[] = [
     { path: ROUTE_PATH.MANAGE_REVENUE_EXPENDITURE, element: <RevenueExpenditure/> },
     { path: ROUTE_PATH.MANAGE_SUPPLIER, element: <Supplier/> },
     { path: ROUTE_PATH.MANAGE_REPORTS_STATISTICS, element: <ReportsStatistics/> },
-
+    { path: ROUTE_PATH.MANAGE_UPDATE_MATERIALS, element: <UpdateMaterials/>}
 
 ];
 
