@@ -39,6 +39,7 @@ export const ROUTE_PATH = {
   MANAGE_REVENUE_EXPENDITURE: 'quan-ly-thu-chi',
   MANAGE_SUPPLIER: 'nha-cung-cap',
   MANAGE_REPORTS_STATISTICS: 'bao-cao-thong-ke',
+  MANAGE_UPDATE_MATERIALS: 'cap-nhat-vat-tu',
 
   PRODUCT_CATEGORY: '/products/categories',
   PRODUCT_CATEGORY_CREATE: '/products/categories/create',
