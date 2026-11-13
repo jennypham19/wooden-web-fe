@@ -36,7 +36,7 @@ export default function AutocompleteComponent<T>(props: AutocompleteProps<T>){
             setLoading(true);
             setIsSearch(true);
         try {
-            const res = await fetchOptions({ page: page, limit: 12, searchTerm: search });
+            const res = await fetchOptions({ page: page, limit: 10, searchTerm: search });
             const newData = (res.data?.data || []) as T[];
             setOptions(newData);
         } catch (err) {
@@ -60,6 +60,7 @@ export default function AutocompleteComponent<T>(props: AutocompleteProps<T>){
 
     return(
         <Autocomplete
+            sx={{ width: '100%'}}
             options={options}
             filterOptions={(x) => x}
             value={value || null}
