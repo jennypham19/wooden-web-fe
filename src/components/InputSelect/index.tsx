@@ -2,7 +2,7 @@ import React from 'react';
 
 
 
-import { Chip, CircularProgress, FormControl, FormHelperText, InputLabel, ListSubheader, MenuItem, Select, SelectChangeEvent, SelectProps, SxProps, Theme } from '@mui/material';
+import { Chip, CircularProgress, FormControl, FormHelperText, Input, InputLabel, ListSubheader, MenuItem, Select, SelectChangeEvent, SelectProps, SxProps, TextField, Theme } from '@mui/material';
 import { ArrowDropDown, ArrowDropUp, Clear } from '@mui/icons-material';
 import { log } from 'console';
 
@@ -44,6 +44,7 @@ interface InputSelectProps {
   renderChips?: boolean, // hiển thị selected dưới dạng Chip
   margin?: any,
   onLoadData?: () => void
+  isBorder?: boolean
 }
 
 const InputSelect: React.FC<InputSelectProps> = ({
@@ -68,7 +69,8 @@ const InputSelect: React.FC<InputSelectProps> = ({
   loadingTitle,
   renderChips = false, // default = text
   margin,
-  onLoadData
+  onLoadData,
+  isBorder = true
 }) => {
   const [open, setOpen] = React.useState(false);
   const handleChange = (event: SelectChangeEvent<typeof value>) => {
@@ -180,6 +182,7 @@ const InputSelect: React.FC<InputSelectProps> = ({
     return allOptions.find((o) => o.value === value)?.label || '';
   };
 
+
   return (
     <FormControl
       fullWidth={fullWidth}
@@ -189,7 +192,7 @@ const InputSelect: React.FC<InputSelectProps> = ({
       margin={margin}
       sx={{
         '& .MuiOutlinedInput-notchedOutline': {
-          border: '1px solid rgb(53, 50, 50)',
+          border: isBorder ? '1px solid rgb(53, 50, 50)' : '1px solid #e9e6e6',
           borderRadius: '8px',
         },
         '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
@@ -250,7 +253,6 @@ const InputSelect: React.FC<InputSelectProps> = ({
           if (isEmpty) {
             return <span style={{ color: '#aaa' }}>{placeholder}</span>;
           }
-
           return getSelectedLabel();
         }}
       >
